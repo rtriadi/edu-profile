@@ -130,6 +130,28 @@ export async function ThemeStyles() {
     .bg-gradient-primary-accent {
       background: linear-gradient(135deg, var(--theme-primary), var(--theme-accent));
     }
+    .bg-gradient-primary-secondary {
+      background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    }
+    .bg-gradient-secondary-accent {
+      background: linear-gradient(135deg, var(--theme-secondary), var(--theme-accent));
+    }
+    
+    /* Hero gradient - maintains the beautiful default look */
+    .bg-gradient-hero {
+      background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-accent) 50%, var(--theme-secondary) 100%);
+    }
+    .bg-gradient-hero-subtle {
+      background: linear-gradient(135deg, var(--theme-primary)/10 0%, var(--theme-accent)/5 50%, var(--theme-secondary)/10 100%);
+    }
+    
+    /* Radial gradients for decorative elements */
+    .bg-radial-primary {
+      background: radial-gradient(circle at center, var(--theme-primary), var(--theme-primary-dark));
+    }
+    .bg-radial-accent {
+      background: radial-gradient(circle at center, var(--theme-accent), var(--theme-accent-dark));
+    }
 
     /* Custom CSS from settings */
     ${customCss}

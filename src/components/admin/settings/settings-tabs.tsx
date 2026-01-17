@@ -493,12 +493,67 @@ export function SettingsTabs() {
 
             <div className="space-y-2">
               <Label>Preset Tema</Label>
-              <div className="grid grid-cols-4 gap-4">
+              <p className="text-xs text-muted-foreground mb-3">
+                Pilih preset warna yang sudah dikurasi untuk tampilan profesional
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { name: "PAUD/TK", primary: "#F472B6", secondary: "#FBBF24" },
-                  { name: "SD", primary: "#3B82F6", secondary: "#10B981" },
-                  { name: "SMP", primary: "#6366F1", secondary: "#14B8A6" },
-                  { name: "SMA/SMK", primary: "#1E3A8A", secondary: "#059669" },
+                  { 
+                    name: "Default", 
+                    description: "Modern & Clean",
+                    primary: "#3B82F6", 
+                    secondary: "#10B981", 
+                    accent: "#8B5CF6" 
+                  },
+                  { 
+                    name: "Ocean Blue", 
+                    description: "Profesional",
+                    primary: "#0EA5E9", 
+                    secondary: "#06B6D4", 
+                    accent: "#6366F1" 
+                  },
+                  { 
+                    name: "Forest Green", 
+                    description: "Natural & Fresh",
+                    primary: "#059669", 
+                    secondary: "#10B981", 
+                    accent: "#14B8A6" 
+                  },
+                  { 
+                    name: "Royal Purple", 
+                    description: "Elegant",
+                    primary: "#7C3AED", 
+                    secondary: "#8B5CF6", 
+                    accent: "#A855F7" 
+                  },
+                  { 
+                    name: "Sunset Orange", 
+                    description: "Energetic",
+                    primary: "#F97316", 
+                    secondary: "#FB923C", 
+                    accent: "#FBBF24" 
+                  },
+                  { 
+                    name: "Rose Pink", 
+                    description: "PAUD/TK",
+                    primary: "#EC4899", 
+                    secondary: "#F472B6", 
+                    accent: "#FB7185" 
+                  },
+                  { 
+                    name: "Navy Gold", 
+                    description: "Formal & Premium",
+                    primary: "#1E3A8A", 
+                    secondary: "#3B82F6", 
+                    accent: "#F59E0B" 
+                  },
+                  { 
+                    name: "Teal Coral", 
+                    description: "Creative",
+                    primary: "#0D9488", 
+                    secondary: "#14B8A6", 
+                    accent: "#F43F5E" 
+                  },
                 ].map((preset) => (
                   <button
                     key={preset.name}
@@ -508,22 +563,27 @@ export function SettingsTabs() {
                         ...themeSettings,
                         primaryColor: preset.primary,
                         secondaryColor: preset.secondary,
+                        accentColor: preset.accent,
                       })
                     }
-                    className="p-4 border rounded-lg text-center hover:border-primary transition-colors"
+                    className="p-4 border rounded-lg text-center hover:border-primary hover:shadow-md transition-all group"
                   >
                     <div className="flex justify-center gap-1 mb-2">
                       <div
-                        className="w-4 h-4 rounded-full"
+                        className="w-5 h-5 rounded-full ring-2 ring-white shadow-sm"
                         style={{ backgroundColor: preset.primary }}
                       />
                       <div
-                        className="w-4 h-4 rounded-full"
+                        className="w-5 h-5 rounded-full ring-2 ring-white shadow-sm -ml-2"
                         style={{ backgroundColor: preset.secondary }}
                       />
+                      <div
+                        className="w-5 h-5 rounded-full ring-2 ring-white shadow-sm -ml-2"
+                        style={{ backgroundColor: preset.accent }}
+                      />
                     </div>
-                    <div className="font-medium text-sm">{preset.name}</div>
-                    <div className="text-xs text-muted-foreground">Preset tema</div>
+                    <div className="font-medium text-sm group-hover:text-primary transition-colors">{preset.name}</div>
+                    <div className="text-xs text-muted-foreground">{preset.description}</div>
                   </button>
                 ))}
               </div>

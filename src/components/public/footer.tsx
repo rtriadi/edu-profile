@@ -71,7 +71,7 @@ export async function PublicFooter() {
                   {siteName}
                 </span>
                 {schoolProfile?.accreditation && (
-                  <span className="text-xs text-primary">
+                  <span className="text-xs text-emerald-400">
                     {siteConfig.language === "en" ? "Accreditation" : "Akreditasi"} {schoolProfile.accreditation}
                   </span>
                 )}
