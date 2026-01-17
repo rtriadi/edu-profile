@@ -30,9 +30,11 @@ declare module "@auth/core/jwt" {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma) as Adapter,
+  // Note: Adapter is not needed for Credentials provider with JWT strategy
+  // adapter: PrismaAdapter(prisma) as Adapter,
   session: { strategy: "jwt" },
   trustHost: true,
+  secret: process.env.AUTH_SECRET,
   pages: {
     signIn: "/login",
     error: "/login",
