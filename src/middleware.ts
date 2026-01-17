@@ -56,7 +56,10 @@ export async function middleware(request: NextRequest) {
 
   // Redirect logged-in users away from login page
   if (pathname === "/login" && token) {
-    return NextResponse.redirect(new URL("/admin", request.url));
+    // Respect callbackUrl if provided, otherwise default to /admin
+    const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
+    const redirectUrl = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/admin";
+    return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
 
   // Handle admin routes authentication
