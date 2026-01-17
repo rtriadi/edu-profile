@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { GraduationCap, Facebook, Instagram, Youtube, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import Image from "next/image";
+import { GraduationCap, Facebook, Instagram, Youtube, Twitter, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { getSiteConfig } from "@/lib/site-config";
 
 async function getFooterData() {
   const schoolProfile = await prisma.schoolProfile.findFirst();
@@ -8,101 +10,66 @@ async function getFooterData() {
 }
 
 export async function PublicFooter() {
-  const schoolProfile = await getFooterData();
+  const [schoolProfile, siteConfig] = await Promise.all([
+    getFooterData(),
+    getSiteConfig(),
+  ]);
   const socialMedia = schoolProfile?.socialMedia as Record<string, string> | null;
 
+  const currentYear = new Date().getFullYear();
+  const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
+
   return (
-    <footer className="bg-slate-900 text-slate-300">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-300 overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-theme-accent/10 rounded-full blur-3xl" />
+      
+      <div className="container mx-auto px-4 py-16 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* About */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <GraduationCap className="h-5 w-5" />
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-3 mb-6">
+              {schoolProfile?.logo ? (
+                <div className="relative h-12 w-12 rounded-xl overflow-hidden ring-2 ring-white/10">
+                  <Image
+                    src={schoolProfile.logo}
+                    alt={siteName}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-lg">
+                  <GraduationCap className="h-6 w-6" />
+                </div>
+              )}
+              <div>
+                <span className="font-bold text-xl text-white block">
+                  {siteName}
+                </span>
+                {schoolProfile?.accreditation && (
+                  <span className="text-xs text-primary">
+                    Akreditasi {schoolProfile.accreditation}
+                  </span>
+                )}
               </div>
-              <span className="font-bold text-lg text-white">
-                {schoolProfile?.name || "EduProfile"}
-              </span>
             </div>
-            <p className="text-sm text-slate-400 mb-4">
-              {schoolProfile?.tagline || "Mendidik Generasi Unggul dan Berkarakter"}
+            <p className="text-sm text-slate-400 mb-6 leading-relaxed">
+              {schoolProfile?.tagline || siteConfig.siteTagline || "Mendidik Generasi Unggul dan Berkarakter"}
             </p>
-            {schoolProfile?.accreditation && (
-              <div className="inline-block px-3 py-1 bg-primary text-primary-foreground text-sm rounded-full">
-                Akreditasi {schoolProfile.accreditation}
-              </div>
-            )}
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-semibold text-white mb-4">Menu Cepat</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/profil" className="hover:text-primary transition-colors">
-                  Profil Sekolah
-                </Link>
-              </li>
-              <li>
-                <Link href="/akademik" className="hover:text-primary transition-colors">
-                  Program Akademik
-                </Link>
-              </li>
-              <li>
-                <Link href="/berita" className="hover:text-primary transition-colors">
-                  Berita & Artikel
-                </Link>
-              </li>
-              <li>
-                <Link href="/galeri" className="hover:text-primary transition-colors">
-                  Galeri
-                </Link>
-              </li>
-              <li>
-                <Link href="/ppdb" className="hover:text-primary transition-colors">
-                  PPDB Online
-                </Link>
-              </li>
-              <li>
-                <Link href="/kontak" className="hover:text-primary transition-colors">
-                  Hubungi Kami
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-semibold text-white mb-4">Kontak</h3>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>{schoolProfile?.address || "Jl. Pendidikan No. 1, Jakarta"}</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-4 w-4 flex-shrink-0" />
-                <span>{schoolProfile?.phone || "(021) 1234567"}</span>
-              </li>
-              <li className="flex items-center gap-3">
-                <Mail className="h-4 w-4 flex-shrink-0" />
-                <span>{schoolProfile?.email || "info@sekolah.sch.id"}</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Media */}
-          <div>
-            <h3 className="font-semibold text-white mb-4">Media Sosial</h3>
-            <div className="flex items-center gap-3">
+            
+            {/* Social Media */}
+            <div className="flex items-center gap-2">
               {socialMedia?.facebook && (
                 <a
                   href={socialMedia.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
+                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-primary hover:text-white transition-all duration-300 hover:scale-110"
                 >
-                  <Facebook className="h-5 w-5" />
+                  <Facebook className="h-4 w-4" />
                 </a>
               )}
               {socialMedia?.instagram && (
@@ -110,9 +77,9 @@ export async function PublicFooter() {
                   href={socialMedia.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
+                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-gradient-to-br hover:from-purple-500 hover:to-pink-500 hover:text-white transition-all duration-300 hover:scale-110"
                 >
-                  <Instagram className="h-5 w-5" />
+                  <Instagram className="h-4 w-4" />
                 </a>
               )}
               {socialMedia?.youtube && (
@@ -120,9 +87,9 @@ export async function PublicFooter() {
                   href={socialMedia.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
+                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all duration-300 hover:scale-110"
                 >
-                  <Youtube className="h-5 w-5" />
+                  <Youtube className="h-4 w-4" />
                 </a>
               )}
               {socialMedia?.twitter && (
@@ -130,29 +97,120 @@ export async function PublicFooter() {
                   href={socialMedia.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-primary transition-colors"
+                  className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-all duration-300 hover:scale-110"
                 >
-                  <Twitter className="h-5 w-5" />
+                  <Twitter className="h-4 w-4" />
                 </a>
               )}
             </div>
-            {schoolProfile?.npsn && (
-              <div className="mt-4 text-sm">
-                <span className="text-slate-500">NPSN: </span>
-                <span>{schoolProfile.npsn}</span>
-              </div>
-            )}
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="font-semibold text-white mb-6 flex items-center gap-2">
+              <div className="w-1 h-5 bg-primary rounded-full" />
+              Menu Cepat
+            </h3>
+            <ul className="space-y-3 text-sm">
+              {[
+                { label: "Profil Sekolah", href: "/profil" },
+                { label: "Program Akademik", href: "/akademik" },
+                { label: "Berita & Artikel", href: "/berita" },
+                { label: "Galeri", href: "/galeri" },
+                { label: "PPDB Online", href: "/ppdb" },
+                { label: "Hubungi Kami", href: "/kontak" },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link 
+                    href={link.href} 
+                    className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
+                    {link.label}
+                    <ArrowUpRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="font-semibold text-white mb-6 flex items-center gap-2">
+              <div className="w-1 h-5 bg-theme-secondary rounded-full" />
+              Kontak
+            </h3>
+            <ul className="space-y-4 text-sm">
+              <li className="flex items-start gap-3 group">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <MapPin className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-slate-400 leading-relaxed">
+                  {schoolProfile?.address || "Jl. Pendidikan No. 1, Jakarta"}
+                </span>
+              </li>
+              <li className="flex items-center gap-3 group">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <Phone className="h-4 w-4 text-primary" />
+                </div>
+                <a 
+                  href={`tel:${schoolProfile?.phone || "(021) 1234567"}`}
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  {schoolProfile?.phone || "(021) 1234567"}
+                </a>
+              </li>
+              <li className="flex items-center gap-3 group">
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
+                  <Mail className="h-4 w-4 text-primary" />
+                </div>
+                <a 
+                  href={`mailto:${schoolProfile?.email || "info@sekolah.sch.id"}`}
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  {schoolProfile?.email || "info@sekolah.sch.id"}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Info */}
+          <div>
+            <h3 className="font-semibold text-white mb-6 flex items-center gap-2">
+              <div className="w-1 h-5 bg-theme-accent rounded-full" />
+              Informasi
+            </h3>
+            <div className="space-y-4">
+              {schoolProfile?.npsn && (
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <span className="text-xs text-slate-500 uppercase tracking-wider">NPSN</span>
+                  <p className="text-white font-semibold">{schoolProfile.npsn}</p>
+                </div>
+              )}
+              {schoolProfile?.foundedYear && (
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <span className="text-xs text-slate-500 uppercase tracking-wider">Berdiri Sejak</span>
+                  <p className="text-white font-semibold">{schoolProfile.foundedYear}</p>
+                </div>
+              )}
+              <Link 
+                href="/ppdb" 
+                className="block p-4 rounded-xl bg-gradient-primary text-white text-center font-semibold hover:opacity-90 transition-opacity"
+              >
+                Daftar PPDB Online
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-slate-500">
-            © {new Date().getFullYear()} {schoolProfile?.name || "EduProfile CMS"}. All rights reserved.
+            © {currentYear} {siteName}. All rights reserved.
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 flex items-center gap-1">
             Powered by{" "}
-            <a href="#" className="text-primary hover:underline">
+            <a href="#" className="text-primary hover:underline font-medium">
               EduProfile CMS
             </a>
           </p>

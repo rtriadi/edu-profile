@@ -37,6 +37,14 @@ function hexToOklch(hex: string): string {
   return `oklch(${L.toFixed(3)} ${C.toFixed(3)} ${H.toFixed(3)})`;
 }
 
+// Generate a lighter/darker variant
+function adjustLightness(oklch: string, adjustment: number): string {
+  const match = oklch.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
+  if (!match) return oklch;
+  const L = Math.min(1, Math.max(0, parseFloat(match[1]) + adjustment));
+  return `oklch(${L.toFixed(3)} ${match[2]} ${match[3]})`;
+}
+
 export async function ThemeStyles() {
   const themeSettings = await getThemeSettings();
 
@@ -49,20 +57,78 @@ export async function ThemeStyles() {
   const secondaryOklch = hexToOklch(secondaryColor);
   const accentOklch = hexToOklch(accentColor);
 
-  // Generate foreground colors (light versions for dark backgrounds)
+  // Generate variants
+  const primaryLight = adjustLightness(primaryOklch, 0.15);
+  const primaryDark = adjustLightness(primaryOklch, -0.15);
+  const secondaryLight = adjustLightness(secondaryOklch, 0.15);
+  const secondaryDark = adjustLightness(secondaryOklch, -0.15);
+  const accentLight = adjustLightness(accentOklch, 0.15);
+  const accentDark = adjustLightness(accentOklch, -0.15);
+
   const customCss = themeSettings.customCss || "";
 
   const cssVariables = `
     :root {
+      /* Theme Colors */
       --theme-primary: ${primaryOklch};
+      --theme-primary-light: ${primaryLight};
+      --theme-primary-dark: ${primaryDark};
       --theme-secondary: ${secondaryOklch};
+      --theme-secondary-light: ${secondaryLight};
+      --theme-secondary-dark: ${secondaryDark};
       --theme-accent: ${accentOklch};
-    }
-
-    /* Override primary color */
-    :root {
+      --theme-accent-light: ${accentLight};
+      --theme-accent-dark: ${accentDark};
+      
+      /* Override shadcn/ui primary */
       --primary: ${primaryOklch};
       --primary-foreground: oklch(0.985 0 0);
+      
+      /* Override shadcn/ui secondary */
+      --secondary: ${secondaryOklch};
+      --secondary-foreground: oklch(0.985 0 0);
+      
+      /* Override shadcn/ui accent */
+      --accent: ${accentOklch};
+      --accent-foreground: oklch(0.985 0 0);
+      
+      /* Ring color for focus states */
+      --ring: ${primaryOklch};
+    }
+    
+    .dark {
+      --primary: ${primaryOklch};
+      --primary-foreground: oklch(0.985 0 0);
+      --secondary: ${secondaryOklch};
+      --secondary-foreground: oklch(0.985 0 0);
+      --accent: ${accentOklch};
+      --accent-foreground: oklch(0.985 0 0);
+      --ring: ${primaryOklch};
+    }
+
+    /* Utility classes for theme colors */
+    .bg-theme-primary { background-color: var(--theme-primary); }
+    .bg-theme-secondary { background-color: var(--theme-secondary); }
+    .bg-theme-accent { background-color: var(--theme-accent); }
+    .text-theme-primary { color: var(--theme-primary); }
+    .text-theme-secondary { color: var(--theme-secondary); }
+    .text-theme-accent { color: var(--theme-accent); }
+    .border-theme-primary { border-color: var(--theme-primary); }
+    .border-theme-secondary { border-color: var(--theme-secondary); }
+    .border-theme-accent { border-color: var(--theme-accent); }
+    
+    /* Gradient utilities */
+    .bg-gradient-primary {
+      background: linear-gradient(135deg, var(--theme-primary), var(--theme-primary-dark));
+    }
+    .bg-gradient-secondary {
+      background: linear-gradient(135deg, var(--theme-secondary), var(--theme-secondary-dark));
+    }
+    .bg-gradient-accent {
+      background: linear-gradient(135deg, var(--theme-accent), var(--theme-accent-dark));
+    }
+    .bg-gradient-primary-accent {
+      background: linear-gradient(135deg, var(--theme-primary), var(--theme-accent));
     }
 
     /* Custom CSS from settings */
