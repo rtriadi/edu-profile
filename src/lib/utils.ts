@@ -168,3 +168,121 @@ export function objectToQueryString(obj: Record<string, unknown>): string {
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
     .join("&");
 }
+
+// ==========================================
+// TIMEZONE-AWARE DATE/TIME UTILITIES
+// ==========================================
+
+// Get locale code from language setting
+export function getLocaleFromLanguage(language: string): string {
+  const localeMap: Record<string, string> = {
+    id: "id-ID",
+    en: "en-US",
+  };
+  return localeMap[language] || "id-ID";
+}
+
+// Format date with timezone awareness
+export function formatDateWithTimezone(
+  date: Date | string,
+  timezone: string = "Asia/Jakarta",
+  language: string = "id",
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const locale = getLocaleFromLanguage(language);
+  const defaultOptions: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: timezone,
+    ...options,
+  };
+  return new Date(date).toLocaleDateString(locale, defaultOptions);
+}
+
+// Format date with time and timezone awareness
+export function formatDateTimeWithTimezone(
+  date: Date | string,
+  timezone: string = "Asia/Jakarta",
+  language: string = "id"
+): string {
+  const locale = getLocaleFromLanguage(language);
+  return new Date(date).toLocaleString(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: timezone,
+  });
+}
+
+// Format time only with timezone
+export function formatTimeWithTimezone(
+  date: Date | string,
+  timezone: string = "Asia/Jakarta",
+  language: string = "id"
+): string {
+  const locale = getLocaleFromLanguage(language);
+  return new Date(date).toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: timezone,
+  });
+}
+
+// Get current date/time in specific timezone
+export function getCurrentDateTime(
+  timezone: string = "Asia/Jakarta",
+  language: string = "id"
+): string {
+  const locale = getLocaleFromLanguage(language);
+  return new Date().toLocaleString(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZone: timezone,
+  });
+}
+
+// Get timezone display name
+export function getTimezoneDisplayName(timezone: string): string {
+  const timezoneNames: Record<string, string> = {
+    "Asia/Jakarta": "WIB (Jakarta)",
+    "Asia/Makassar": "WITA (Makassar)",
+    "Asia/Jayapura": "WIT (Jayapura)",
+  };
+  return timezoneNames[timezone] || timezone;
+}
+
+// Format relative time with language support
+export function formatRelativeTimeWithLanguage(
+  date: Date | string,
+  language: string = "id"
+): string {
+  const now = new Date();
+  const past = new Date(date);
+  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+  if (language === "en") {
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)} weeks ago`;
+    return formatDateWithTimezone(date, "Asia/Jakarta", language);
+  }
+
+  // Indonesian (default)
+  if (diffInSeconds < 60) return "Baru saja";
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} menit lalu`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} jam lalu`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} hari lalu`;
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 604800)} minggu lalu`;
+  
+  return formatDateWithTimezone(date, "Asia/Jakarta", language);
+}

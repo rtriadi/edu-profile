@@ -148,7 +148,7 @@ export default async function HomePage() {
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/15 font-semibold backdrop-blur-sm" asChild>
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white/20 hover:text-white font-semibold backdrop-blur-sm" asChild>
                     <Link href="/profil">Tentang Kami</Link>
                   </Button>
                 </div>
@@ -258,8 +258,9 @@ export default async function HomePage() {
                 </div>
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   {schoolProfile?.accreditation && (
-                    <div className="px-5 py-3 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg">
-                      Akreditasi {schoolProfile.accreditation}
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium shadow-md">
+                      <Award className="h-4 w-4" />
+                      <span className="text-sm">Akreditasi <strong>{schoolProfile.accreditation}</strong></span>
                     </div>
                   )}
                   <Button variant="outline" asChild className="group">
@@ -270,21 +271,21 @@ export default async function HomePage() {
                   </Button>
                 </div>
               </div>
-              <div className="order-1 lg:order-2 relative">
+              <div className="order-1 lg:order-2 relative pb-8 lg:pb-0">
                 <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted border border-border">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
                     <GraduationCap className="h-32 w-32 text-muted-foreground/30" />
                   </div>
                 </div>
-                {/* Floating badge */}
-                <div className="absolute -bottom-6 -left-6 p-6 bg-card rounded-2xl shadow-2xl border border-border">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
-                      <Clock className="h-7 w-7" />
+                {/* Floating badge - responsive positioning */}
+                <div className="mt-4 lg:mt-0 lg:absolute lg:-bottom-6 lg:-left-6 p-4 sm:p-6 bg-card rounded-2xl shadow-2xl border border-border">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground flex-shrink-0">
+                      <Clock className="h-6 w-6 sm:h-7 sm:w-7" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Berdiri Sejak</p>
-                      <p className="text-2xl font-bold text-foreground">{schoolProfile?.foundedYear || "1990"}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Berdiri Sejak</p>
+                      <p className="text-xl sm:text-2xl font-bold text-foreground">{schoolProfile?.foundedYear || "1990"}</p>
                     </div>
                   </div>
                 </div>

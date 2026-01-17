@@ -15,36 +15,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { DateTimeDisplay } from "@/components/ui/datetime-display";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/use-translation";
 
-const navItems = [
-  { label: "Beranda", href: "/" },
+// Navigation items with translation keys
+const getNavItems = (t: (key: string) => string) => [
+  { label: t("nav.home"), href: "/" },
   {
-    label: "Profil",
+    label: t("nav.profile"),
     href: "/profil",
     children: [
-      { label: "Tentang Kami", href: "/profil" },
-      { label: "Visi & Misi", href: "/profil/visi-misi" },
-      { label: "Sejarah", href: "/profil/sejarah" },
-      { label: "Struktur Organisasi", href: "/profil/struktur" },
-      { label: "Guru & Staff", href: "/profil/guru-staff" },
-      { label: "Fasilitas", href: "/profil/fasilitas" },
+      { label: t("nav.aboutUs"), href: "/profil" },
+      { label: t("nav.visionMission"), href: "/profil/visi-misi" },
+      { label: t("nav.history"), href: "/profil/sejarah" },
+      { label: t("nav.structure"), href: "/profil/struktur" },
+      { label: t("nav.teachersStaff"), href: "/profil/guru-staff" },
+      { label: t("nav.facilities"), href: "/profil/fasilitas" },
     ],
   },
   {
-    label: "Akademik",
+    label: t("nav.academic"),
     href: "/akademik",
     children: [
-      { label: "Kurikulum", href: "/akademik/kurikulum" },
-      { label: "Ekstrakurikuler", href: "/akademik/ekstrakurikuler" },
-      { label: "Program Unggulan", href: "/akademik/program-unggulan" },
-      { label: "Prestasi", href: "/akademik/prestasi" },
+      { label: t("nav.curriculum"), href: "/akademik/kurikulum" },
+      { label: t("nav.extracurricular"), href: "/akademik/ekstrakurikuler" },
+      { label: t("nav.featuredPrograms"), href: "/akademik/program-unggulan" },
+      { label: t("nav.achievements"), href: "/akademik/prestasi" },
     ],
   },
-  { label: "Berita", href: "/berita" },
-  { label: "Galeri", href: "/galeri" },
-  { label: "PPDB", href: "/ppdb" },
-  { label: "Kontak", href: "/kontak" },
+  { label: t("nav.news"), href: "/berita" },
+  { label: t("nav.gallery"), href: "/galeri" },
+  { label: t("nav.ppdb"), href: "/ppdb" },
+  { label: t("nav.contact"), href: "/kontak" },
 ];
 
 interface PublicHeaderProps {
@@ -56,6 +59,9 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { t } = useTranslation();
+  
+  const navItems = getNavItems(t);
 
   // Handle scroll effect
   useEffect(() => {
@@ -151,9 +157,15 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
 
           {/* CTA Button & Theme Toggle */}
           <div className="hidden lg:flex items-center gap-3">
+            <DateTimeDisplay 
+              showIcon={true} 
+              showTimezone={false} 
+              format="full"
+              className="text-xs text-muted-foreground"
+            />
             <ThemeToggle />
             <Button asChild className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all">
-              <Link href="/ppdb">Daftar PPDB</Link>
+              <Link href="/ppdb">{t("nav.register")}</Link>
             </Button>
           </div>
 
@@ -167,8 +179,8 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <div className="flex items-center gap-3 mb-8">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 overflow-y-auto">
+                <div className="flex items-center gap-3 p-6 border-b">
                   {logo ? (
                     <div className="relative h-10 w-10 rounded-xl overflow-hidden">
                       <Image src={logo} alt={siteName} fill className="object-cover" />
@@ -180,7 +192,7 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
                   )}
                   <span className="font-bold text-lg">{siteName}</span>
                 </div>
-                <nav className="flex flex-col gap-2">
+                <nav className="flex flex-col gap-1 p-4">
                   {navItems.map((item) => (
                     <div key={item.href}>
                       <Link
@@ -212,12 +224,12 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
                       )}
                     </div>
                   ))}
-                  <div className="mt-6 pt-6 border-t">
-                    <Button className="w-full" asChild onClick={() => setIsOpen(false)}>
-                      <Link href="/ppdb">Daftar PPDB</Link>
-                    </Button>
-                  </div>
                 </nav>
+                <div className="mt-auto p-4 border-t">
+                  <Button className="w-full" asChild onClick={() => setIsOpen(false)}>
+                    <Link href="/ppdb">{t("nav.register")}</Link>
+                  </Button>
+                </div>
               </SheetContent>
             </Sheet>
           </div>

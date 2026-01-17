@@ -35,6 +35,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { getInitials } from "@/lib/utils";
+import { DateTimeDisplay } from "@/components/ui/datetime-display";
 import type { UserSession } from "@/types";
 
 interface AdminHeaderProps {
@@ -112,6 +113,13 @@ export function AdminHeader({ user }: AdminHeaderProps) {
       </Breadcrumb>
 
       <div className="ml-auto flex items-center gap-2">
+        <DateTimeDisplay 
+          showIcon={true} 
+          showTimezone={true} 
+          format="full"
+          className="hidden md:flex text-xs text-muted-foreground"
+        />
+        
         <Button variant="ghost" size="icon" asChild>
           <Link href="/" target="_blank">
             <ExternalLink className="h-4 w-4" />

@@ -50,6 +50,18 @@ export default async function RootLayout({
 }>) {
   const config = await getSiteConfig();
   
+  // Prepare site settings for client-side context
+  const siteSettings = {
+    siteName: config.siteName,
+    siteTagline: config.siteTagline,
+    language: config.language,
+    timezone: config.timezone,
+    maintenanceMode: config.maintenanceMode,
+    primaryColor: config.primaryColor,
+    secondaryColor: config.secondaryColor,
+    accentColor: config.accentColor,
+  };
+  
   return (
     <html lang={config.language || "id"} suppressHydrationWarning>
       <head>
@@ -76,7 +88,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
+        <Providers siteSettings={siteSettings}>
           {children}
           <ScrollToTop />
         </Providers>

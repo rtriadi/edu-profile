@@ -3,6 +3,7 @@ import Image from "next/image";
 import { GraduationCap, Facebook, Instagram, Youtube, Twitter, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
+import { getTranslations, type Language } from "@/lib/translations";
 
 async function getFooterData() {
   const schoolProfile = await prisma.schoolProfile.findFirst();
@@ -15,9 +16,29 @@ export async function PublicFooter() {
     getSiteConfig(),
   ]);
   const socialMedia = schoolProfile?.socialMedia as Record<string, string> | null;
+  const translations = getTranslations(siteConfig.language as Language);
 
   const currentYear = new Date().getFullYear();
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
+  
+  // Quick links with translations
+  const quickLinks = siteConfig.language === "en" 
+    ? [
+        { label: "School Profile", href: "/profil" },
+        { label: "Academic Programs", href: "/akademik" },
+        { label: "News & Articles", href: "/berita" },
+        { label: "Gallery", href: "/galeri" },
+        { label: "Online Registration", href: "/ppdb" },
+        { label: "Contact Us", href: "/kontak" },
+      ]
+    : [
+        { label: "Profil Sekolah", href: "/profil" },
+        { label: "Program Akademik", href: "/akademik" },
+        { label: "Berita & Artikel", href: "/berita" },
+        { label: "Galeri", href: "/galeri" },
+        { label: "PPDB Online", href: "/ppdb" },
+        { label: "Hubungi Kami", href: "/kontak" },
+      ];
 
   return (
     <footer className="relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-300 overflow-hidden">
@@ -51,13 +72,13 @@ export async function PublicFooter() {
                 </span>
                 {schoolProfile?.accreditation && (
                   <span className="text-xs text-primary">
-                    Akreditasi {schoolProfile.accreditation}
+                    {siteConfig.language === "en" ? "Accreditation" : "Akreditasi"} {schoolProfile.accreditation}
                   </span>
                 )}
               </div>
             </div>
             <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-              {schoolProfile?.tagline || siteConfig.siteTagline || "Mendidik Generasi Unggul dan Berkarakter"}
+              {schoolProfile?.tagline || siteConfig.siteTagline || translations.home.heroSubtitle}
             </p>
             
             {/* Social Media */}
@@ -109,17 +130,10 @@ export async function PublicFooter() {
           <div>
             <h3 className="font-semibold text-white mb-6 flex items-center gap-2">
               <div className="w-1 h-5 bg-primary rounded-full" />
-              Menu Cepat
+              {translations.footer.quickLinks}
             </h3>
             <ul className="space-y-3 text-sm">
-              {[
-                { label: "Profil Sekolah", href: "/profil" },
-                { label: "Program Akademik", href: "/akademik" },
-                { label: "Berita & Artikel", href: "/berita" },
-                { label: "Galeri", href: "/galeri" },
-                { label: "PPDB Online", href: "/ppdb" },
-                { label: "Hubungi Kami", href: "/kontak" },
-              ].map((link) => (
+              {quickLinks.map((link) => (
                 <li key={link.href}>
                   <Link 
                     href={link.href} 
@@ -138,7 +152,7 @@ export async function PublicFooter() {
           <div>
             <h3 className="font-semibold text-white mb-6 flex items-center gap-2">
               <div className="w-1 h-5 bg-theme-secondary rounded-full" />
-              Kontak
+              {translations.footer.contact}
             </h3>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3 group">
@@ -178,7 +192,7 @@ export async function PublicFooter() {
           <div>
             <h3 className="font-semibold text-white mb-6 flex items-center gap-2">
               <div className="w-1 h-5 bg-theme-accent rounded-full" />
-              Informasi
+              {translations.footer.information}
             </h3>
             <div className="space-y-4">
               {schoolProfile?.npsn && (
@@ -189,7 +203,7 @@ export async function PublicFooter() {
               )}
               {schoolProfile?.foundedYear && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-xs text-slate-500 uppercase tracking-wider">Berdiri Sejak</span>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider">{translations.footer.foundedSince}</span>
                   <p className="text-white font-semibold">{schoolProfile.foundedYear}</p>
                 </div>
               )}
@@ -197,7 +211,7 @@ export async function PublicFooter() {
                 href="/ppdb" 
                 className="block p-4 rounded-xl bg-gradient-primary text-white text-center font-semibold hover:opacity-90 transition-opacity"
               >
-                Daftar PPDB Online
+                {translations.home.registerPpdb}
               </Link>
             </div>
           </div>
@@ -206,10 +220,10 @@ export async function PublicFooter() {
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-slate-500">
-            © {currentYear} {siteName}. All rights reserved.
+            © {currentYear} {siteName}. {translations.footer.allRightsReserved}.
           </p>
           <p className="text-sm text-slate-500 flex items-center gap-1">
-            Powered by{" "}
+            {translations.footer.poweredBy}{" "}
             <a href="#" className="text-primary hover:underline font-medium">
               EduProfile CMS
             </a>
