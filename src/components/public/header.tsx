@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -99,8 +100,9 @@ export function PublicHeader() {
             )}
           </nav>
 
-          {/* CTA Button */}
+          {/* CTA Button & Theme Toggle */}
           <div className="hidden lg:flex items-center gap-2">
+            <ThemeToggle />
             <Button asChild>
               <Link href="/ppdb">Daftar PPDB</Link>
             </Button>
@@ -147,7 +149,11 @@ export function PublicHeader() {
                     )}
                   </div>
                 ))}
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-4 pt-4 border-t space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Tema</span>
+                    <ThemeToggle />
+                  </div>
                   <Button className="w-full" asChild onClick={() => setIsOpen(false)}>
                     <Link href="/ppdb">Daftar PPDB</Link>
                   </Button>
