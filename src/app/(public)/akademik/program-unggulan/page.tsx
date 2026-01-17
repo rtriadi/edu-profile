@@ -12,14 +12,19 @@ export const metadata: Metadata = {
 };
 
 async function getProgramUnggulanData() {
-  const programs = await prisma.program.findMany({
-    where: { 
-      isActive: true,
-      type: "FEATURED",
-    },
-    orderBy: { order: "asc" },
-  });
-  return programs;
+  try {
+    const programs = await prisma.program.findMany({
+      where: { 
+        isActive: true,
+        type: "FEATURED",
+      },
+      orderBy: { order: "asc" },
+    });
+    return programs;
+  } catch (error) {
+    console.error("Error fetching program unggulan data:", error);
+    return [];
+  }
 }
 
 export default async function ProgramUnggulanPage() {

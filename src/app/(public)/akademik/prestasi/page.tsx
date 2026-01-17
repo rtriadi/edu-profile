@@ -12,12 +12,17 @@ export const metadata: Metadata = {
 };
 
 async function getPrestasiData() {
-  const achievements = await prisma.achievement.findMany({
-    where: { isPublished: true },
-    orderBy: { date: "desc" },
-    take: 20,
-  });
-  return achievements;
+  try {
+    const achievements = await prisma.achievement.findMany({
+      where: { isPublished: true },
+      orderBy: { date: "desc" },
+      take: 20,
+    });
+    return achievements;
+  } catch (error) {
+    console.error("Error fetching prestasi data:", error);
+    return [];
+  }
 }
 
 function getLevelBadgeColor(level: string) {

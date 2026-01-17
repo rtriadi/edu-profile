@@ -11,17 +11,22 @@ export const metadata: Metadata = {
 };
 
 async function getStrukturData() {
-  const [schoolProfile, leadership] = await Promise.all([
-    prisma.schoolProfile.findFirst({
-      select: { name: true },
-    }),
-    prisma.staff.findMany({
-      where: { isActive: true },
-      orderBy: { order: "asc" },
-      take: 10,
-    }),
-  ]);
-  return { schoolProfile, leadership };
+  try {
+    const [schoolProfile, leadership] = await Promise.all([
+      prisma.schoolProfile.findFirst({
+        select: { name: true },
+      }),
+      prisma.staff.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
+        take: 10,
+      }),
+    ]);
+    return { schoolProfile, leadership };
+  } catch (error) {
+    console.error("Error fetching struktur data:", error);
+    return { schoolProfile: null, leadership: [] };
+  }
 }
 
 export default async function StrukturPage() {

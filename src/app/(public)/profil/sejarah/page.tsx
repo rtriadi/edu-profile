@@ -10,15 +10,20 @@ export const metadata: Metadata = {
 };
 
 async function getSejarahData() {
-  const schoolProfile = await prisma.schoolProfile.findFirst({
-    select: {
-      name: true,
-      history: true,
-      foundedYear: true,
-      accreditation: true,
-    },
-  });
-  return schoolProfile;
+  try {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      select: {
+        name: true,
+        history: true,
+        foundedYear: true,
+        accreditation: true,
+      },
+    });
+    return schoolProfile;
+  } catch (error) {
+    console.error("Error fetching sejarah data:", error);
+    return null;
+  }
 }
 
 export default async function SejarahPage() {

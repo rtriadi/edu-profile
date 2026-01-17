@@ -21,14 +21,19 @@ export const metadata: Metadata = {
 };
 
 async function getEkstrakurikulerData() {
-  const programs = await prisma.program.findMany({
-    where: { 
-      isActive: true,
-      type: "EXTRACURRICULAR",
-    },
-    orderBy: { order: "asc" },
-  });
-  return programs;
+  try {
+    const programs = await prisma.program.findMany({
+      where: { 
+        isActive: true,
+        type: "EXTRACURRICULAR",
+      },
+      orderBy: { order: "asc" },
+    });
+    return programs;
+  } catch (error) {
+    console.error("Error fetching ekstrakurikuler data:", error);
+    return [];
+  }
 }
 
 // Default ekstrakurikuler if no data in database

@@ -10,10 +10,15 @@ export const metadata: Metadata = {
 };
 
 async function getKurikulumData() {
-  const schoolProfile = await prisma.schoolProfile.findFirst({
-    select: { name: true, schoolLevel: true },
-  });
-  return schoolProfile;
+  try {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      select: { name: true, schoolLevel: true },
+    });
+    return schoolProfile;
+  } catch (error) {
+    console.error("Error fetching kurikulum data:", error);
+    return null;
+  }
 }
 
 export default async function KurikulumPage() {

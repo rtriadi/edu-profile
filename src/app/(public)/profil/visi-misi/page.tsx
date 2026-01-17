@@ -10,15 +10,20 @@ export const metadata: Metadata = {
 };
 
 async function getVisiMisiData() {
-  const schoolProfile = await prisma.schoolProfile.findFirst({
-    select: {
-      name: true,
-      vision: true,
-      mission: true,
-      tagline: true,
-    },
-  });
-  return schoolProfile;
+  try {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      select: {
+        name: true,
+        vision: true,
+        mission: true,
+        tagline: true,
+      },
+    });
+    return schoolProfile;
+  } catch (error) {
+    console.error("Error fetching visi-misi data:", error);
+    return null;
+  }
 }
 
 export default async function VisiMisiPage() {
