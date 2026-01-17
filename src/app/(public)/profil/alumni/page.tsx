@@ -92,7 +92,7 @@ export default async function AlumniPage() {
 
                         {alum.testimonial && (
                           <blockquote className="mt-4 text-sm text-muted-foreground italic border-l-2 pl-3">
-                            "{alum.testimonial}"
+                            &ldquo;{alum.testimonial}&rdquo;
                           </blockquote>
                         )}
                       </CardContent>

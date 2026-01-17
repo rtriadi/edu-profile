@@ -194,7 +194,7 @@ export function PageBuilder({
       {blocks.length === 0 && (
         <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
           <p className="mb-2">Halaman masih kosong</p>
-          <p className="text-sm">Klik "Tambah Blok" untuk mulai membuat konten</p>
+          <p className="text-sm">Klik &quot;Tambah Blok&quot; untuk mulai membuat konten</p>
         </div>
       )}
     </div>
