@@ -599,7 +599,7 @@ export default async function HomePage() {
         </section>
 
         {/* Contact Info */}
-        <section className="py-16 bg-muted/50">
+        <section className="py-16 bg-slate-900">
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-3 gap-6">
               {[
@@ -622,16 +622,16 @@ export default async function HomePage() {
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow"
+                  className="flex items-start gap-4 p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
                     <item.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1 text-card-foreground">
+                    <h3 className="font-semibold mb-1 text-white">
                       {item.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-slate-400 text-sm">
                       {item.value}
                     </p>
                   </div>
