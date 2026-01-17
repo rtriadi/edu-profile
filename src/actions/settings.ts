@@ -242,3 +242,40 @@ export async function saveEmailSettings(data: EmailSettings): Promise<ApiRespons
     return { success: false, error: "Gagal menyimpan pengaturan email" };
   }
 }
+
+// ==========================================
+// GENERAL SETTINGS
+// ==========================================
+
+export interface GeneralSettings {
+  siteName?: string;
+  siteTagline?: string;
+  language?: string;
+  timezone?: string;
+  maintenanceMode?: boolean;
+}
+
+export async function getGeneralSettings(): Promise<GeneralSettings> {
+  const settings = await getSettings("general");
+  return settings as GeneralSettings;
+}
+
+export async function saveGeneralSettings(data: GeneralSettings): Promise<ApiResponse> {
+  const session = await auth();
+  if (!session) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const settingsToSave = Object.entries(data).map(([key, value]) => ({
+      key,
+      value,
+      group: "general",
+    }));
+
+    return await setSettings(settingsToSave);
+  } catch (error) {
+    console.error("Save general settings error:", error);
+    return { success: false, error: "Gagal menyimpan pengaturan umum" };
+  }
+}

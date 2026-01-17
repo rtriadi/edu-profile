@@ -31,9 +31,12 @@ import {
   saveSeoSettings,
   getEmailSettings,
   saveEmailSettings,
+  getGeneralSettings,
+  saveGeneralSettings,
   type ThemeSettings,
   type SeoSettings,
   type EmailSettings,
+  type GeneralSettings,
 } from "@/actions/settings";
 
 export function SettingsTabs() {
@@ -77,7 +80,7 @@ export function SettingsTabs() {
   });
 
   // General settings state
-  const [generalSettings, setGeneralSettings] = useState({
+  const [generalSettings, setGeneralSettings] = useState<GeneralSettings>({
     siteName: "EduProfile CMS",
     siteTagline: "Sistem Manajemen Konten Profil Sekolah",
     language: "id",
@@ -89,15 +92,17 @@ export function SettingsTabs() {
   useEffect(() => {
     async function loadSettings() {
       try {
-        const [theme, seo, email] = await Promise.all([
+        const [theme, seo, email, general] = await Promise.all([
           getThemeSettings(),
           getSeoSettings(),
           getEmailSettings(),
+          getGeneralSettings(),
         ]);
 
         if (theme) setThemeSettings({ ...themeSettings, ...theme });
         if (seo) setSeoSettings({ ...seoSettings, ...seo });
         if (email) setEmailSettings({ ...emailSettings, ...email });
+        if (general) setGeneralSettings({ ...generalSettings, ...general });
       } catch (error) {
         console.error("Error loading settings:", error);
       } finally {
@@ -143,9 +148,12 @@ export function SettingsTabs() {
 
   const handleSaveGeneral = async () => {
     setIsLoading(true);
-    // For now, just show success toast - general settings can be expanded later
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    toast.success("Pengaturan umum berhasil disimpan");
+    const result = await saveGeneralSettings(generalSettings);
+    if (result.success) {
+      toast.success("Pengaturan umum berhasil disimpan");
+    } else {
+      toast.error(result.error || "Gagal menyimpan pengaturan umum");
+    }
     setIsLoading(false);
   };
 
