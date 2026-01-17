@@ -54,6 +54,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Redirect logged-in users away from login page
+  if (pathname === "/login" && token) {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+
   // Handle admin routes authentication
   if (pathname.startsWith("/admin")) {
     if (!token) {
