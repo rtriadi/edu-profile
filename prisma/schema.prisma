@@ -1,0 +1,659 @@
+// EduProfile CMS - School Profile Website
+// Prisma Schema for MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// USER & AUTHENTICATION
+// ==========================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(EDITOR)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  posts    Post[]
+  pages    Page[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  EDITOR
+}
+
+// ==========================================
+// SCHOOL PROFILE
+// ==========================================
+
+model SchoolProfile {
+  id            String   @id @default(cuid())
+  name          String
+  tagline       String?
+  logo          String?
+  favicon       String?
+  email         String?
+  phone         String?
+  whatsapp      String?
+  address       String?  @db.Text
+  latitude      Float?
+  longitude     Float?
+  vision        String?  @db.Text
+  mission       String?  @db.Text
+  history       String?  @db.Text
+  accreditation String?
+  npsn          String?
+  foundedYear   Int?
+  schoolLevel   SchoolLevel @default(SD)
+  socialMedia   Json?    // {facebook, instagram, youtube, twitter, tiktok}
+  operatingHours Json?   // {mon: "07:00-14:00", tue: "07:00-14:00", ...}
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("school_profiles")
+}
+
+enum SchoolLevel {
+  PAUD
+  TK
+  SD
+  SMP
+  SMA
+  SMK
+}
+
+// ==========================================
+// DYNAMIC PAGES (CMS)
+// ==========================================
+
+model Page {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     Json      // Block-based content
+  excerpt     String?   @db.Text
+  featuredImg String?
+  status      Status    @default(DRAFT)
+  template    String    @default("default")
+  seoTitle    String?
+  seoDesc     String?   @db.Text
+  seoKeywords String?
+  ogImage     String?
+  authorId    String
+  locale      String    @default("id")
+  order       Int       @default(0)
+  parentId    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  author   User   @relation(fields: [authorId], references: [id])
+  parent   Page?  @relation("PageHierarchy", fields: [parentId], references: [id])
+  children Page[] @relation("PageHierarchy")
+
+  @@index([slug])
+  @@index([status])
+  @@map("pages")
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ==========================================
+// NEWS/BLOG POSTS
+// ==========================================
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     Json      // Block-based content
+  excerpt     String?   @db.Text
+  featuredImg String?
+  status      Status    @default(DRAFT)
+  categoryId  String
+  authorId    String
+  views       Int       @default(0)
+  isFeatured  Boolean   @default(false)
+  locale      String    @default("id")
+  seoTitle    String?
+  seoDesc     String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  category Category    @relation(fields: [categoryId], references: [id])
+  author   User        @relation(fields: [authorId], references: [id])
+  tags     PostToTag[]
+
+  @@index([slug])
+  @@index([status])
+  @@index([categoryId])
+  @@map("posts")
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  color       String? @default("#3B82F6")
+  order       Int     @default(0)
+
+  posts Post[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+
+  posts PostToTag[]
+
+  @@map("tags")
+}
+
+model PostToTag {
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+// ==========================================
+// STAFF & TEACHERS
+// ==========================================
+
+model Staff {
+  id         String   @id @default(cuid())
+  name       String
+  nip        String?
+  position   String
+  department String?
+  bio        String?  @db.Text
+  photo      String?
+  email      String?
+  phone      String?
+  education  String?
+  isTeacher  Boolean  @default(false)
+  subjects   Json?    // Array of subjects taught
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("staff")
+}
+
+// ==========================================
+// ACADEMIC PROGRAMS
+// ==========================================
+
+model Program {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  type        ProgramType
+  description String?     @db.Text
+  content     Json?       // Detailed content blocks
+  image       String?
+  icon        String?
+  isActive    Boolean     @default(true)
+  order       Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("programs")
+}
+
+enum ProgramType {
+  CURRICULUM      // Kurikulum
+  EXTRACURRICULAR // Ekstrakurikuler
+  FEATURED        // Program Unggulan
+}
+
+// ==========================================
+// GALLERY
+// ==========================================
+
+model Gallery {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  description String?      @db.Text
+  coverImage  String?
+  type        GalleryType  @default(PHOTO)
+  isPublished Boolean      @default(true)
+  eventDate   DateTime?
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  items GalleryItem[]
+
+  @@map("galleries")
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  galleryId String
+  url       String
+  thumbnail String?
+  caption   String?
+  type      String   @default("image") // image, video
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  gallery Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  @@map("gallery_items")
+}
+
+enum GalleryType {
+  PHOTO
+  VIDEO
+  MIXED
+}
+
+// ==========================================
+// PPDB (Penerimaan Peserta Didik Baru)
+// ==========================================
+
+model PPDBPeriod {
+  id           String   @id @default(cuid())
+  name         String   // e.g., "PPDB 2024/2025"
+  academicYear String   // e.g., "2024/2025"
+  description  String?  @db.Text
+  startDate    DateTime
+  endDate      DateTime
+  quota        Int?
+  requirements Json?    // List of requirements
+  stages       Json?    // Registration stages with dates
+  formFields   Json?    // Custom form fields
+  isActive     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  registrations PPDBRegistration[]
+
+  @@map("ppdb_periods")
+}
+
+model PPDBRegistration {
+  id             String     @id @default(cuid())
+  periodId       String
+  registrationNo String     @unique
+  
+  // Student Info
+  studentName    String
+  nisn           String?
+  birthPlace     String
+  birthDate      DateTime
+  gender         Gender
+  religion       String?
+  address        String     @db.Text
+  photo          String?
+  
+  // Previous School
+  previousSchool String?
+  
+  // Parent/Guardian Info
+  fatherName     String?
+  fatherJob      String?
+  fatherPhone    String?
+  motherName     String?
+  motherJob      String?
+  motherPhone    String?
+  guardianName   String?
+  guardianPhone  String?
+  guardianEmail  String?
+  
+  // Documents & Custom Fields
+  documents      Json?      // Uploaded documents
+  customFields   Json?      // Custom form field values
+  
+  // Status
+  status         PPDBStatus @default(PENDING)
+  notes          String?    @db.Text
+  reviewedAt     DateTime?
+  reviewedBy     String?
+  
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  period PPDBPeriod @relation(fields: [periodId], references: [id])
+
+  @@index([registrationNo])
+  @@index([status])
+  @@map("ppdb_registrations")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum PPDBStatus {
+  PENDING
+  REVIEWING
+  ACCEPTED
+  REJECTED
+  ENROLLED
+  WITHDRAWN
+}
+
+// ==========================================
+// EVENTS & AGENDA
+// ==========================================
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  description String?   @db.Text
+  content     Json?     // Detailed content
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  isAllDay    Boolean   @default(false)
+  image       String?
+  type        EventType @default(ACADEMIC)
+  color       String?   @default("#3B82F6")
+  isPublished Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([startDate])
+  @@map("events")
+}
+
+enum EventType {
+  ACADEMIC    // Akademik
+  HOLIDAY     // Libur
+  EXAM        // Ujian
+  CEREMONY    // Upacara
+  COMPETITION // Lomba
+  MEETING     // Rapat
+  OTHER       // Lainnya
+}
+
+// ==========================================
+// DOWNLOADS
+// ==========================================
+
+model Download {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  file        String
+  fileName    String?
+  fileSize    Int?
+  fileType    String?
+  category    String?
+  downloads   Int      @default(0)
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("downloads")
+}
+
+// ==========================================
+// TESTIMONIALS & ALUMNI
+// ==========================================
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  role        String   // e.g., "Alumni 2020", "Orang Tua Siswa"
+  content     String   @db.Text
+  photo       String?
+  rating      Int?     @default(5)
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model Alumni {
+  id             String   @id @default(cuid())
+  name           String
+  graduationYear Int
+  photo          String?
+  currentStatus  String?  // e.g., "Mahasiswa UI", "Dokter"
+  company        String?
+  achievement    String?  @db.Text
+  testimonial    String?  @db.Text
+  socialMedia    Json?
+  isPublished    Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("alumni")
+}
+
+// ==========================================
+// FACILITIES
+// ==========================================
+
+model Facility {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  images      Json?    // Array of image URLs
+  icon        String?
+  features    Json?    // List of features
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("facilities")
+}
+
+// ==========================================
+// MEDIA LIBRARY
+// ==========================================
+
+model Media {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  type      String   // image, video, document, audio
+  mimeType  String?
+  size      Int?
+  width     Int?
+  height    Int?
+  alt       String?
+  folder    String   @default("general")
+  createdAt DateTime @default(now())
+
+  @@index([folder])
+  @@index([type])
+  @@map("media")
+}
+
+// ==========================================
+// NAVIGATION MENUS
+// ==========================================
+
+model Menu {
+  id        String     @id @default(cuid())
+  name      String
+  location  String     @unique // e.g., "header", "footer", "mobile"
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items MenuItem[]
+
+  @@map("menus")
+}
+
+model MenuItem {
+  id        String  @id @default(cuid())
+  menuId    String
+  label     String
+  url       String?
+  pageSlug  String? // Link to internal page
+  type      String  @default("link") // link, page, dropdown, megamenu
+  parentId  String?
+  order     Int     @default(0)
+  isVisible Boolean @default(true)
+  openNew   Boolean @default(false)
+  icon      String?
+  cssClass  String?
+
+  menu     Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  parent   MenuItem?  @relation("MenuItemChildren", fields: [parentId], references: [id])
+  children MenuItem[] @relation("MenuItemChildren")
+
+  @@map("menu_items")
+}
+
+// ==========================================
+// SITE SETTINGS
+// ==========================================
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  group     String   @default("general") // general, seo, theme, email, etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([group])
+  @@map("settings")
+}
+
+// ==========================================
+// CONTACT MESSAGES
+// ==========================================
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  isReplied Boolean  @default(false)
+  repliedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+// ==========================================
+// ANNOUNCEMENTS (Quick announcements/banners)
+// ==========================================
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  content     String    @db.Text
+  type        String    @default("info") // info, warning, success, error
+  link        String?
+  linkText    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  showOnPages Json?     // ["home", "all", "specific-slug"]
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("announcements")
+}
+
+// ==========================================
+// ACHIEVEMENTS
+// ==========================================
+
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  category    String?  // Akademik, Olahraga, Seni, dll
+  level       String?  // Sekolah, Kecamatan, Kabupaten, Provinsi, Nasional, Internasional
+  date        DateTime?
+  image       String?
+  participants String? // Nama peserta
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("achievements")
+}
