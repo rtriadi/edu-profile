@@ -13,21 +13,30 @@ function hexToOklch(hex: string): string {
 
   // Convert to XYZ
   const x = 0.4124564 * linearR + 0.3575761 * linearG + 0.1804375 * linearB;
-  const y = 0.2126729 * linearR + 0.7151522 * linearG + 0.0721750 * linearB;
-  const z = 0.0193339 * linearR + 0.1191920 * linearG + 0.9503041 * linearB;
+  const y = 0.2126729 * linearR + 0.7151522 * linearG + 0.072175 * linearB;
+  const z = 0.0193339 * linearR + 0.119192 * linearG + 0.9503041 * linearB;
 
   // Convert XYZ to OKLab
   const l_ = 0.8189330101 * x + 0.3618667424 * y - 0.1288597137 * z;
   const m_ = 0.0329845436 * x + 0.9293118715 * y + 0.0361456387 * z;
-  const s_ = 0.0482003018 * x + 0.2643662691 * y + 0.6338517070 * z;
+  const s_ = 0.0482003018 * x + 0.2643662691 * y + 0.633851707 * z;
 
   const l_cuberoot = Math.cbrt(l_);
   const m_cuberoot = Math.cbrt(m_);
   const s_cuberoot = Math.cbrt(s_);
 
-  const L = 0.2104542553 * l_cuberoot + 0.7936177850 * m_cuberoot - 0.0040720468 * s_cuberoot;
-  const a = 1.9779984951 * l_cuberoot - 2.4285922050 * m_cuberoot + 0.4505937099 * s_cuberoot;
-  const b_val = 0.0259040371 * l_cuberoot + 0.7827717662 * m_cuberoot - 0.8086757660 * s_cuberoot;
+  const L =
+    0.2104542553 * l_cuberoot +
+    0.793617785 * m_cuberoot -
+    0.0040720468 * s_cuberoot;
+  const a =
+    1.9779984951 * l_cuberoot -
+    2.428592205 * m_cuberoot +
+    0.4505937099 * s_cuberoot;
+  const b_val =
+    0.0259040371 * l_cuberoot +
+    0.7827717662 * m_cuberoot -
+    0.808675766 * s_cuberoot;
 
   // Convert OKLab to OKLCH
   const C = Math.sqrt(a * a + b_val * b_val);
@@ -157,7 +166,5 @@ export async function ThemeStyles() {
     ${customCss}
   `;
 
-  return (
-    <style dangerouslySetInnerHTML={{ __html: cssVariables }} />
-  );
+  return <style dangerouslySetInnerHTML={{ __html: cssVariables }} />;
 }

@@ -1,6 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { GraduationCap, Facebook, Instagram, Youtube, Twitter, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
+import {
+  GraduationCap,
+  Facebook,
+  Instagram,
+  Youtube,
+  Twitter,
+  Mail,
+  Phone,
+  MapPin,
+  ArrowUpRight,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
@@ -15,30 +25,34 @@ export async function PublicFooter() {
     getFooterData(),
     getSiteConfig(),
   ]);
-  const socialMedia = schoolProfile?.socialMedia as Record<string, string> | null;
+  const socialMedia = schoolProfile?.socialMedia as Record<
+    string,
+    string
+  > | null;
   const translations = getTranslations(siteConfig.language as Language);
 
   const currentYear = new Date().getFullYear();
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
-  
+
   // Quick links with translations
-  const quickLinks = siteConfig.language === "en" 
-    ? [
-        { label: "School Profile", href: "/profil" },
-        { label: "Academic Programs", href: "/akademik" },
-        { label: "News & Articles", href: "/berita" },
-        { label: "Gallery", href: "/galeri" },
-        { label: "Online Registration", href: "/ppdb" },
-        { label: "Contact Us", href: "/kontak" },
-      ]
-    : [
-        { label: "Profil Sekolah", href: "/profil" },
-        { label: "Program Akademik", href: "/akademik" },
-        { label: "Berita & Artikel", href: "/berita" },
-        { label: "Galeri", href: "/galeri" },
-        { label: "PPDB Online", href: "/ppdb" },
-        { label: "Hubungi Kami", href: "/kontak" },
-      ];
+  const quickLinks =
+    siteConfig.language === "en"
+      ? [
+          { label: "School Profile", href: "/profil" },
+          { label: "Academic Programs", href: "/akademik" },
+          { label: "News & Articles", href: "/berita" },
+          { label: "Gallery", href: "/galeri" },
+          { label: "Online Registration", href: "/ppdb" },
+          { label: "Contact Us", href: "/kontak" },
+        ]
+      : [
+          { label: "Profil Sekolah", href: "/profil" },
+          { label: "Program Akademik", href: "/akademik" },
+          { label: "Berita & Artikel", href: "/berita" },
+          { label: "Galeri", href: "/galeri" },
+          { label: "PPDB Online", href: "/ppdb" },
+          { label: "Hubungi Kami", href: "/kontak" },
+        ];
 
   return (
     <footer className="relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-300 overflow-hidden">
@@ -46,7 +60,7 @@ export async function PublicFooter() {
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5" />
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-theme-accent/10 rounded-full blur-3xl" />
-      
+
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* About */}
@@ -72,15 +86,20 @@ export async function PublicFooter() {
                 </span>
                 {schoolProfile?.accreditation && (
                   <span className="text-xs text-emerald-400">
-                    {siteConfig.language === "en" ? "Accreditation" : "Akreditasi"} {schoolProfile.accreditation}
+                    {siteConfig.language === "en"
+                      ? "Accreditation"
+                      : "Akreditasi"}{" "}
+                    {schoolProfile.accreditation}
                   </span>
                 )}
               </div>
             </div>
             <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-              {schoolProfile?.tagline || siteConfig.siteTagline || translations.home.heroSubtitle}
+              {schoolProfile?.tagline ||
+                siteConfig.siteTagline ||
+                translations.home.heroSubtitle}
             </p>
-            
+
             {/* Social Media */}
             <div className="flex items-center gap-2">
               {socialMedia?.facebook && (
@@ -135,8 +154,8 @@ export async function PublicFooter() {
             <ul className="space-y-3 text-sm">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <Link 
-                    href={link.href} 
+                  <Link
+                    href={link.href}
                     className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-primary transition-colors" />
@@ -167,7 +186,7 @@ export async function PublicFooter() {
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                   <Phone className="h-4 w-4 text-primary" />
                 </div>
-                <a 
+                <a
                   href={`tel:${schoolProfile?.phone || "(021) 1234567"}`}
                   className="text-slate-400 hover:text-white transition-colors"
                 >
@@ -178,7 +197,7 @@ export async function PublicFooter() {
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                   <Mail className="h-4 w-4 text-primary" />
                 </div>
-                <a 
+                <a
                   href={`mailto:${schoolProfile?.email || "info@sekolah.sch.id"}`}
                   className="text-slate-400 hover:text-white transition-colors"
                 >
@@ -197,18 +216,26 @@ export async function PublicFooter() {
             <div className="space-y-4">
               {schoolProfile?.npsn && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-xs text-slate-500 uppercase tracking-wider">NPSN</span>
-                  <p className="text-white font-semibold">{schoolProfile.npsn}</p>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider">
+                    NPSN
+                  </span>
+                  <p className="text-white font-semibold">
+                    {schoolProfile.npsn}
+                  </p>
                 </div>
               )}
               {schoolProfile?.foundedYear && (
                 <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-xs text-slate-500 uppercase tracking-wider">{translations.footer.foundedSince}</span>
-                  <p className="text-white font-semibold">{schoolProfile.foundedYear}</p>
+                  <span className="text-xs text-slate-500 uppercase tracking-wider">
+                    {translations.footer.foundedSince}
+                  </span>
+                  <p className="text-white font-semibold">
+                    {schoolProfile.foundedYear}
+                  </p>
                 </div>
               )}
-              <Link 
-                href="/ppdb" 
+              <Link
+                href="/ppdb"
                 className="block p-4 rounded-xl bg-gradient-primary text-white text-center font-semibold hover:opacity-90 transition-opacity"
               >
                 {translations.home.registerPpdb}

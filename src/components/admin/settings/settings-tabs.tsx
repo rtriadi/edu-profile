@@ -194,9 +194,7 @@ export function SettingsTabs() {
         <Card>
           <CardHeader>
             <CardTitle>Pengaturan Umum</CardTitle>
-            <CardDescription>
-              Konfigurasi dasar website
-            </CardDescription>
+            <CardDescription>Konfigurasi dasar website</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -206,7 +204,10 @@ export function SettingsTabs() {
                   id="siteName"
                   value={generalSettings.siteName}
                   onChange={(e) =>
-                    setGeneralSettings({ ...generalSettings, siteName: e.target.value })
+                    setGeneralSettings({
+                      ...generalSettings,
+                      siteName: e.target.value,
+                    })
                   }
                   disabled={isLoading}
                 />
@@ -217,7 +218,10 @@ export function SettingsTabs() {
                   id="siteTagline"
                   value={generalSettings.siteTagline}
                   onChange={(e) =>
-                    setGeneralSettings({ ...generalSettings, siteTagline: e.target.value })
+                    setGeneralSettings({
+                      ...generalSettings,
+                      siteTagline: e.target.value,
+                    })
                   }
                   disabled={isLoading}
                 />
@@ -257,8 +261,12 @@ export function SettingsTabs() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Asia/Jakarta">WIB (Jakarta)</SelectItem>
-                    <SelectItem value="Asia/Makassar">WITA (Makassar)</SelectItem>
-                    <SelectItem value="Asia/Jayapura">WIT (Jayapura)</SelectItem>
+                    <SelectItem value="Asia/Makassar">
+                      WITA (Makassar)
+                    </SelectItem>
+                    <SelectItem value="Asia/Jayapura">
+                      WIT (Jayapura)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -269,7 +277,10 @@ export function SettingsTabs() {
                 id="maintenance"
                 checked={generalSettings.maintenanceMode}
                 onCheckedChange={(checked) =>
-                  setGeneralSettings({ ...generalSettings, maintenanceMode: checked })
+                  setGeneralSettings({
+                    ...generalSettings,
+                    maintenanceMode: checked,
+                  })
                 }
               />
               <Label htmlFor="maintenance">Mode Maintenance</Label>
@@ -298,9 +309,7 @@ export function SettingsTabs() {
         <Card>
           <CardHeader>
             <CardTitle>Pengaturan SEO</CardTitle>
-            <CardDescription>
-              Optimasi mesin pencari
-            </CardDescription>
+            <CardDescription>Optimasi mesin pencari</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -315,7 +324,9 @@ export function SettingsTabs() {
                 maxLength={70}
                 disabled={isLoading}
               />
-              <p className="text-xs text-muted-foreground">Maksimal 70 karakter</p>
+              <p className="text-xs text-muted-foreground">
+                Maksimal 70 karakter
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -324,13 +335,18 @@ export function SettingsTabs() {
                 id="metaDescription"
                 value={seoSettings.siteDescription || ""}
                 onChange={(e) =>
-                  setSeoSettings({ ...seoSettings, siteDescription: e.target.value })
+                  setSeoSettings({
+                    ...seoSettings,
+                    siteDescription: e.target.value,
+                  })
                 }
                 placeholder="Deskripsi yang muncul di hasil pencarian"
                 maxLength={160}
                 disabled={isLoading}
               />
-              <p className="text-xs text-muted-foreground">Maksimal 160 karakter</p>
+              <p className="text-xs text-muted-foreground">
+                Maksimal 160 karakter
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -339,7 +355,10 @@ export function SettingsTabs() {
                 id="metaKeywords"
                 value={seoSettings.siteKeywords || ""}
                 onChange={(e) =>
-                  setSeoSettings({ ...seoSettings, siteKeywords: e.target.value })
+                  setSeoSettings({
+                    ...seoSettings,
+                    siteKeywords: e.target.value,
+                  })
                 }
                 placeholder="sekolah, pendidikan, profil sekolah"
                 disabled={isLoading}
@@ -353,7 +372,10 @@ export function SettingsTabs() {
                   id="gaId"
                   value={seoSettings.googleAnalyticsId || ""}
                   onChange={(e) =>
-                    setSeoSettings({ ...seoSettings, googleAnalyticsId: e.target.value })
+                    setSeoSettings({
+                      ...seoSettings,
+                      googleAnalyticsId: e.target.value,
+                    })
                   }
                   placeholder="G-XXXXXXXXXX"
                   disabled={isLoading}
@@ -365,7 +387,10 @@ export function SettingsTabs() {
                   id="gtmId"
                   value={seoSettings.googleTagManagerId || ""}
                   onChange={(e) =>
-                    setSeoSettings({ ...seoSettings, googleTagManagerId: e.target.value })
+                    setSeoSettings({
+                      ...seoSettings,
+                      googleTagManagerId: e.target.value,
+                    })
                   }
                   placeholder="GTM-XXXXXXX"
                   disabled={isLoading}
@@ -410,9 +435,7 @@ export function SettingsTabs() {
         <Card>
           <CardHeader>
             <CardTitle>Pengaturan Tema</CardTitle>
-            <CardDescription>
-              Kustomisasi tampilan website
-            </CardDescription>
+            <CardDescription>Kustomisasi tampilan website</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -424,7 +447,10 @@ export function SettingsTabs() {
                     type="color"
                     value={themeSettings.primaryColor || "#3B82F6"}
                     onChange={(e) =>
-                      setThemeSettings({ ...themeSettings, primaryColor: e.target.value })
+                      setThemeSettings({
+                        ...themeSettings,
+                        primaryColor: e.target.value,
+                      })
                     }
                     className="w-16 h-10 p-1"
                     disabled={isLoading}
@@ -432,7 +458,10 @@ export function SettingsTabs() {
                   <Input
                     value={themeSettings.primaryColor || "#3B82F6"}
                     onChange={(e) =>
-                      setThemeSettings({ ...themeSettings, primaryColor: e.target.value })
+                      setThemeSettings({
+                        ...themeSettings,
+                        primaryColor: e.target.value,
+                      })
                     }
                     placeholder="#3B82F6"
                     className="flex-1"
@@ -448,7 +477,10 @@ export function SettingsTabs() {
                     type="color"
                     value={themeSettings.secondaryColor || "#10B981"}
                     onChange={(e) =>
-                      setThemeSettings({ ...themeSettings, secondaryColor: e.target.value })
+                      setThemeSettings({
+                        ...themeSettings,
+                        secondaryColor: e.target.value,
+                      })
                     }
                     className="w-16 h-10 p-1"
                     disabled={isLoading}
@@ -456,7 +488,10 @@ export function SettingsTabs() {
                   <Input
                     value={themeSettings.secondaryColor || "#10B981"}
                     onChange={(e) =>
-                      setThemeSettings({ ...themeSettings, secondaryColor: e.target.value })
+                      setThemeSettings({
+                        ...themeSettings,
+                        secondaryColor: e.target.value,
+                      })
                     }
                     placeholder="#10B981"
                     className="flex-1"
@@ -474,7 +509,10 @@ export function SettingsTabs() {
                   type="color"
                   value={themeSettings.accentColor || "#8B5CF6"}
                   onChange={(e) =>
-                    setThemeSettings({ ...themeSettings, accentColor: e.target.value })
+                    setThemeSettings({
+                      ...themeSettings,
+                      accentColor: e.target.value,
+                    })
                   }
                   className="w-16 h-10 p-1"
                   disabled={isLoading}
@@ -482,7 +520,10 @@ export function SettingsTabs() {
                 <Input
                   value={themeSettings.accentColor || "#8B5CF6"}
                   onChange={(e) =>
-                    setThemeSettings({ ...themeSettings, accentColor: e.target.value })
+                    setThemeSettings({
+                      ...themeSettings,
+                      accentColor: e.target.value,
+                    })
                   }
                   placeholder="#8B5CF6"
                   className="flex-1 max-w-xs"
@@ -494,65 +535,66 @@ export function SettingsTabs() {
             <div className="space-y-2">
               <Label>Preset Tema</Label>
               <p className="text-xs text-muted-foreground mb-3">
-                Pilih preset warna yang sudah dikurasi untuk tampilan profesional
+                Pilih preset warna yang sudah dikurasi untuk tampilan
+                profesional
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { 
-                    name: "Default", 
+                  {
+                    name: "Default",
                     description: "Modern & Clean",
-                    primary: "#3B82F6", 
-                    secondary: "#10B981", 
-                    accent: "#8B5CF6" 
+                    primary: "#3B82F6",
+                    secondary: "#10B981",
+                    accent: "#8B5CF6",
                   },
-                  { 
-                    name: "Ocean Professional", 
+                  {
+                    name: "Ocean Professional",
                     description: "Bisnis & Formal",
-                    primary: "#0369A1", 
-                    secondary: "#0891B2", 
-                    accent: "#7C3AED" 
+                    primary: "#0369A1",
+                    secondary: "#0891B2",
+                    accent: "#7C3AED",
                   },
-                  { 
-                    name: "Emerald Fresh", 
+                  {
+                    name: "Emerald Fresh",
                     description: "Natural & Segar",
-                    primary: "#059669", 
-                    secondary: "#0D9488", 
-                    accent: "#6366F1" 
+                    primary: "#059669",
+                    secondary: "#0D9488",
+                    accent: "#6366F1",
                   },
-                  { 
-                    name: "Indigo Premium", 
+                  {
+                    name: "Indigo Premium",
                     description: "Elegan & Modern",
-                    primary: "#4F46E5", 
-                    secondary: "#7C3AED", 
-                    accent: "#EC4899" 
+                    primary: "#4F46E5",
+                    secondary: "#7C3AED",
+                    accent: "#EC4899",
                   },
-                  { 
-                    name: "Amber Energy", 
+                  {
+                    name: "Amber Energy",
                     description: "Hangat & Dinamis",
-                    primary: "#D97706", 
-                    secondary: "#EA580C", 
-                    accent: "#DC2626" 
+                    primary: "#D97706",
+                    secondary: "#EA580C",
+                    accent: "#DC2626",
                   },
-                  { 
-                    name: "Rose Playful", 
+                  {
+                    name: "Rose Playful",
                     description: "PAUD/TK/Kreatif",
-                    primary: "#DB2777", 
-                    secondary: "#E11D48", 
-                    accent: "#7C3AED" 
+                    primary: "#DB2777",
+                    secondary: "#E11D48",
+                    accent: "#7C3AED",
                   },
-                  { 
-                    name: "Navy Executive", 
+                  {
+                    name: "Navy Executive",
                     description: "Formal & Premium",
-                    primary: "#1E3A8A", 
-                    secondary: "#1D4ED8", 
-                    accent: "#CA8A04" 
+                    primary: "#1E3A8A",
+                    secondary: "#1D4ED8",
+                    accent: "#CA8A04",
                   },
-                  { 
-                    name: "Teal Modern", 
+                  {
+                    name: "Teal Modern",
                     description: "Fresh & Creative",
-                    primary: "#0F766E", 
-                    secondary: "#0891B2", 
-                    accent: "#BE185D" 
+                    primary: "#0F766E",
+                    secondary: "#0891B2",
+                    accent: "#BE185D",
                   },
                 ].map((preset) => (
                   <button
@@ -582,8 +624,12 @@ export function SettingsTabs() {
                         style={{ backgroundColor: preset.accent }}
                       />
                     </div>
-                    <div className="font-medium text-sm group-hover:text-primary transition-colors">{preset.name}</div>
-                    <div className="text-xs text-muted-foreground">{preset.description}</div>
+                    <div className="font-medium text-sm group-hover:text-primary transition-colors">
+                      {preset.name}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {preset.description}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -595,7 +641,10 @@ export function SettingsTabs() {
                 id="customCss"
                 value={themeSettings.customCss || ""}
                 onChange={(e) =>
-                  setThemeSettings({ ...themeSettings, customCss: e.target.value })
+                  setThemeSettings({
+                    ...themeSettings,
+                    customCss: e.target.value,
+                  })
                 }
                 placeholder="/* Custom CSS */\n.my-class { ... }"
                 rows={6}
@@ -630,9 +679,7 @@ export function SettingsTabs() {
         <Card>
           <CardHeader>
             <CardTitle>Pengaturan Email</CardTitle>
-            <CardDescription>
-              Konfigurasi pengiriman email
-            </CardDescription>
+            <CardDescription>Konfigurasi pengiriman email</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -642,7 +689,10 @@ export function SettingsTabs() {
                   id="smtpHost"
                   value={emailSettings.smtpHost || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, smtpHost: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      smtpHost: e.target.value,
+                    })
                   }
                   placeholder="smtp.gmail.com"
                   disabled={isLoading}
@@ -655,7 +705,10 @@ export function SettingsTabs() {
                   type="number"
                   value={emailSettings.smtpPort || 587}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, smtpPort: parseInt(e.target.value) })
+                    setEmailSettings({
+                      ...emailSettings,
+                      smtpPort: parseInt(e.target.value),
+                    })
                   }
                   placeholder="587"
                   disabled={isLoading}
@@ -670,7 +723,10 @@ export function SettingsTabs() {
                   id="smtpUser"
                   value={emailSettings.smtpUser || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, smtpUser: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      smtpUser: e.target.value,
+                    })
                   }
                   placeholder="user@gmail.com"
                   disabled={isLoading}
@@ -683,7 +739,10 @@ export function SettingsTabs() {
                   type="password"
                   value={emailSettings.smtpPassword || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, smtpPassword: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      smtpPassword: e.target.value,
+                    })
                   }
                   placeholder="••••••••"
                   disabled={isLoading}
@@ -699,7 +758,10 @@ export function SettingsTabs() {
                   type="email"
                   value={emailSettings.fromEmail || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, fromEmail: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      fromEmail: e.target.value,
+                    })
                   }
                   placeholder="noreply@sekolah.sch.id"
                   disabled={isLoading}
@@ -711,7 +773,10 @@ export function SettingsTabs() {
                   id="fromName"
                   value={emailSettings.fromName || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, fromName: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      fromName: e.target.value,
+                    })
                   }
                   placeholder="Sekolah Contoh"
                   disabled={isLoading}
@@ -727,7 +792,10 @@ export function SettingsTabs() {
                   type="email"
                   value={emailSettings.contactEmail || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, contactEmail: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      contactEmail: e.target.value,
+                    })
                   }
                   placeholder="admin@sekolah.sch.id"
                   disabled={isLoading}
@@ -740,7 +808,10 @@ export function SettingsTabs() {
                   type="email"
                   value={emailSettings.ppdbNotifyEmail || ""}
                   onChange={(e) =>
-                    setEmailSettings({ ...emailSettings, ppdbNotifyEmail: e.target.value })
+                    setEmailSettings({
+                      ...emailSettings,
+                      ppdbNotifyEmail: e.target.value,
+                    })
                   }
                   placeholder="ppdb@sekolah.sch.id"
                   disabled={isLoading}
@@ -782,9 +853,7 @@ export function SettingsTabs() {
         <Card>
           <CardHeader>
             <CardTitle>Pengaturan Keamanan</CardTitle>
-            <CardDescription>
-              Konfigurasi keamanan website
-            </CardDescription>
+            <CardDescription>Konfigurasi keamanan website</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-4 border rounded-lg">
