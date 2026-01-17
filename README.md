@@ -226,6 +226,51 @@ docker run -p 3000:3000 --env-file .env edu-profile
 
 MIT License - Silakan gunakan untuk proyek apapun.
 
+## 🧪 Testing
+
+```bash
+# Run tests
+npm run test
+
+# Run tests once
+npm run test:run
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+## 🎨 UI/UX Components
+
+### Animation Components
+- `FadeIn` - Fade in animation with direction
+- `ScaleIn` - Scale in animation
+- `SlideIn` - Slide in from any direction
+- `Stagger` - Stagger children animations
+
+### Loading Components
+- `Spinner` - Loading spinner with sizes
+- `PageLoading` - Full page loading state
+- `Skeleton` - Skeleton loading placeholders
+- `DotsLoading` - Animated dots loading
+
+### Empty States
+- `EmptyState` - Customizable empty state
+- `NoDataEmpty` - No data available
+- `NoSearchResults` - No search results found
+- `ErrorState` - Error occurred state
+
+### Form Components
+- `FormField` - Form field with validation
+- `FormInput` - Enhanced input with states
+- `FormTextarea` - Textarea with character count
+- `PasswordInput` - Password with visibility toggle
+- `SearchInput` - Search with clear button
+
+### Navigation
+- `Breadcrumbs` - Breadcrumb navigation
+- `ScrollToTop` - Scroll to top button
+- `ThemeToggle` - Dark/light mode toggle
+
 ---
 
 Made with ❤️ for Indonesian Schools
