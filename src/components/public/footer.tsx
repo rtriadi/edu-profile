@@ -67,7 +67,7 @@ export async function PublicFooter() {
                 </div>
               )}
               <div>
-                <span className="font-bold text-xl text-white block">
+                <span className="font-bold text-xl text-white block drop-shadow-sm">
                   {siteName}
                 </span>
                 {schoolProfile?.accreditation && (

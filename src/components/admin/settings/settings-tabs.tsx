@@ -506,53 +506,53 @@ export function SettingsTabs() {
                     accent: "#8B5CF6" 
                   },
                   { 
-                    name: "Ocean Blue", 
-                    description: "Profesional",
-                    primary: "#0EA5E9", 
-                    secondary: "#06B6D4", 
+                    name: "Ocean Professional", 
+                    description: "Bisnis & Formal",
+                    primary: "#0369A1", 
+                    secondary: "#0891B2", 
+                    accent: "#7C3AED" 
+                  },
+                  { 
+                    name: "Emerald Fresh", 
+                    description: "Natural & Segar",
+                    primary: "#059669", 
+                    secondary: "#0D9488", 
                     accent: "#6366F1" 
                   },
                   { 
-                    name: "Forest Green", 
-                    description: "Natural & Fresh",
-                    primary: "#059669", 
-                    secondary: "#10B981", 
-                    accent: "#14B8A6" 
+                    name: "Indigo Premium", 
+                    description: "Elegan & Modern",
+                    primary: "#4F46E5", 
+                    secondary: "#7C3AED", 
+                    accent: "#EC4899" 
                   },
                   { 
-                    name: "Royal Purple", 
-                    description: "Elegant",
-                    primary: "#7C3AED", 
-                    secondary: "#8B5CF6", 
-                    accent: "#A855F7" 
+                    name: "Amber Energy", 
+                    description: "Hangat & Dinamis",
+                    primary: "#D97706", 
+                    secondary: "#EA580C", 
+                    accent: "#DC2626" 
                   },
                   { 
-                    name: "Sunset Orange", 
-                    description: "Energetic",
-                    primary: "#F97316", 
-                    secondary: "#FB923C", 
-                    accent: "#FBBF24" 
+                    name: "Rose Playful", 
+                    description: "PAUD/TK/Kreatif",
+                    primary: "#DB2777", 
+                    secondary: "#E11D48", 
+                    accent: "#7C3AED" 
                   },
                   { 
-                    name: "Rose Pink", 
-                    description: "PAUD/TK",
-                    primary: "#EC4899", 
-                    secondary: "#F472B6", 
-                    accent: "#FB7185" 
-                  },
-                  { 
-                    name: "Navy Gold", 
+                    name: "Navy Executive", 
                     description: "Formal & Premium",
                     primary: "#1E3A8A", 
-                    secondary: "#3B82F6", 
-                    accent: "#F59E0B" 
+                    secondary: "#1D4ED8", 
+                    accent: "#CA8A04" 
                   },
                   { 
-                    name: "Teal Coral", 
-                    description: "Creative",
-                    primary: "#0D9488", 
-                    secondary: "#14B8A6", 
-                    accent: "#F43F5E" 
+                    name: "Teal Modern", 
+                    description: "Fresh & Creative",
+                    primary: "#0F766E", 
+                    secondary: "#0891B2", 
+                    accent: "#BE185D" 
                   },
                 ].map((preset) => (
                   <button

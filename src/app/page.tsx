@@ -481,7 +481,7 @@ export default async function HomePage() {
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/15 font-semibold" asChild>
+                  <Button size="lg" className="border-2 border-white bg-transparent text-white hover:bg-white/20 hover:text-white font-semibold" asChild>
                     <Link href="/kontak">Hubungi Kami</Link>
                   </Button>
                 </div>
