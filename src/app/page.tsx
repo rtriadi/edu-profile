@@ -13,6 +13,8 @@ import {
   Sparkles,
   BookOpen,
   Clock,
+  Award,
+  Target,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -100,104 +102,116 @@ export default async function HomePage() {
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <PublicHeader siteName={siteName} logo={schoolProfile?.logo} />
       
       <main className="flex-1">
-        {/* Hero Section - Modern Gradient */}
-        <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
-          {/* Animated background elements */}
+        {/* Hero Section - Works in both light and dark mode */}
+        <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+          {/* Background - adapts to theme */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
+          
+          {/* Decorative elements */}
           <div className="absolute inset-0">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-3xl animate-pulse" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-theme-accent/20 rounded-full blur-3xl animate-pulse delay-1000" />
-            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-theme-secondary/20 rounded-full blur-3xl animate-pulse delay-500" />
+            <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl" />
           </div>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
           
           <div className="container mx-auto px-4 relative z-10 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-                  <Sparkles className="h-4 w-4 text-yellow-400" />
-                  <span className="text-sm font-medium">Selamat Datang di {siteName}</span>
+              <div className="space-y-8 text-white">
+                {/* Welcome badge */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
+                  <Sparkles className="h-4 w-4 text-yellow-300" />
+                  <span className="text-sm font-medium text-white">Selamat Datang di {siteName}</span>
                 </div>
                 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                  <span className="bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
-                    {schoolProfile?.name || siteName}
-                  </span>
+                {/* Main heading */}
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white">
+                  {schoolProfile?.name || siteName}
                 </h1>
                 
-                <p className="text-lg md:text-xl text-white/80 max-w-xl leading-relaxed">
+                {/* Tagline */}
+                <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed">
                   {schoolProfile?.tagline || siteConfig.siteTagline || "Mendidik Generasi Unggul dan Berkarakter untuk Masa Depan yang Gemilang"}
                 </p>
                 
+                {/* CTA Buttons */}
                 <div className="flex flex-wrap gap-4">
-                  <Button size="lg" className="bg-white text-slate-900 hover:bg-white/90 shadow-2xl shadow-white/20 group" asChild>
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-xl shadow-black/20 font-semibold group" asChild>
                     <Link href="/ppdb">
                       Daftar Sekarang
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm" asChild>
+                  <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/15 font-semibold backdrop-blur-sm" asChild>
                     <Link href="/profil">Tentang Kami</Link>
                   </Button>
                 </div>
                 
-                {/* Quick stats */}
-                <div className="flex flex-wrap gap-6 pt-8 border-t border-white/10">
+                {/* Quick stats in hero */}
+                <div className="flex flex-wrap gap-8 pt-8 border-t border-white/20">
                   {schoolProfile?.accreditation && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-                        <Star className="h-5 w-5 text-yellow-400" />
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-yellow-400/20 flex items-center justify-center">
+                        <Award className="h-6 w-6 text-yellow-300" />
                       </div>
                       <div>
-                        <p className="text-xs text-white/60">Akreditasi</p>
-                        <p className="font-bold">{schoolProfile.accreditation}</p>
+                        <p className="text-sm text-white/70">Akreditasi</p>
+                        <p className="font-bold text-white text-lg">{schoolProfile.accreditation}</p>
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                      <Users className="h-5 w-5 text-primary" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
+                      <Users className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-white/60">Total Guru</p>
-                      <p className="font-bold">{data.stats.staff}+ Pengajar</p>
+                      <p className="text-sm text-white/70">Total Guru</p>
+                      <p className="font-bold text-white text-lg">{data.stats.staff}+ Pengajar</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-xl bg-theme-secondary/20 flex items-center justify-center">
-                      <Trophy className="h-5 w-5 text-theme-secondary" />
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
+                      <Trophy className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-xs text-white/60">Prestasi</p>
-                      <p className="font-bold">{data.stats.achievements}+ Penghargaan</p>
+                      <p className="text-sm text-white/70">Prestasi</p>
+                      <p className="font-bold text-white text-lg">{data.stats.achievements}+ Penghargaan</p>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* Hero image placeholder */}
+              {/* Hero visual - right side */}
               <div className="hidden lg:block relative">
                 <div className="relative aspect-square max-w-lg mx-auto">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-theme-accent/20 rounded-3xl backdrop-blur-sm border border-white/10" />
-                  <div className="absolute inset-4 bg-gradient-to-br from-white/5 to-white/10 rounded-2xl flex items-center justify-center">
-                    <GraduationCap className="h-32 w-32 text-white/20" />
+                  {/* Main visual container */}
+                  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 shadow-2xl" />
+                  <div className="absolute inset-6 bg-white/5 rounded-2xl flex items-center justify-center">
+                    <GraduationCap className="h-40 w-40 text-white/30" />
                   </div>
+                  
                   {/* Floating cards */}
-                  <div className="absolute -left-8 top-1/4 p-4 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 animate-float">
-                    <BookOpen className="h-8 w-8 text-primary" />
+                  <div className="absolute -left-6 top-1/4 p-4 bg-white/15 backdrop-blur-lg rounded-2xl border border-white/20 shadow-xl animate-float">
+                    <BookOpen className="h-8 w-8 text-white" />
                   </div>
-                  <div className="absolute -right-8 bottom-1/4 p-4 bg-white/10 backdrop-blur-lg rounded-2xl border border-white/20 animate-float delay-300">
-                    <Trophy className="h-8 w-8 text-yellow-400" />
+                  <div className="absolute -right-6 top-1/2 p-4 bg-white/15 backdrop-blur-lg rounded-2xl border border-white/20 shadow-xl animate-float delay-500">
+                    <Target className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="absolute left-1/4 -bottom-4 p-4 bg-yellow-400/20 backdrop-blur-lg rounded-2xl border border-yellow-400/30 shadow-xl animate-float delay-300">
+                    <Trophy className="h-8 w-8 text-yellow-300" />
                   </div>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Wave divider */}
+          {/* Wave divider - uses CSS variable for background */}
           <div className="absolute bottom-0 left-0 right-0">
             <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
               <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z" className="fill-background"/>
@@ -205,44 +219,46 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Stats Section - Floating Cards */}
+        {/* Stats Section */}
         <section className="py-16 -mt-8 relative z-10">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <StatCard icon={Users} value={data.stats.staff} label="Guru & Staff" color="primary" />
-              <StatCard icon={GraduationCap} value={data.stats.alumni} label="Alumni" suffix="+" color="secondary" />
-              <StatCard icon={Trophy} value={data.stats.achievements} label="Prestasi" color="accent" />
-              <StatCard icon={Calendar} value={data.stats.extracurriculars} label="Ekstrakurikuler" color="primary" />
+              <StatCard icon={Users} value={data.stats.staff} label="Guru & Staff" />
+              <StatCard icon={GraduationCap} value={data.stats.alumni} label="Alumni" suffix="+" />
+              <StatCard icon={Trophy} value={data.stats.achievements} label="Prestasi" />
+              <StatCard icon={Calendar} value={data.stats.extracurriculars} label="Ekstrakurikuler" />
             </div>
           </div>
         </section>
 
-        {/* About Section - Split Design */}
+        {/* About Section */}
         <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
-                <Badge className="mb-4 bg-primary/10 text-primary border-0">Tentang Kami</Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
-                  Membangun Generasi <span className="text-primary">Unggul</span> dan <span className="text-theme-accent">Berkarakter</span>
+                <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">Tentang Kami</Badge>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-foreground">
+                  Membangun Generasi{" "}
+                  <span className="text-primary">Unggul</span> dan{" "}
+                  <span className="text-primary">Berkarakter</span>
                 </h2>
                 <div className="space-y-4 text-muted-foreground">
-                  <p className="leading-relaxed">
+                  <p className="leading-relaxed text-base">
                     {schoolProfile?.vision || "Menjadi sekolah unggulan yang menghasilkan lulusan berkarakter, cerdas, dan berwawasan global."}
                   </p>
-                  <div className="p-6 rounded-2xl bg-muted/50 border border-border">
+                  <div className="p-6 rounded-2xl bg-muted border border-border">
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-primary" />
                       Misi Kami
                     </h3>
-                    <p className="whitespace-pre-line text-sm leading-relaxed">
+                    <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                       {schoolProfile?.mission || "Menyelenggarakan pendidikan berkualitas untuk mengembangkan potensi peserta didik."}
                     </p>
                   </div>
                 </div>
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   {schoolProfile?.accreditation && (
-                    <div className="px-5 py-3 bg-gradient-primary text-white rounded-xl font-semibold shadow-lg shadow-primary/25">
+                    <div className="px-5 py-3 bg-primary text-primary-foreground rounded-xl font-semibold shadow-lg">
                       Akreditasi {schoolProfile.accreditation}
                     </div>
                   )}
@@ -255,20 +271,20 @@ export default async function HomePage() {
                 </div>
               </div>
               <div className="order-1 lg:order-2 relative">
-                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-theme-accent/10 flex items-center justify-center">
-                    <GraduationCap className="h-32 w-32 text-muted-foreground/20" />
+                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted border border-border">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
+                    <GraduationCap className="h-32 w-32 text-muted-foreground/30" />
                   </div>
                 </div>
                 {/* Floating badge */}
-                <div className="absolute -bottom-6 -left-6 p-6 bg-background rounded-2xl shadow-2xl border">
+                <div className="absolute -bottom-6 -left-6 p-6 bg-card rounded-2xl shadow-2xl border border-border">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center text-white">
+                    <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
                       <Clock className="h-7 w-7" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Berdiri Sejak</p>
-                      <p className="text-2xl font-bold">{schoolProfile?.foundedYear || "1990"}</p>
+                      <p className="text-2xl font-bold text-foreground">{schoolProfile?.foundedYear || "1990"}</p>
                     </div>
                   </div>
                 </div>
@@ -279,27 +295,28 @@ export default async function HomePage() {
 
         {/* Programs Section */}
         {data.programs.length > 0 && (
-          <section className="py-20 md:py-28 bg-muted/30">
+          <section className="py-20 md:py-28 bg-muted/50">
             <div className="container mx-auto px-4">
               <div className="text-center mb-16">
-                <Badge className="mb-4 bg-theme-secondary/10 text-theme-secondary border-0">Program Kami</Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Program Unggulan</h2>
+                <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">Program Kami</Badge>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">Program Unggulan</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
                   Program-program unggulan yang kami tawarkan untuk mengembangkan potensi siswa
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {data.programs.map((program, index) => (
-                  <Card key={program.id} className="group hover:shadow-xl transition-all duration-300 border-0 bg-background hover:-translate-y-1">
+                  <Card key={program.id} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border">
                     <CardHeader className="pb-4">
                       <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
-                        index % 3 === 0 ? 'bg-primary/10 text-primary' :
-                        index % 3 === 1 ? 'bg-theme-secondary/10 text-theme-secondary' :
-                        'bg-theme-accent/10 text-theme-accent'
+                        index % 4 === 0 ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                        index % 4 === 1 ? 'bg-green-500/10 text-green-600 dark:text-green-400' :
+                        index % 4 === 2 ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400' :
+                        'bg-orange-500/10 text-orange-600 dark:text-orange-400'
                       }`}>
                         <GraduationCap className="h-7 w-7" />
                       </div>
-                      <CardTitle className="text-lg">{program.name}</CardTitle>
+                      <CardTitle className="text-lg text-card-foreground">{program.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <CardDescription className="line-clamp-3">
@@ -327,8 +344,8 @@ export default async function HomePage() {
             <div className="container mx-auto px-4">
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
                 <div>
-                  <Badge className="mb-4 bg-primary/10 text-primary border-0">Berita Terbaru</Badge>
-                  <h2 className="text-3xl md:text-4xl font-bold">Kabar & Informasi</h2>
+                  <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">Berita Terbaru</Badge>
+                  <h2 className="text-3xl md:text-4xl font-bold text-foreground">Kabar &amp; Informasi</h2>
                 </div>
                 <Button variant="outline" asChild className="hidden md:flex group">
                   <Link href="/berita">
@@ -339,7 +356,7 @@ export default async function HomePage() {
               </div>
               <div className="grid md:grid-cols-3 gap-6">
                 {data.recentPosts.map((post) => (
-                  <Card key={post.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-0 bg-background hover:-translate-y-1">
+                  <Card key={post.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border">
                     <div className="aspect-video relative bg-muted overflow-hidden">
                       {post.featuredImg ? (
                         <Image
@@ -349,8 +366,8 @@ export default async function HomePage() {
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/5 to-theme-accent/5">
-                          <Calendar className="h-12 w-12 text-muted-foreground/30" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                          <Calendar className="h-12 w-12 text-muted-foreground/40" />
                         </div>
                       )}
                       <div className="absolute top-4 left-4">
@@ -367,7 +384,7 @@ export default async function HomePage() {
                         <Clock className="h-3 w-3" />
                         {post.publishedAt && formatDate(post.publishedAt)}
                       </div>
-                      <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                      <CardTitle className="text-lg line-clamp-2 text-card-foreground group-hover:text-primary transition-colors">
                         <Link href={`/berita/${post.slug}`}>
                           {post.title}
                         </Link>
@@ -392,41 +409,43 @@ export default async function HomePage() {
 
         {/* Testimonials Section */}
         {data.testimonials.length > 0 && (
-          <section className="py-20 md:py-28 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
+          <section className="py-20 md:py-28 bg-primary text-primary-foreground relative overflow-hidden">
+            {/* Background decorations */}
             <div className="absolute inset-0">
-              <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-              <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-theme-accent/10 rounded-full blur-3xl" />
+              <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
             </div>
+            
             <div className="container mx-auto px-4 relative z-10">
               <div className="text-center mb-16">
-                <Badge className="mb-4 bg-white/10 text-white border-white/20">Testimoni</Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">Apa Kata Mereka</h2>
-                <p className="text-white/70 max-w-2xl mx-auto">
+                <Badge className="mb-4 bg-white/15 text-white hover:bg-white/20 border-white/20">Testimoni</Badge>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Apa Kata Mereka</h2>
+                <p className="text-white/80 max-w-2xl mx-auto">
                   Testimoni dari alumni, orang tua, dan siswa kami
                 </p>
               </div>
               <div className="grid md:grid-cols-3 gap-6">
                 {data.testimonials.map((testimonial) => (
-                  <Card key={testimonial.id} className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <Card key={testimonial.id} className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-colors">
                     <CardContent className="pt-8">
                       <div className="flex gap-1 mb-4">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-4 w-4 ${i < (testimonial.rating || 5) ? 'text-yellow-400 fill-yellow-400' : 'text-white/20'}`}
+                            className={`h-4 w-4 ${i < (testimonial.rating || 5) ? 'text-yellow-400 fill-yellow-400' : 'text-white/30'}`}
                           />
                         ))}
                       </div>
-                      <p className="text-white/90 italic mb-6 leading-relaxed">
+                      <p className="text-white/95 italic mb-6 leading-relaxed">
                         &ldquo;{testimonial.content}&rdquo;
                       </p>
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold">
+                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
                           {testimonial.name[0]}
                         </div>
                         <div>
-                          <p className="font-semibold">{testimonial.name}</p>
-                          <p className="text-sm text-white/60">{testimonial.role}</p>
+                          <p className="font-semibold text-white">{testimonial.name}</p>
+                          <p className="text-sm text-white/70">{testimonial.role}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -440,25 +459,28 @@ export default async function HomePage() {
         {/* CTA Section */}
         <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-primary via-primary to-primary/90 text-white">
-              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-2xl">
+              {/* Decorative elements */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+              <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+              <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
+              
               <CardContent className="relative z-10 py-16 text-center">
                 <Sparkles className="h-12 w-12 mx-auto mb-6 text-yellow-300" />
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
                   Bergabung Bersama Kami
                 </h2>
                 <p className="text-white/90 mb-10 max-w-2xl mx-auto text-lg">
                   Daftarkan putra-putri Anda untuk menjadi bagian dari keluarga besar {siteName}
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-2xl" asChild>
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold shadow-xl" asChild>
                     <Link href="/ppdb">
                       Daftar PPDB Online
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                  <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                  <Button size="lg" variant="outline" className="border-2 border-white/40 text-white hover:bg-white/15 font-semibold" asChild>
                     <Link href="/kontak">Hubungi Kami</Link>
                   </Button>
                 </div>
@@ -468,20 +490,20 @@ export default async function HomePage() {
         </section>
 
         {/* Contact Info */}
-        <section className="py-16 bg-muted/30">
+        <section className="py-16 bg-muted/50">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6">
               {[
                 { icon: MapPin, title: "Alamat", value: schoolProfile?.address || "Jl. Pendidikan No. 1, Jakarta" },
                 { icon: Phone, title: "Telepon", value: schoolProfile?.phone || "(021) 1234567" },
                 { icon: Mail, title: "Email", value: schoolProfile?.email || "info@sekolah.sch.id" },
               ].map((item) => (
-                <div key={item.title} className="flex items-start gap-4 p-6 rounded-2xl bg-background border hover:shadow-lg transition-shadow">
+                <div key={item.title} className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border hover:shadow-lg transition-shadow">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <item.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-1">{item.title}</h3>
+                    <h3 className="font-semibold mb-1 text-card-foreground">{item.title}</h3>
                     <p className="text-muted-foreground text-sm">{item.value}</p>
                   </div>
                 </div>
@@ -501,26 +523,18 @@ function StatCard({
   value,
   label,
   suffix = "",
-  color = "primary",
 }: {
   icon: React.ElementType;
   value: number;
   label: string;
   suffix?: string;
-  color?: "primary" | "secondary" | "accent";
 }) {
-  const colorClasses = {
-    primary: "bg-primary/10 text-primary",
-    secondary: "bg-theme-secondary/10 text-theme-secondary",
-    accent: "bg-theme-accent/10 text-theme-accent",
-  };
-
   return (
-    <div className="group p-6 bg-background rounded-2xl shadow-lg border hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      <div className={`w-12 h-12 rounded-xl ${colorClasses[color]} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-        <Icon className="h-6 w-6" />
+    <div className="group p-6 bg-card rounded-2xl shadow-lg border border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <Icon className="h-6 w-6 text-primary" />
       </div>
-      <div className="text-3xl md:text-4xl font-bold mb-1">
+      <div className="text-3xl md:text-4xl font-bold mb-1 text-card-foreground">
         {value}{suffix}
       </div>
       <div className="text-sm text-muted-foreground">{label}</div>
