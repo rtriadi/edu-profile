@@ -147,16 +147,14 @@ export async function createPost(data: PostInput): Promise<ApiResponse> {
       },
     });
 
-    // Add tags if provided
+    // Add tags if provided (using transaction for batch insert)
     if (validated.tags && validated.tags.length > 0) {
-      for (const tagId of validated.tags) {
-        await prisma.postToTag.create({
-          data: {
-            postId: post.id,
-            tagId,
-          },
-        });
-      }
+      await prisma.postToTag.createMany({
+        data: validated.tags.map((tagId) => ({
+          postId: post.id,
+          tagId,
+        })),
+      });
     }
 
     revalidatePath("/admin/posts");
@@ -227,16 +225,14 @@ export async function updatePost(
         where: { postId: id },
       });
 
-      // Add new tags
+      // Add new tags (using transaction for batch insert)
       if (data.tags.length > 0) {
-        for (const tagId of data.tags) {
-          await prisma.postToTag.create({
-            data: {
-              postId: post.id,
-              tagId,
-            },
-          });
-        }
+        await prisma.postToTag.createMany({
+          data: data.tags.map((tagId) => ({
+            postId: post.id,
+            tagId,
+          })),
+        });
       }
     }
 

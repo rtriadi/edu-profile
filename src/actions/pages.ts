@@ -6,12 +6,19 @@ import { auth } from "@/lib/auth";
 import { pageSchema, type PageInput } from "@/lib/validations";
 import type { ApiResponse, Status } from "@/types";
 
+// Admin function - requires authentication
 export async function getPages(params?: {
   page?: number;
   limit?: number;
   search?: string;
   status?: Status;
 }) {
+  // Require authentication for admin data access
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
   const page = params?.page || 1;
   const limit = params?.limit || 10;
   const skip = (page - 1) * limit;
@@ -55,7 +62,13 @@ export async function getPages(params?: {
   };
 }
 
+// Admin function - requires authentication
 export async function getPageById(id: string) {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
   const page = await prisma.page.findUnique({
     where: { id },
     include: {
@@ -74,6 +87,7 @@ export async function getPageById(id: string) {
   return page;
 }
 
+// Public function - only returns published pages
 export async function getPageBySlug(slug: string) {
   const page = await prisma.page.findUnique({
     where: { slug, status: "PUBLISHED" },
@@ -286,12 +300,15 @@ export async function reorderPages(
   }
 
   try {
-    for (const item of items) {
-      await prisma.page.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      });
-    }
+    // Use transaction for batch updates to avoid N+1 queries
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.page.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        })
+      )
+    );
 
     revalidatePath("/admin/pages");
     return { success: true, message: "Urutan halaman berhasil diperbarui" };

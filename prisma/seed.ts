@@ -6,15 +6,32 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
+  // Get admin credentials from environment variables
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@sekolah.sch.id";
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (!adminPassword) {
+    console.error("❌ Error: ADMIN_PASSWORD environment variable is required for seeding.");
+    console.log("   Set it in your .env file or run with:");
+    console.log("   ADMIN_PASSWORD=your_secure_password npx tsx prisma/seed.ts");
+    process.exit(1);
+  }
+
+  // Validate password strength
+  if (adminPassword.length < 8) {
+    console.error("❌ Error: ADMIN_PASSWORD must be at least 8 characters long.");
+    process.exit(1);
+  }
+
   // Create default admin user
-  const hashedPassword = await bcrypt.hash("admin123", 12);
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
   
   const admin = await prisma.user.upsert({
-    where: { email: "admin@sekolah.sch.id" },
+    where: { email: adminEmail },
     update: {},
     create: {
       name: "Administrator",
-      email: "admin@sekolah.sch.id",
+      email: adminEmail,
       password: hashedPassword,
       role: "SUPERADMIN",
       isActive: true,
@@ -363,9 +380,9 @@ async function main() {
   console.log("✅ Created default settings");
 
   console.log("\n🎉 Database seeded successfully!");
-  console.log("\n📋 Default Admin Credentials:");
-  console.log("   Email: admin@sekolah.sch.id");
-  console.log("   Password: admin123");
+  console.log("\n📋 Admin User Created:");
+  console.log(`   Email: ${adminEmail}`);
+  console.log("   Password: (as provided in ADMIN_PASSWORD env variable)");
   console.log("\n⚠️  Please change the password after first login!");
 }
 

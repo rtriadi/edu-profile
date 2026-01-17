@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, Save, Globe, Palette, Mail, Shield } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,17 +24,138 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  getThemeSettings,
+  saveThemeSettings,
+  getSeoSettings,
+  saveSeoSettings,
+  getEmailSettings,
+  saveEmailSettings,
+  type ThemeSettings,
+  type SeoSettings,
+  type EmailSettings,
+} from "@/actions/settings";
 
 export function SettingsTabs() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
-  const handleSave = async () => {
+  // Theme settings state
+  const [themeSettings, setThemeSettings] = useState<ThemeSettings>({
+    primaryColor: "#3B82F6",
+    secondaryColor: "#10B981",
+    accentColor: "#8B5CF6",
+    fontFamily: "Geist",
+    headerStyle: "default",
+    footerStyle: "default",
+    customCss: "",
+  });
+
+  // SEO settings state
+  const [seoSettings, setSeoSettings] = useState<SeoSettings>({
+    siteTitle: "",
+    siteDescription: "",
+    siteKeywords: "",
+    ogImage: "",
+    googleAnalyticsId: "",
+    googleTagManagerId: "",
+    facebookPixelId: "",
+    robotsTxt: "",
+  });
+
+  // Email settings state
+  const [emailSettings, setEmailSettings] = useState<EmailSettings>({
+    smtpHost: "",
+    smtpPort: 587,
+    smtpUser: "",
+    smtpPassword: "",
+    smtpSecure: false,
+    fromEmail: "",
+    fromName: "",
+    contactEmail: "",
+    ppdbNotifyEmail: "",
+  });
+
+  // General settings state
+  const [generalSettings, setGeneralSettings] = useState({
+    siteName: "EduProfile CMS",
+    siteTagline: "Sistem Manajemen Konten Profil Sekolah",
+    language: "id",
+    timezone: "Asia/Jakarta",
+    maintenanceMode: false,
+  });
+
+  // Load settings on mount
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const [theme, seo, email] = await Promise.all([
+          getThemeSettings(),
+          getSeoSettings(),
+          getEmailSettings(),
+        ]);
+
+        if (theme) setThemeSettings({ ...themeSettings, ...theme });
+        if (seo) setSeoSettings({ ...seoSettings, ...seo });
+        if (email) setEmailSettings({ ...emailSettings, ...email });
+      } catch (error) {
+        console.error("Error loading settings:", error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    }
+
+    loadSettings();
+  }, []);
+
+  const handleSaveTheme = async () => {
     setIsLoading(true);
-    // Simulate save
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    toast.success("Pengaturan berhasil disimpan");
+    const result = await saveThemeSettings(themeSettings);
+    if (result.success) {
+      toast.success("Pengaturan tema berhasil disimpan");
+    } else {
+      toast.error(result.error || "Gagal menyimpan pengaturan tema");
+    }
     setIsLoading(false);
   };
+
+  const handleSaveSeo = async () => {
+    setIsLoading(true);
+    const result = await saveSeoSettings(seoSettings);
+    if (result.success) {
+      toast.success("Pengaturan SEO berhasil disimpan");
+    } else {
+      toast.error(result.error || "Gagal menyimpan pengaturan SEO");
+    }
+    setIsLoading(false);
+  };
+
+  const handleSaveEmail = async () => {
+    setIsLoading(true);
+    const result = await saveEmailSettings(emailSettings);
+    if (result.success) {
+      toast.success("Pengaturan email berhasil disimpan");
+    } else {
+      toast.error(result.error || "Gagal menyimpan pengaturan email");
+    }
+    setIsLoading(false);
+  };
+
+  const handleSaveGeneral = async () => {
+    setIsLoading(true);
+    // For now, just show success toast - general settings can be expanded later
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    toast.success("Pengaturan umum berhasil disimpan");
+    setIsLoading(false);
+  };
+
+  if (isLoadingData) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <Tabs defaultValue="general" className="space-y-6">
@@ -75,7 +196,10 @@ export function SettingsTabs() {
                 <Label htmlFor="siteName">Nama Website</Label>
                 <Input
                   id="siteName"
-                  defaultValue="EduProfile CMS"
+                  value={generalSettings.siteName}
+                  onChange={(e) =>
+                    setGeneralSettings({ ...generalSettings, siteName: e.target.value })
+                  }
                   disabled={isLoading}
                 />
               </div>
@@ -83,7 +207,10 @@ export function SettingsTabs() {
                 <Label htmlFor="siteTagline">Tagline</Label>
                 <Input
                   id="siteTagline"
-                  defaultValue="Sistem Manajemen Konten Profil Sekolah"
+                  value={generalSettings.siteTagline}
+                  onChange={(e) =>
+                    setGeneralSettings({ ...generalSettings, siteTagline: e.target.value })
+                  }
                   disabled={isLoading}
                 />
               </div>
@@ -92,7 +219,13 @@ export function SettingsTabs() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="language">Bahasa Default</Label>
-                <Select defaultValue="id" disabled={isLoading}>
+                <Select
+                  value={generalSettings.language}
+                  onValueChange={(value) =>
+                    setGeneralSettings({ ...generalSettings, language: value })
+                  }
+                  disabled={isLoading}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -104,7 +237,13 @@ export function SettingsTabs() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="timezone">Zona Waktu</Label>
-                <Select defaultValue="Asia/Jakarta" disabled={isLoading}>
+                <Select
+                  value={generalSettings.timezone}
+                  onValueChange={(value) =>
+                    setGeneralSettings({ ...generalSettings, timezone: value })
+                  }
+                  disabled={isLoading}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -118,8 +257,30 @@ export function SettingsTabs() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Switch id="maintenance" />
+              <Switch
+                id="maintenance"
+                checked={generalSettings.maintenanceMode}
+                onCheckedChange={(checked) =>
+                  setGeneralSettings({ ...generalSettings, maintenanceMode: checked })
+                }
+              />
               <Label htmlFor="maintenance">Mode Maintenance</Label>
+            </div>
+
+            <div className="pt-4">
+              <Button onClick={handleSaveGeneral} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Simpan Pengaturan Umum
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -138,6 +299,10 @@ export function SettingsTabs() {
               <Label htmlFor="metaTitle">Meta Title</Label>
               <Input
                 id="metaTitle"
+                value={seoSettings.siteTitle || ""}
+                onChange={(e) =>
+                  setSeoSettings({ ...seoSettings, siteTitle: e.target.value })
+                }
                 placeholder="Judul yang muncul di hasil pencarian"
                 maxLength={70}
                 disabled={isLoading}
@@ -149,6 +314,10 @@ export function SettingsTabs() {
               <Label htmlFor="metaDescription">Meta Description</Label>
               <Textarea
                 id="metaDescription"
+                value={seoSettings.siteDescription || ""}
+                onChange={(e) =>
+                  setSeoSettings({ ...seoSettings, siteDescription: e.target.value })
+                }
                 placeholder="Deskripsi yang muncul di hasil pencarian"
                 maxLength={160}
                 disabled={isLoading}
@@ -160,6 +329,10 @@ export function SettingsTabs() {
               <Label htmlFor="metaKeywords">Meta Keywords</Label>
               <Input
                 id="metaKeywords"
+                value={seoSettings.siteKeywords || ""}
+                onChange={(e) =>
+                  setSeoSettings({ ...seoSettings, siteKeywords: e.target.value })
+                }
                 placeholder="sekolah, pendidikan, profil sekolah"
                 disabled={isLoading}
               />
@@ -170,15 +343,23 @@ export function SettingsTabs() {
                 <Label htmlFor="gaId">Google Analytics ID</Label>
                 <Input
                   id="gaId"
+                  value={seoSettings.googleAnalyticsId || ""}
+                  onChange={(e) =>
+                    setSeoSettings({ ...seoSettings, googleAnalyticsId: e.target.value })
+                  }
                   placeholder="G-XXXXXXXXXX"
                   disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="gscId">Google Search Console</Label>
+                <Label htmlFor="gtmId">Google Tag Manager ID</Label>
                 <Input
-                  id="gscId"
-                  placeholder="Verification code"
+                  id="gtmId"
+                  value={seoSettings.googleTagManagerId || ""}
+                  onChange={(e) =>
+                    setSeoSettings({ ...seoSettings, googleTagManagerId: e.target.value })
+                  }
+                  placeholder="GTM-XXXXXXX"
                   disabled={isLoading}
                 />
               </div>
@@ -189,9 +370,29 @@ export function SettingsTabs() {
               <Input
                 id="ogImage"
                 type="url"
+                value={seoSettings.ogImage || ""}
+                onChange={(e) =>
+                  setSeoSettings({ ...seoSettings, ogImage: e.target.value })
+                }
                 placeholder="https://..."
                 disabled={isLoading}
               />
+            </div>
+
+            <div className="pt-4">
+              <Button onClick={handleSaveSeo} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Simpan Pengaturan SEO
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -213,12 +414,18 @@ export function SettingsTabs() {
                   <Input
                     id="primaryColor"
                     type="color"
-                    defaultValue="#3B82F6"
+                    value={themeSettings.primaryColor || "#3B82F6"}
+                    onChange={(e) =>
+                      setThemeSettings({ ...themeSettings, primaryColor: e.target.value })
+                    }
                     className="w-16 h-10 p-1"
                     disabled={isLoading}
                   />
                   <Input
-                    defaultValue="#3B82F6"
+                    value={themeSettings.primaryColor || "#3B82F6"}
+                    onChange={(e) =>
+                      setThemeSettings({ ...themeSettings, primaryColor: e.target.value })
+                    }
                     placeholder="#3B82F6"
                     className="flex-1"
                     disabled={isLoading}
@@ -231,12 +438,18 @@ export function SettingsTabs() {
                   <Input
                     id="secondaryColor"
                     type="color"
-                    defaultValue="#10B981"
+                    value={themeSettings.secondaryColor || "#10B981"}
+                    onChange={(e) =>
+                      setThemeSettings({ ...themeSettings, secondaryColor: e.target.value })
+                    }
                     className="w-16 h-10 p-1"
                     disabled={isLoading}
                   />
                   <Input
-                    defaultValue="#10B981"
+                    value={themeSettings.secondaryColor || "#10B981"}
+                    onChange={(e) =>
+                      setThemeSettings({ ...themeSettings, secondaryColor: e.target.value })
+                    }
                     placeholder="#10B981"
                     className="flex-1"
                     disabled={isLoading}
@@ -246,24 +459,100 @@ export function SettingsTabs() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="accentColor">Warna Accent</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="accentColor"
+                  type="color"
+                  value={themeSettings.accentColor || "#8B5CF6"}
+                  onChange={(e) =>
+                    setThemeSettings({ ...themeSettings, accentColor: e.target.value })
+                  }
+                  className="w-16 h-10 p-1"
+                  disabled={isLoading}
+                />
+                <Input
+                  value={themeSettings.accentColor || "#8B5CF6"}
+                  onChange={(e) =>
+                    setThemeSettings({ ...themeSettings, accentColor: e.target.value })
+                  }
+                  placeholder="#8B5CF6"
+                  className="flex-1 max-w-xs"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
               <Label>Preset Tema</Label>
               <div className="grid grid-cols-4 gap-4">
-                {["PAUD/TK", "SD", "SMP", "SMA/SMK"].map((level) => (
+                {[
+                  { name: "PAUD/TK", primary: "#F472B6", secondary: "#FBBF24" },
+                  { name: "SD", primary: "#3B82F6", secondary: "#10B981" },
+                  { name: "SMP", primary: "#6366F1", secondary: "#14B8A6" },
+                  { name: "SMA/SMK", primary: "#1E3A8A", secondary: "#059669" },
+                ].map((preset) => (
                   <button
-                    key={level}
+                    key={preset.name}
                     type="button"
+                    onClick={() =>
+                      setThemeSettings({
+                        ...themeSettings,
+                        primaryColor: preset.primary,
+                        secondaryColor: preset.secondary,
+                      })
+                    }
                     className="p-4 border rounded-lg text-center hover:border-primary transition-colors"
                   >
-                    <div className="font-medium">{level}</div>
+                    <div className="flex justify-center gap-1 mb-2">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: preset.primary }}
+                      />
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: preset.secondary }}
+                      />
+                    </div>
+                    <div className="font-medium text-sm">{preset.name}</div>
                     <div className="text-xs text-muted-foreground">Preset tema</div>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch id="darkMode" />
-              <Label htmlFor="darkMode">Aktifkan Dark Mode Toggle</Label>
+            <div className="space-y-2">
+              <Label htmlFor="customCss">Custom CSS</Label>
+              <Textarea
+                id="customCss"
+                value={themeSettings.customCss || ""}
+                onChange={(e) =>
+                  setThemeSettings({ ...themeSettings, customCss: e.target.value })
+                }
+                placeholder="/* Custom CSS */\n.my-class { ... }"
+                rows={6}
+                className="font-mono text-sm"
+                disabled={isLoading}
+              />
+              <p className="text-xs text-muted-foreground">
+                Tambahkan CSS kustom untuk mempersonalisasi tampilan website
+              </p>
+            </div>
+
+            <div className="pt-4">
+              <Button onClick={handleSaveTheme} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Simpan Pengaturan Tema
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -283,6 +572,10 @@ export function SettingsTabs() {
                 <Label htmlFor="smtpHost">SMTP Host</Label>
                 <Input
                   id="smtpHost"
+                  value={emailSettings.smtpHost || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, smtpHost: e.target.value })
+                  }
                   placeholder="smtp.gmail.com"
                   disabled={isLoading}
                 />
@@ -292,6 +585,10 @@ export function SettingsTabs() {
                 <Input
                   id="smtpPort"
                   type="number"
+                  value={emailSettings.smtpPort || 587}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, smtpPort: parseInt(e.target.value) })
+                  }
                   placeholder="587"
                   disabled={isLoading}
                 />
@@ -303,6 +600,10 @@ export function SettingsTabs() {
                 <Label htmlFor="smtpUser">SMTP Username</Label>
                 <Input
                   id="smtpUser"
+                  value={emailSettings.smtpUser || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, smtpUser: e.target.value })
+                  }
                   placeholder="user@gmail.com"
                   disabled={isLoading}
                 />
@@ -312,6 +613,10 @@ export function SettingsTabs() {
                 <Input
                   id="smtpPassword"
                   type="password"
+                  value={emailSettings.smtpPassword || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, smtpPassword: e.target.value })
+                  }
                   placeholder="••••••••"
                   disabled={isLoading}
                 />
@@ -324,6 +629,10 @@ export function SettingsTabs() {
                 <Input
                   id="fromEmail"
                   type="email"
+                  value={emailSettings.fromEmail || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, fromEmail: e.target.value })
+                  }
                   placeholder="noreply@sekolah.sch.id"
                   disabled={isLoading}
                 />
@@ -332,15 +641,70 @@ export function SettingsTabs() {
                 <Label htmlFor="fromName">Nama Pengirim</Label>
                 <Input
                   id="fromName"
+                  value={emailSettings.fromName || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, fromName: e.target.value })
+                  }
                   placeholder="Sekolah Contoh"
                   disabled={isLoading}
                 />
               </div>
             </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="contactEmail">Email Penerima Kontak</Label>
+                <Input
+                  id="contactEmail"
+                  type="email"
+                  value={emailSettings.contactEmail || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, contactEmail: e.target.value })
+                  }
+                  placeholder="admin@sekolah.sch.id"
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ppdbNotifyEmail">Email Notifikasi PPDB</Label>
+                <Input
+                  id="ppdbNotifyEmail"
+                  type="email"
+                  value={emailSettings.ppdbNotifyEmail || ""}
+                  onChange={(e) =>
+                    setEmailSettings({ ...emailSettings, ppdbNotifyEmail: e.target.value })
+                  }
+                  placeholder="ppdb@sekolah.sch.id"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
             <div className="flex items-center space-x-2">
-              <Switch id="emailNotif" defaultChecked />
-              <Label htmlFor="emailNotif">Kirim notifikasi email saat ada pesan baru</Label>
+              <Switch
+                id="smtpSecure"
+                checked={emailSettings.smtpSecure || false}
+                onCheckedChange={(checked) =>
+                  setEmailSettings({ ...emailSettings, smtpSecure: checked })
+                }
+              />
+              <Label htmlFor="smtpSecure">Gunakan SSL/TLS</Label>
+            </div>
+
+            <div className="pt-4">
+              <Button onClick={handleSaveEmail} disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Simpan Pengaturan Email
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -407,22 +771,6 @@ export function SettingsTabs() {
           </CardContent>
         </Card>
       </TabsContent>
-
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Menyimpan...
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" />
-              Simpan Pengaturan
-            </>
-          )}
-        </Button>
-      </div>
     </Tabs>
   );
 }

@@ -4,22 +4,39 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { contactMessageSchema, type ContactMessageInput } from "@/lib/validations";
+import { rateLimitByIp, sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/security";
 import type { ApiResponse } from "@/types";
 
 export async function submitContactMessage(
   data: ContactMessageInput
 ): Promise<ApiResponse> {
   try {
+    // Rate limiting: 5 messages per minute per IP
+    const rateLimitResult = await rateLimitByIp("contact-form", {
+      maxRequests: 5,
+      windowMs: 60000, // 1 minute
+    });
+
+    if (!rateLimitResult.success) {
+      return {
+        success: false,
+        error: `Terlalu banyak permintaan. Coba lagi dalam ${rateLimitResult.resetIn} detik.`,
+      };
+    }
+
     const validated = contactMessageSchema.parse(data);
 
+    // Sanitize inputs
+    const sanitizedData = {
+      name: sanitizeText(validated.name),
+      email: sanitizeEmail(validated.email) || validated.email,
+      phone: validated.phone ? sanitizePhone(validated.phone) : null,
+      subject: validated.subject ? sanitizeText(validated.subject) : null,
+      message: sanitizeText(validated.message),
+    };
+
     await prisma.contactMessage.create({
-      data: {
-        name: validated.name,
-        email: validated.email,
-        phone: validated.phone,
-        subject: validated.subject,
-        message: validated.message,
-      },
+      data: sanitizedData,
     });
 
     // TODO: Send email notification to admin

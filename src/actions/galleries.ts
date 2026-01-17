@@ -242,26 +242,28 @@ export async function addGalleryItems(
       _max: { order: true },
     });
 
-    let order = (maxOrder._max.order ?? -1) + 1;
+    const startOrder = (maxOrder._max.order ?? -1) + 1;
 
-    for (const item of items) {
+    // Validate and prepare all items
+    const validatedItems = items.map((item, index) => {
       const validated = galleryItemSchema.parse({
         ...item,
-        order,
+        order: startOrder + index,
       });
+      return {
+        galleryId,
+        url: validated.url,
+        thumbnail: validated.thumbnail,
+        caption: validated.caption,
+        type: validated.type,
+        order: validated.order,
+      };
+    });
 
-      await prisma.galleryItem.create({
-        data: {
-          galleryId,
-          url: validated.url,
-          thumbnail: validated.thumbnail,
-          caption: validated.caption,
-          type: validated.type,
-          order: validated.order,
-        },
-      });
-      order++;
-    }
+    // Batch insert using createMany
+    await prisma.galleryItem.createMany({
+      data: validatedItems,
+    });
 
     // Update cover image if not set
     const gallery = await prisma.gallery.findUnique({ where: { id: galleryId } });
@@ -343,12 +345,15 @@ export async function reorderGalleryItems(
   }
 
   try {
-    for (const item of items) {
-      await prisma.galleryItem.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      });
-    }
+    // Use transaction for batch updates to avoid N+1 queries
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.galleryItem.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        })
+      )
+    );
 
     revalidatePath("/admin/galleries");
     revalidatePath("/galeri");

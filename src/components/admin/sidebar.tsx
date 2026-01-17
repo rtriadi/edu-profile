@@ -77,7 +77,7 @@ const contentMenuItems = [
   },
   {
     title: "Galeri",
-    url: "/admin/gallery",
+    url: "/admin/galleries",
     icon: Image,
   },
   {

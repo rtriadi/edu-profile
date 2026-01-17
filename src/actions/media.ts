@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { put, del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { validateFile } from "@/lib/security";
 import type { ApiResponse } from "@/types";
 
 export async function getMedia(params?: {
@@ -60,27 +61,25 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
       return { success: false, error: "File tidak ditemukan" };
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      return { success: false, error: "Ukuran file maksimal 10MB" };
+    // Validate file (size, MIME type, and extension)
+    const validation = validateFile(file, {
+      maxSizeMB: 10,
+      allowedTypes: ["image", "video", "audio", "document"],
+    });
+
+    if (!validation.valid) {
+      return { success: false, error: validation.error || "File tidak valid" };
     }
 
-    // Determine file type
-    let type = "other";
-    if (file.type.startsWith("image/")) type = "image";
-    else if (file.type.startsWith("video/")) type = "video";
-    else if (file.type.startsWith("audio/")) type = "audio";
-    else if (
-      file.type.includes("pdf") ||
-      file.type.includes("document") ||
-      file.type.includes("sheet") ||
-      file.type.includes("presentation")
-    ) {
-      type = "document";
-    }
+    const type = validation.fileType || "other";
+
+    // Sanitize filename - remove special characters
+    const sanitizedName = file.name
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .replace(/_{2,}/g, "_");
 
     // Upload to Vercel Blob
-    const blob = await put(`${folder}/${file.name}`, file, {
+    const blob = await put(`${folder}/${sanitizedName}`, file, {
       access: "public",
     });
 
@@ -91,7 +90,7 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
     // Save to database
     const media = await prisma.media.create({
       data: {
-        name: file.name,
+        name: sanitizedName,
         url: blob.url,
         type,
         mimeType: file.type,
@@ -164,6 +163,12 @@ export async function updateMediaAlt(
 }
 
 // Local file upload for development (without Vercel Blob)
+/**
+ * Local file upload for development (without Vercel Blob)
+ * WARNING: This stores files as base64 data URLs in the database.
+ * This is NOT recommended for production - use uploadMedia with Vercel Blob instead.
+ * This function is provided only for local development/testing purposes.
+ */
 export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse> {
   const session = await auth();
   if (!session) {
@@ -178,21 +183,24 @@ export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse>
       return { success: false, error: "File tidak ditemukan" };
     }
 
-    // For local development, we'll store the file info but use a placeholder URL
-    // In production, use uploadMedia with Vercel Blob
-    
-    let type = "other";
-    if (file.type.startsWith("image/")) type = "image";
-    else if (file.type.startsWith("video/")) type = "video";
-    else if (file.type.startsWith("audio/")) type = "audio";
-    else if (
-      file.type.includes("pdf") ||
-      file.type.includes("document")
-    ) {
-      type = "document";
+    // Validate file (size, MIME type, and extension)
+    const validation = validateFile(file, {
+      maxSizeMB: 5, // Lower limit for local storage
+      allowedTypes: ["image", "video", "audio", "document"],
+    });
+
+    if (!validation.valid) {
+      return { success: false, error: validation.error || "File tidak valid" };
     }
 
-    // Create a data URL for development
+    const type = validation.fileType || "other";
+
+    // Sanitize filename
+    const sanitizedName = file.name
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .replace(/_{2,}/g, "_");
+
+    // Create a data URL for development (NOT for production!)
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64 = buffer.toString("base64");
@@ -200,7 +208,7 @@ export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse>
 
     const media = await prisma.media.create({
       data: {
-        name: file.name,
+        name: sanitizedName,
         url: dataUrl,
         type,
         mimeType: file.type,
@@ -210,7 +218,7 @@ export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse>
     });
 
     revalidatePath("/admin/media");
-    return { success: true, data: media, message: "File berhasil diupload" };
+    return { success: true, data: media, message: "File berhasil diupload (local mode)" };
   } catch (error) {
     console.error("Upload error:", error);
     return { success: false, error: "Gagal mengupload file" };
