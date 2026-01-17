@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 
 // Paths that should be accessible during maintenance
 const maintenanceAllowedPaths = [
@@ -19,21 +19,16 @@ function isAllowedDuringMaintenance(pathname: string): boolean {
 
 async function checkMaintenanceMode(baseUrl: string): Promise<boolean> {
   try {
-    // Add timestamp to prevent caching
     const response = await fetch(`${baseUrl}/api/maintenance?t=${Date.now()}`, {
       cache: "no-store",
-      headers: {
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-      },
     });
     
     if (response.ok) {
       const data = await response.json();
       return data.maintenanceMode === true;
     }
-  } catch (error) {
-    console.error("Error checking maintenance mode:", error);
+  } catch {
+    // Silently fail - don't block if API is unreachable
   }
   
   return false;
@@ -42,25 +37,26 @@ async function checkMaintenanceMode(baseUrl: string): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Get session token (lightweight - Edge compatible)
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.AUTH_SECRET 
+  });
+
   // Skip maintenance check for allowed paths
   if (!isAllowedDuringMaintenance(pathname)) {
-    // Check maintenance mode via API
     const baseUrl = request.nextUrl.origin;
     const maintenanceMode = await checkMaintenanceMode(baseUrl);
 
     // If in maintenance mode, redirect non-admin users
-    if (maintenanceMode) {
-      const session = await auth();
-      if (!session?.user) {
-        return NextResponse.redirect(new URL("/maintenance", request.url));
-      }
+    if (maintenanceMode && !token) {
+      return NextResponse.redirect(new URL("/maintenance", request.url));
     }
   }
 
   // Handle admin routes authentication
   if (pathname.startsWith("/admin")) {
-    const session = await auth();
-    if (!session?.user) {
+    if (!token) {
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
@@ -72,13 +68,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
