@@ -86,12 +86,14 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             {logo ? (
-              <div className="relative h-10 w-10 rounded-xl overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
+              <div className="relative h-10 w-auto min-w-[40px] group-hover:opacity-90 transition-all">
                 <Image
                   src={logo}
                   alt={siteName}
-                  fill
-                  className="object-cover"
+                  width={40}
+                  height={40}
+                  className="object-contain h-10 w-auto"
+                  style={{ maxHeight: '40px' }}
                 />
               </div>
             ) : (
@@ -182,8 +184,15 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
               <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 overflow-y-auto">
                 <div className="flex items-center gap-3 p-6 border-b">
                   {logo ? (
-                    <div className="relative h-10 w-10 rounded-xl overflow-hidden">
-                      <Image src={logo} alt={siteName} fill className="object-cover" />
+                    <div className="relative h-10 w-auto min-w-[40px]">
+                      <Image 
+                        src={logo} 
+                        alt={siteName} 
+                        width={40}
+                        height={40}
+                        className="object-contain h-10 w-auto"
+                        style={{ maxHeight: '40px' }}
+                      />
                     </div>
                   ) : (
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-primary text-white">

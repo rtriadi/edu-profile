@@ -28,8 +28,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
-import { PublicHeader } from "@/components/public/header";
-import { PublicFooter } from "@/components/public/footer";
 import { getSiteConfig } from "@/lib/site-config";
 
 async function getHomeData() {
@@ -110,12 +108,9 @@ export default async function HomePage() {
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <PublicHeader siteName={siteName} logo={schoolProfile?.logo} />
-
-      <main className="flex-1">
-        {/* Hero Section - Works in both light and dark mode */}
-        <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <main className="flex-1">
+      {/* Hero Section - Works in both light and dark mode */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
           {/* Background - adapts to theme */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
 
@@ -641,9 +636,6 @@ export default async function HomePage() {
           </div>
         </section>
       </main>
-
-      <PublicFooter />
-    </div>
   );
 }
 
