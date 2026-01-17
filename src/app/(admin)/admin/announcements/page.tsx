@@ -37,7 +37,7 @@ export default function AnnouncementsPage() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            Belum ada pengumuman aktif. Klik tombol "Tambah Pengumuman" untuk membuat.
+            Belum ada pengumuman aktif. Klik tombol &quot;Tambah Pengumuman&quot; untuk membuat.
           </p>
         </CardContent>
       </Card>
