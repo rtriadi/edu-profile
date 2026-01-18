@@ -49,6 +49,7 @@ interface SchoolProfileFormProps {
     foundedYear: number | null;
     schoolLevel: SchoolLevel;
     socialMedia: unknown;
+    operatingHours: unknown;
   } | null;
 }
 
@@ -64,6 +65,7 @@ const schoolLevels: { value: SchoolLevel; label: string }[] = [
 export function SchoolProfileForm({ profile }: SchoolProfileFormProps) {
   const router = useRouter();
   const socialMedia = profile?.socialMedia as Record<string, string> | null;
+  const operatingHours = profile?.operatingHours as Record<string, string> | null;
 
   const {
     register,
@@ -97,6 +99,15 @@ export function SchoolProfileForm({ profile }: SchoolProfileFormProps) {
         twitter: socialMedia?.twitter || "",
         tiktok: socialMedia?.tiktok || "",
       },
+      operatingHours: {
+        monday: operatingHours?.monday || "07:00 - 15:00",
+        tuesday: operatingHours?.tuesday || "07:00 - 15:00",
+        wednesday: operatingHours?.wednesday || "07:00 - 15:00",
+        thursday: operatingHours?.thursday || "07:00 - 15:00",
+        friday: operatingHours?.friday || "07:00 - 11:30",
+        saturday: operatingHours?.saturday || "07:00 - 12:00",
+        sunday: operatingHours?.sunday || "Tutup",
+      },
     },
   });
 
@@ -120,6 +131,7 @@ export function SchoolProfileForm({ profile }: SchoolProfileFormProps) {
           <TabsTrigger value="general">Informasi Umum</TabsTrigger>
           <TabsTrigger value="visi-misi">Visi & Misi</TabsTrigger>
           <TabsTrigger value="contact">Kontak</TabsTrigger>
+          <TabsTrigger value="hours">Jam Operasional</TabsTrigger>
           <TabsTrigger value="social">Media Sosial</TabsTrigger>
         </TabsList>
 
@@ -360,6 +372,93 @@ export function SchoolProfileForm({ profile }: SchoolProfileFormProps) {
                   />
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="hours">
+          <Card>
+            <CardHeader>
+              <CardTitle>Jam Operasional</CardTitle>
+              <CardDescription>
+                Atur jam operasional sekolah untuk setiap hari
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="monday">Senin</Label>
+                  <Input
+                    id="monday"
+                    placeholder="07:00 - 15:00"
+                    {...register("operatingHours.monday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tuesday">Selasa</Label>
+                  <Input
+                    id="tuesday"
+                    placeholder="07:00 - 15:00"
+                    {...register("operatingHours.tuesday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="wednesday">Rabu</Label>
+                  <Input
+                    id="wednesday"
+                    placeholder="07:00 - 15:00"
+                    {...register("operatingHours.wednesday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="thursday">Kamis</Label>
+                  <Input
+                    id="thursday"
+                    placeholder="07:00 - 15:00"
+                    {...register("operatingHours.thursday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="friday">Jumat</Label>
+                  <Input
+                    id="friday"
+                    placeholder="07:00 - 11:30"
+                    {...register("operatingHours.friday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="saturday">Sabtu</Label>
+                  <Input
+                    id="saturday"
+                    placeholder="07:00 - 12:00 atau Tutup"
+                    {...register("operatingHours.saturday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="sunday">Minggu</Label>
+                  <Input
+                    id="sunday"
+                    placeholder="Tutup"
+                    {...register("operatingHours.sunday")}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Format: &quot;07:00 - 15:00&quot; atau &quot;Tutup&quot; jika libur
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
