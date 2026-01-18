@@ -11,6 +11,17 @@ export const metadata: Metadata = {
   description: "Hubungi kami untuk informasi lebih lanjut",
 };
 
+// Type for operating hours
+interface OperatingHours {
+  monday?: string;
+  tuesday?: string;
+  wednesday?: string;
+  thursday?: string;
+  friday?: string;
+  saturday?: string;
+  sunday?: string;
+}
+
 // Cache the contact data to avoid connection pool issues during build
 const getContactData = unstable_cache(
   async () => {
@@ -26,8 +37,60 @@ const getContactData = unstable_cache(
   { revalidate: 60, tags: ["school-profile"] }
 );
 
+// Helper to format operating hours for display
+function getOperatingHoursDisplay(hours: OperatingHours | null) {
+  if (!hours) {
+    // Default hours if not set in database
+    return [
+      { day: "Senin - Jumat", hours: "07:00 - 15:00" },
+      { day: "Sabtu", hours: "07:00 - 12:00" },
+      { day: "Minggu", hours: "Tutup" },
+    ];
+  }
+
+  const result = [];
+
+  // Check if weekdays have the same hours
+  const weekdayHours = hours.monday || "07:00 - 15:00";
+  const allWeekdaysSame = 
+    hours.monday === hours.tuesday &&
+    hours.tuesday === hours.wednesday &&
+    hours.wednesday === hours.thursday;
+
+  if (allWeekdaysSame && hours.monday) {
+    result.push({ day: "Senin - Kamis", hours: weekdayHours });
+  } else {
+    if (hours.monday) result.push({ day: "Senin", hours: hours.monday });
+    if (hours.tuesday) result.push({ day: "Selasa", hours: hours.tuesday });
+    if (hours.wednesday) result.push({ day: "Rabu", hours: hours.wednesday });
+    if (hours.thursday) result.push({ day: "Kamis", hours: hours.thursday });
+  }
+
+  if (hours.friday) result.push({ day: "Jumat", hours: hours.friday });
+  if (hours.saturday) result.push({ day: "Sabtu", hours: hours.saturday });
+  
+  result.push({ 
+    day: "Minggu", 
+    hours: hours.sunday || "Tutup" 
+  });
+
+  // If no hours set, return defaults
+  if (result.length === 1) {
+    return [
+      { day: "Senin - Jumat", hours: "07:00 - 15:00" },
+      { day: "Sabtu", hours: "07:00 - 12:00" },
+      { day: "Minggu", hours: "Tutup" },
+    ];
+  }
+
+  return result;
+}
+
 export default async function KontakPage() {
   const schoolProfile = await getContactData();
+  const operatingHours = getOperatingHoursDisplay(
+    schoolProfile?.operatingHours as OperatingHours | null
+  );
 
   return (
     <main className="flex-1">
@@ -101,9 +164,11 @@ export default async function KontakPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-1 text-muted-foreground text-sm">
-                    <p>Senin - Jumat: 07:00 - 15:00</p>
-                    <p>Sabtu: 07:00 - 12:00</p>
-                    <p>Minggu: Tutup</p>
+                    {operatingHours.map((item) => (
+                      <p key={item.day}>
+                        {item.day}: {item.hours}
+                      </p>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -135,13 +200,14 @@ export default async function KontakPage() {
                 <CardContent className="p-0">
                   <div className="aspect-video w-full">
                     <iframe
-                      src={`https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${schoolProfile.latitude},${schoolProfile.longitude}`}
+                      src={`https://maps.google.com/maps?q=${schoolProfile.latitude},${schoolProfile.longitude}&z=15&output=embed`}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
+                      title="Lokasi Sekolah"
                     />
                   </div>
                 </CardContent>

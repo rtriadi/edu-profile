@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth, canAccess } from "@/lib/auth";
 import { schoolProfileSchema, type SchoolProfileInput } from "@/lib/validations";
@@ -48,6 +48,7 @@ export async function updateSchoolProfile(
           foundedYear: validated.foundedYear,
           schoolLevel: validated.schoolLevel,
           socialMedia: validated.socialMedia,
+          operatingHours: validated.operatingHours,
         },
       });
     } else {
@@ -71,6 +72,7 @@ export async function updateSchoolProfile(
           foundedYear: validated.foundedYear,
           schoolLevel: validated.schoolLevel,
           socialMedia: validated.socialMedia,
+          operatingHours: validated.operatingHours,
         },
       });
     }
@@ -78,6 +80,7 @@ export async function updateSchoolProfile(
     revalidatePath("/admin/school-profile");
     revalidatePath("/");
     revalidatePath("/profil");
+    revalidatePath("/kontak");
     return { success: true, data: profile, message: "Profil sekolah berhasil diperbarui" };
   } catch (error) {
     console.error("Update school profile error:", error);

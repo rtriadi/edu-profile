@@ -466,6 +466,15 @@ export const schoolProfileSchema = z.object({
     twitter: z.string().url().optional().or(z.literal("")),
     tiktok: z.string().url().optional().or(z.literal("")),
   }).optional(),
+  operatingHours: z.object({
+    monday: z.string().max(50).optional(),
+    tuesday: z.string().max(50).optional(),
+    wednesday: z.string().max(50).optional(),
+    thursday: z.string().max(50).optional(),
+    friday: z.string().max(50).optional(),
+    saturday: z.string().max(50).optional(),
+    sunday: z.string().max(50).optional(),
+  }).optional(),
 });
 
 // ==========================================

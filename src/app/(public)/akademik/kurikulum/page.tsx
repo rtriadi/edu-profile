@@ -10,24 +10,88 @@ export const metadata: Metadata = {
   description: "Kurikulum dan program pembelajaran sekolah kami",
 };
 
+// Type for operating hours
+interface OperatingHours {
+  monday?: string;
+  tuesday?: string;
+  wednesday?: string;
+  thursday?: string;
+  friday?: string;
+  saturday?: string;
+  sunday?: string;
+}
+
 const getKurikulumData = unstable_cache(
   async () => {
     try {
-      const schoolProfile = await prisma.schoolProfile.findFirst({
-        select: { name: true, schoolLevel: true },
-      });
-      return schoolProfile;
+      const [schoolProfile, curriculumPrograms] = await Promise.all([
+        prisma.schoolProfile.findFirst({
+          select: { 
+            name: true, 
+            schoolLevel: true,
+            operatingHours: true,
+          },
+        }),
+        prisma.program.findMany({
+          where: { 
+            type: "CURRICULUM",
+            isActive: true,
+          },
+          orderBy: [{ order: "asc" }, { name: "asc" }],
+        }),
+      ]);
+      return { schoolProfile, curriculumPrograms };
     } catch (error) {
       console.error("Error fetching kurikulum data:", error);
-      return null;
+      return { schoolProfile: null, curriculumPrograms: [] };
     }
   },
   ["kurikulum-page-data"],
-  { revalidate: 60, tags: ["school-profile"] }
+  { revalidate: 60, tags: ["school-profile", "programs"] }
 );
 
+// Default subjects if no curriculum programs exist in database
+const defaultSubjects = [
+  "Pendidikan Agama",
+  "Pendidikan Pancasila",
+  "Bahasa Indonesia",
+  "Matematika",
+  "IPA (Ilmu Pengetahuan Alam)",
+  "IPS (Ilmu Pengetahuan Sosial)",
+  "Bahasa Inggris",
+  "Seni Budaya",
+  "Pendidikan Jasmani",
+  "Prakarya",
+  "Informatika",
+  "Bahasa Daerah",
+];
+
+// Helper to format operating hours
+function formatOperatingHours(hours: OperatingHours | null) {
+  if (!hours) {
+    return {
+      weekdays: "07:00 - 15:00 WIB",
+      friday: "07:00 - 11:30 WIB",
+    };
+  }
+  
+  return {
+    weekdays: hours.monday || "07:00 - 15:00 WIB",
+    friday: hours.friday || "07:00 - 11:30 WIB",
+  };
+}
+
 export default async function KurikulumPage() {
-  const schoolProfile = await getKurikulumData();
+  const { schoolProfile, curriculumPrograms } = await getKurikulumData();
+  
+  // Use curriculum programs from DB or fallback to default
+  const subjects = curriculumPrograms.length > 0 
+    ? curriculumPrograms.map(p => p.name)
+    : defaultSubjects;
+
+  const operatingHours = formatOperatingHours(
+    schoolProfile?.operatingHours as OperatingHours | null
+  );
 
   return (
     <main className="flex-1">
@@ -86,20 +150,7 @@ export default async function KurikulumPage() {
                 Mata Pelajaran
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {[
-                  "Pendidikan Agama",
-                  "Pendidikan Pancasila",
-                  "Bahasa Indonesia",
-                  "Matematika",
-                  "IPA (Ilmu Pengetahuan Alam)",
-                  "IPS (Ilmu Pengetahuan Sosial)",
-                  "Bahasa Inggris",
-                  "Seni Budaya",
-                  "Pendidikan Jasmani",
-                  "Prakarya",
-                  "Informatika",
-                  "Bahasa Daerah",
-                ].map((subject) => (
+                {subjects.map((subject) => (
                   <Card key={subject} className="bg-muted/30">
                     <CardContent className="py-4 text-center">
                       <span className="text-sm font-medium">{subject}</span>
@@ -107,6 +158,11 @@ export default async function KurikulumPage() {
                   </Card>
                 ))}
               </div>
+              {curriculumPrograms.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-4 text-center">
+                  Data mata pelajaran dapat dikelola melalui menu Program di panel admin dengan tipe &quot;Kurikulum&quot;.
+                </p>
+              )}
             </div>
 
             {/* Jam Belajar */}
@@ -120,11 +176,11 @@ export default async function KurikulumPage() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <h3 className="font-semibold mb-2">Senin - Kamis</h3>
-                      <p className="text-muted-foreground">07:00 - 15:00 WIB</p>
+                      <p className="text-muted-foreground">{operatingHours.weekdays}</p>
                     </div>
                     <div>
                       <h3 className="font-semibold mb-2">Jumat</h3>
-                      <p className="text-muted-foreground">07:00 - 11:30 WIB</p>
+                      <p className="text-muted-foreground">{operatingHours.friday}</p>
                     </div>
                   </div>
                 </CardContent>

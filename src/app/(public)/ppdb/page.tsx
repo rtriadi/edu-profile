@@ -238,20 +238,14 @@ export default async function PPDBPage() {
               {/* Download */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Download</CardTitle>
+                  <CardTitle className="text-lg">Unduhan</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button variant="outline" className="w-full justify-start" asChild>
-                    <a href="#" download>
+                    <Link href="/unduhan">
                       <FileText className="mr-2 h-4 w-4" />
-                      Brosur Sekolah
-                    </a>
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <a href="#" download>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Formulir Pendaftaran
-                    </a>
+                      Lihat Semua Unduhan
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

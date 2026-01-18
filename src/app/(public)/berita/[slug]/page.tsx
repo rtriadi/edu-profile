@@ -167,7 +167,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Eye className="h-4 w-4" />
-                  <span>{post.views} views</span>
+                  <span>{post.views} kali dilihat</span>
                 </div>
               </div>
 
@@ -209,7 +209,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 <span className="text-sm text-muted-foreground">Bagikan:</span>
                 <Button variant="outline" size="sm">
                   <Share2 className="h-4 w-4 mr-2" />
-                  Share
+                  Bagikan
                 </Button>
               </div>
             </div>
