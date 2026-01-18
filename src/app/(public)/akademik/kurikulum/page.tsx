@@ -163,9 +163,6 @@ export default async function KurikulumPage() {
                   </div>
                 </CardContent>
               </Card>
-              <p className="text-sm text-muted-foreground mt-4 text-center">
-                Jam operasional dapat dikelola melalui menu Profil Sekolah di panel admin.
-              </p>
             </div>
           </div>
         </div>
