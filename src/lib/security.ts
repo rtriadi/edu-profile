@@ -327,3 +327,63 @@ export function sanitizePhone(phone: string): string {
   // Keep only digits, +, -, (, ), and spaces
   return phone.replace(/[^\d+\-() ]/g, "").trim();
 }
+
+/**
+ * Validate Google Analytics ID format
+ * Accepts GA4 (G-XXXXXXXXXX) or Universal Analytics (UA-XXXXXXXX-X)
+ */
+export function validateGoogleAnalyticsId(id: string): boolean {
+  if (typeof id !== "string") return false;
+  
+  const trimmed = id.trim();
+  
+  // GA4 format: G-XXXXXXXXXX (10+ alphanumeric after G-)
+  const ga4Regex = /^G-[A-Z0-9]{10,}$/i;
+  
+  // Universal Analytics format: UA-XXXXXXXX-X
+  const uaRegex = /^UA-\d{4,10}-\d{1,4}$/i;
+  
+  return ga4Regex.test(trimmed) || uaRegex.test(trimmed);
+}
+
+/**
+ * Sanitize CSS input to prevent CSS injection attacks
+ * Removes potentially dangerous CSS properties and values
+ */
+export function sanitizeCss(css: string): string {
+  if (typeof css !== "string") return "";
+  
+  // Remove null bytes
+  let sanitized = css.replace(/\0/g, "");
+  
+  // Remove JavaScript expressions
+  sanitized = sanitized.replace(/expression\s*\(/gi, "");
+  sanitized = sanitized.replace(/javascript\s*:/gi, "");
+  
+  // Remove behavior property (IE-specific, can execute HTC files)
+  sanitized = sanitized.replace(/behavior\s*:/gi, "");
+  
+  // Remove -moz-binding (Firefox-specific, can execute XBL)
+  sanitized = sanitized.replace(/-moz-binding\s*:/gi, "");
+  
+  // Remove @import to prevent loading external stylesheets
+  sanitized = sanitized.replace(/@import\s+/gi, "/* @import blocked */ ");
+  
+  // Remove data: URIs in url() to prevent data exfiltration
+  sanitized = sanitized.replace(/url\s*\(\s*["']?\s*data:/gi, "url(/* data: blocked */");
+  
+  // Remove javascript: URIs in url()
+  sanitized = sanitized.replace(/url\s*\(\s*["']?\s*javascript:/gi, "url(/* javascript: blocked */");
+  
+  // Remove HTML comments that could hide malicious content
+  sanitized = sanitized.replace(/<!--[\s\S]*?-->/g, "");
+  
+  // Remove </style> tags that could break out of the style element
+  sanitized = sanitized.replace(/<\s*\/?\s*style\s*>/gi, "");
+  
+  // Remove any remaining < or > that could be used for HTML injection
+  sanitized = sanitized.replace(/</g, "");
+  sanitized = sanitized.replace(/>/g, "");
+  
+  return sanitized.trim();
+}

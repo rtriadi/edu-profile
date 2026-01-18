@@ -73,14 +73,22 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
   }, []);
 
   return (
-    <header 
-      className={cn(
-        "sticky top-0 z-50 w-full border-b transition-all duration-300",
-        isScrolled 
-          ? "bg-background/95 backdrop-blur-lg shadow-sm supports-[backdrop-filter]:bg-background/80" 
-          : "bg-background/80 backdrop-blur-sm"
-      )}
-    >
+    <>
+      {/* Skip to main content link for accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+      >
+        Langsung ke konten utama
+      </a>
+      <header 
+        className={cn(
+          "sticky top-0 z-50 w-full border-b transition-all duration-300",
+          isScrolled 
+            ? "bg-background/95 backdrop-blur-lg shadow-sm supports-[backdrop-filter]:bg-background/80" 
+            : "bg-background/80 backdrop-blur-sm"
+        )}
+      >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -245,5 +253,6 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
         </div>
       </div>
     </header>
+    </>
   );
 }

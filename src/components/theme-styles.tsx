@@ -1,4 +1,5 @@
 import { getThemeSettings } from "@/actions/settings";
+import { sanitizeCss } from "@/lib/security";
 
 function hexToOklch(hex: string): string {
   // Convert hex to RGB
@@ -74,7 +75,7 @@ export async function ThemeStyles() {
   const accentLight = adjustLightness(accentOklch, 0.15);
   const accentDark = adjustLightness(accentOklch, -0.15);
 
-  const customCss = themeSettings.customCss || "";
+  const customCss = sanitizeCss(themeSettings.customCss || "");
 
   const cssVariables = `
     :root {

@@ -5,6 +5,7 @@ import { Providers } from "@/components/providers";
 import { ThemeStyles } from "@/components/theme-styles";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import { getSiteConfig } from "@/lib/site-config";
+import { validateGoogleAnalyticsId } from "@/lib/security";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,15 +63,20 @@ export default async function RootLayout({
     accentColor: config.accentColor,
   };
   
+  // Validate Google Analytics ID before rendering
+  const validGaId = config.googleAnalyticsId && validateGoogleAnalyticsId(config.googleAnalyticsId) 
+    ? config.googleAnalyticsId 
+    : null;
+  
   return (
     <html lang={config.language || "id"} suppressHydrationWarning>
       <head>
         <ThemeStyles />
-        {config.googleAnalyticsId && (
+        {validGaId && (
           <>
             <script
               async
-              src={`https://www.googletagmanager.com/gtag/js?id=${config.googleAnalyticsId}`}
+              src={`https://www.googletagmanager.com/gtag/js?id=${validGaId}`}
             />
             <script
               dangerouslySetInnerHTML={{
@@ -78,7 +84,7 @@ export default async function RootLayout({
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', '${config.googleAnalyticsId}');
+                  gtag('config', '${validGaId}');
                 `,
               }}
             />

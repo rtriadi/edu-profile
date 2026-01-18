@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { rateLimitByIp, sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/security";
 import type { ApiResponse } from "@/types";
 
 // ==========================================
@@ -332,9 +333,45 @@ export async function createPublicRegistration(data: {
   photo?: string;
 }): Promise<ApiResponse> {
   try {
+    // Rate limiting: 3 registrations per 5 minutes per IP
+    const rateLimitResult = await rateLimitByIp("ppdb-registration", {
+      maxRequests: 3,
+      windowMs: 300000, // 5 minutes
+    });
+
+    if (!rateLimitResult.success) {
+      return {
+        success: false,
+        error: `Terlalu banyak permintaan. Coba lagi dalam ${rateLimitResult.resetIn} detik.`,
+      };
+    }
+
+    // Sanitize all input data
+    const sanitizedData = {
+      periodId: data.periodId,
+      studentName: sanitizeText(data.studentName),
+      nisn: data.nisn ? sanitizeText(data.nisn) : undefined,
+      birthPlace: sanitizeText(data.birthPlace),
+      birthDate: data.birthDate,
+      gender: data.gender,
+      religion: data.religion ? sanitizeText(data.religion) : undefined,
+      address: sanitizeText(data.address),
+      previousSchool: data.previousSchool ? sanitizeText(data.previousSchool) : undefined,
+      fatherName: data.fatherName ? sanitizeText(data.fatherName) : undefined,
+      fatherJob: data.fatherJob ? sanitizeText(data.fatherJob) : undefined,
+      fatherPhone: data.fatherPhone ? sanitizePhone(data.fatherPhone) : undefined,
+      motherName: data.motherName ? sanitizeText(data.motherName) : undefined,
+      motherJob: data.motherJob ? sanitizeText(data.motherJob) : undefined,
+      motherPhone: data.motherPhone ? sanitizePhone(data.motherPhone) : undefined,
+      guardianName: data.guardianName ? sanitizeText(data.guardianName) : undefined,
+      guardianPhone: data.guardianPhone ? sanitizePhone(data.guardianPhone) : undefined,
+      guardianEmail: data.guardianEmail ? sanitizeEmail(data.guardianEmail) : undefined,
+      photo: data.photo,
+    };
+
     // Validate period exists and is active
     const period = await prisma.pPDBPeriod.findUnique({
-      where: { id: data.periodId },
+      where: { id: sanitizedData.periodId },
     });
 
     if (!period) {
@@ -353,7 +390,7 @@ export async function createPublicRegistration(data: {
     // Check quota if set
     if (period.quota) {
       const currentCount = await prisma.pPDBRegistration.count({
-        where: { periodId: data.periodId },
+        where: { periodId: sanitizedData.periodId },
       });
       if (currentCount >= period.quota) {
         return { success: false, error: "Kuota pendaftaran sudah penuh" };
@@ -363,33 +400,33 @@ export async function createPublicRegistration(data: {
     // Generate registration number
     const year = new Date().getFullYear();
     const count = await prisma.pPDBRegistration.count({
-      where: { periodId: data.periodId },
+      where: { periodId: sanitizedData.periodId },
     });
     const registrationNo = `PPDB-${year}-${String(count + 1).padStart(4, "0")}`;
 
-    // Create registration
+    // Create registration with sanitized data
     const registration = await prisma.pPDBRegistration.create({
       data: {
-        periodId: data.periodId,
+        periodId: sanitizedData.periodId,
         registrationNo,
-        studentName: data.studentName,
-        nisn: data.nisn,
-        birthPlace: data.birthPlace,
-        birthDate: data.birthDate,
-        gender: data.gender,
-        religion: data.religion,
-        address: data.address,
-        previousSchool: data.previousSchool,
-        fatherName: data.fatherName,
-        fatherJob: data.fatherJob,
-        fatherPhone: data.fatherPhone,
-        motherName: data.motherName,
-        motherJob: data.motherJob,
-        motherPhone: data.motherPhone,
-        guardianName: data.guardianName,
-        guardianPhone: data.guardianPhone,
-        guardianEmail: data.guardianEmail,
-        photo: data.photo,
+        studentName: sanitizedData.studentName,
+        nisn: sanitizedData.nisn,
+        birthPlace: sanitizedData.birthPlace,
+        birthDate: sanitizedData.birthDate,
+        gender: sanitizedData.gender,
+        religion: sanitizedData.religion,
+        address: sanitizedData.address,
+        previousSchool: sanitizedData.previousSchool,
+        fatherName: sanitizedData.fatherName,
+        fatherJob: sanitizedData.fatherJob,
+        fatherPhone: sanitizedData.fatherPhone,
+        motherName: sanitizedData.motherName,
+        motherJob: sanitizedData.motherJob,
+        motherPhone: sanitizedData.motherPhone,
+        guardianName: sanitizedData.guardianName,
+        guardianPhone: sanitizedData.guardianPhone,
+        guardianEmail: sanitizedData.guardianEmail,
+        photo: sanitizedData.photo,
         status: "PENDING",
       },
     });
