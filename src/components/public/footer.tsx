@@ -67,12 +67,14 @@ export async function PublicFooter() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               {schoolProfile?.logo ? (
-                <div className="relative h-12 w-12 rounded-xl overflow-hidden ring-2 ring-white/10">
+                <div className="relative h-12 w-auto min-w-[48px]">
                   <Image
                     src={schoolProfile.logo}
                     alt={siteName}
-                    fill
-                    className="object-cover"
+                    width={48}
+                    height={48}
+                    className="object-contain h-12 w-auto"
+                    style={{ maxHeight: '48px' }}
                   />
                 </div>
               ) : (

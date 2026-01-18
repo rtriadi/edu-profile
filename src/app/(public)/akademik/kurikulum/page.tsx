@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { BookOpen, GraduationCap, Clock, Target } from "lucide-react";
+import { BookOpen, Clock, Target } from "lucide-react";
 import { unstable_cache } from "next/cache";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,22 +50,6 @@ const getKurikulumData = unstable_cache(
   { revalidate: 60, tags: ["school-profile", "programs"] }
 );
 
-// Default subjects if no curriculum programs exist in database
-const defaultSubjects = [
-  "Pendidikan Agama",
-  "Pendidikan Pancasila",
-  "Bahasa Indonesia",
-  "Matematika",
-  "IPA (Ilmu Pengetahuan Alam)",
-  "IPS (Ilmu Pengetahuan Sosial)",
-  "Bahasa Inggris",
-  "Seni Budaya",
-  "Pendidikan Jasmani",
-  "Prakarya",
-  "Informatika",
-  "Bahasa Daerah",
-];
-
 // Helper to format operating hours
 function formatOperatingHours(hours: OperatingHours | null) {
   if (!hours) {
@@ -83,11 +67,6 @@ function formatOperatingHours(hours: OperatingHours | null) {
 
 export default async function KurikulumPage() {
   const { schoolProfile, curriculumPrograms } = await getKurikulumData();
-  
-  // Use curriculum programs from DB or fallback to default
-  const subjects = curriculumPrograms.length > 0 
-    ? curriculumPrograms.map(p => p.name)
-    : defaultSubjects;
 
   const operatingHours = formatOperatingHours(
     schoolProfile?.operatingHours as OperatingHours | null
@@ -143,27 +122,26 @@ export default async function KurikulumPage() {
               </Card>
             </div>
 
-            {/* Mata Pelajaran */}
-            <div className="mb-12">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <GraduationCap className="h-6 w-6 text-primary" />
-                Mata Pelajaran
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {subjects.map((subject) => (
-                  <Card key={subject} className="bg-muted/30">
-                    <CardContent className="py-4 text-center">
-                      <span className="text-sm font-medium">{subject}</span>
-                    </CardContent>
-                  </Card>
-                ))}
+            {/* Program Kurikulum dari Database */}
+            {curriculumPrograms.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold mb-6">Program Kurikulum</h2>
+                <div className="grid gap-4">
+                  {curriculumPrograms.map((program) => (
+                    <Card key={program.id}>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{program.name}</CardTitle>
+                      </CardHeader>
+                      {program.description && (
+                        <CardContent>
+                          <p className="text-muted-foreground">{program.description}</p>
+                        </CardContent>
+                      )}
+                    </Card>
+                  ))}
+                </div>
               </div>
-              {curriculumPrograms.length === 0 && (
-                <p className="text-sm text-muted-foreground mt-4 text-center">
-                  Data mata pelajaran dapat dikelola melalui menu Program di panel admin dengan tipe &quot;Kurikulum&quot;.
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Jam Belajar */}
             <div>
@@ -185,6 +163,9 @@ export default async function KurikulumPage() {
                   </div>
                 </CardContent>
               </Card>
+              <p className="text-sm text-muted-foreground mt-4 text-center">
+                Jam operasional dapat dikelola melalui menu Profil Sekolah di panel admin.
+              </p>
             </div>
           </div>
         </div>

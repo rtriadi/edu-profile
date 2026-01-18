@@ -1,13 +1,23 @@
 import { Construction, Mail, Phone } from "lucide-react";
+import { unstable_cache } from "next/cache";
 import { getSiteConfig } from "@/lib/site-config";
 import { prisma } from "@/lib/prisma";
 
-async function getSchoolContact() {
-  const schoolProfile = await prisma.schoolProfile.findFirst({
-    select: { email: true, phone: true, name: true },
-  });
-  return schoolProfile;
-}
+const getSchoolContact = unstable_cache(
+  async () => {
+    try {
+      const schoolProfile = await prisma.schoolProfile.findFirst({
+        select: { email: true, phone: true, name: true },
+      });
+      return schoolProfile;
+    } catch (error) {
+      console.error("Error fetching school contact:", error);
+      return null;
+    }
+  },
+  ["maintenance-page-contact"],
+  { revalidate: 60, tags: ["school-profile"] }
+);
 
 export default async function MaintenancePage() {
   const [siteConfig, schoolContact] = await Promise.all([

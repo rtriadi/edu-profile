@@ -305,3 +305,103 @@ export async function updateRegistrationStatus(
     return { success: false, error: "Gagal memperbarui status pendaftaran" };
   }
 }
+
+// ==========================================
+// PUBLIC REGISTRATION ACTION
+// ==========================================
+
+export async function createPublicRegistration(data: {
+  periodId: string;
+  studentName: string;
+  nisn?: string;
+  birthPlace: string;
+  birthDate: Date;
+  gender: "MALE" | "FEMALE";
+  religion?: string;
+  address: string;
+  previousSchool?: string;
+  fatherName?: string;
+  fatherJob?: string;
+  fatherPhone?: string;
+  motherName?: string;
+  motherJob?: string;
+  motherPhone?: string;
+  guardianName?: string;
+  guardianPhone?: string;
+  guardianEmail?: string;
+  photo?: string;
+}): Promise<ApiResponse> {
+  try {
+    // Validate period exists and is active
+    const period = await prisma.pPDBPeriod.findUnique({
+      where: { id: data.periodId },
+    });
+
+    if (!period) {
+      return { success: false, error: "Periode PPDB tidak ditemukan" };
+    }
+
+    if (!period.isActive) {
+      return { success: false, error: "Periode PPDB tidak aktif" };
+    }
+
+    const now = new Date();
+    if (now < period.startDate || now > period.endDate) {
+      return { success: false, error: "Pendaftaran di luar periode yang ditentukan" };
+    }
+
+    // Check quota if set
+    if (period.quota) {
+      const currentCount = await prisma.pPDBRegistration.count({
+        where: { periodId: data.periodId },
+      });
+      if (currentCount >= period.quota) {
+        return { success: false, error: "Kuota pendaftaran sudah penuh" };
+      }
+    }
+
+    // Generate registration number
+    const year = new Date().getFullYear();
+    const count = await prisma.pPDBRegistration.count({
+      where: { periodId: data.periodId },
+    });
+    const registrationNo = `PPDB-${year}-${String(count + 1).padStart(4, "0")}`;
+
+    // Create registration
+    const registration = await prisma.pPDBRegistration.create({
+      data: {
+        periodId: data.periodId,
+        registrationNo,
+        studentName: data.studentName,
+        nisn: data.nisn,
+        birthPlace: data.birthPlace,
+        birthDate: data.birthDate,
+        gender: data.gender,
+        religion: data.religion,
+        address: data.address,
+        previousSchool: data.previousSchool,
+        fatherName: data.fatherName,
+        fatherJob: data.fatherJob,
+        fatherPhone: data.fatherPhone,
+        motherName: data.motherName,
+        motherJob: data.motherJob,
+        motherPhone: data.motherPhone,
+        guardianName: data.guardianName,
+        guardianPhone: data.guardianPhone,
+        guardianEmail: data.guardianEmail,
+        photo: data.photo,
+        status: "PENDING",
+      },
+    });
+
+    revalidatePath("/admin/ppdb/registrations");
+    return { 
+      success: true, 
+      data: { registrationNo: registration.registrationNo }, 
+      message: "Pendaftaran berhasil! Nomor registrasi Anda: " + registration.registrationNo 
+    };
+  } catch (error) {
+    console.error("Create public registration error:", error);
+    return { success: false, error: "Gagal melakukan pendaftaran. Silakan coba lagi." };
+  }
+}

@@ -200,7 +200,7 @@ export default async function KontakPage() {
                 <CardContent className="p-0">
                   <div className="aspect-video w-full">
                     <iframe
-                      src={`https://maps.google.com/maps?q=${schoolProfile.latitude},${schoolProfile.longitude}&z=15&output=embed`}
+                      src={`https://maps.google.com/maps?q=${schoolProfile.latitude},${schoolProfile.longitude}&z=19&output=embed`}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
