@@ -359,6 +359,67 @@ async function main() {
   }
   console.log("✅ Created sample testimonials");
 
+  // Create Grade Levels (Day Care, KB, TK A, TK B)
+  const gradeLevels = [
+    {
+      name: "Day Care",
+      slug: "day-care",
+      description: "Program penitipan anak dengan pengasuhan profesional dan stimulasi tumbuh kembang sesuai usia.",
+      ageRange: "6 - 24 Bulan",
+      minAge: 6,
+      maxAge: 24,
+      quota: 15,
+      features: ["Pengasuhan profesional", "Stimulasi motorik", "Area bermain aman", "Makan siang & snack"],
+      isActive: true,
+      order: 0,
+    },
+    {
+      name: "Kelompok Bermain (KB)",
+      slug: "kelompok-bermain",
+      description: "Program bermain sambil belajar untuk mengembangkan keterampilan sosial dan kreativitas anak.",
+      ageRange: "2 - 3 Tahun",
+      minAge: 24,
+      maxAge: 36,
+      quota: 20,
+      features: ["Bermain edukatif", "Pengembangan sosial", "Kreativitas seni", "Motorik halus & kasar"],
+      isActive: true,
+      order: 1,
+    },
+    {
+      name: "TK A",
+      slug: "tk-a",
+      description: "Jenjang awal Taman Kanak-kanak dengan fokus pengenalan huruf, angka, dan keterampilan dasar.",
+      ageRange: "4 - 5 Tahun",
+      minAge: 48,
+      maxAge: 60,
+      quota: 25,
+      features: ["Pengenalan huruf & angka", "Bahasa Inggris dasar", "Seni & kreativitas", "Pendidikan karakter"],
+      isActive: true,
+      order: 2,
+    },
+    {
+      name: "TK B",
+      slug: "tk-b",
+      description: "Jenjang lanjutan TK dengan persiapan memasuki Sekolah Dasar dan pengembangan kemampuan baca tulis.",
+      ageRange: "5 - 6 Tahun",
+      minAge: 60,
+      maxAge: 72,
+      quota: 25,
+      features: ["Persiapan SD", "Baca tulis hitung", "Bahasa Inggris", "Komputer dasar", "Tahfidz Quran"],
+      isActive: true,
+      order: 3,
+    },
+  ];
+
+  for (const gradeLevel of gradeLevels) {
+    await prisma.gradeLevel.upsert({
+      where: { slug: gradeLevel.slug },
+      update: {},
+      create: gradeLevel,
+    });
+  }
+  console.log("✅ Created grade levels (Day Care, KB, TK A, TK B)");
+
   // Create default settings
   const settings = [
     { key: "site_name", value: { value: "Sekolah Contoh" }, group: "general" },

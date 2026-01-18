@@ -746,7 +746,7 @@ export default async function HomePage() {
                     <h3 className="font-semibold mb-1 text-white">
                       {item.title}
                     </h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-slate-300 text-sm">
                       {item.value}
                     </p>
                   </div>

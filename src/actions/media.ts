@@ -121,12 +121,26 @@ export async function deleteMedia(id: string): Promise<ApiResponse> {
       return { success: false, error: "Media tidak ditemukan" };
     }
 
-    // Delete from Vercel Blob
-    try {
-      await del(media.url);
-    } catch (e) {
-      console.error("Failed to delete from blob:", e);
+    // Delete file based on URL type
+    if (media.url.startsWith("/uploads/")) {
+      // Local file - delete from filesystem
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        const filePath = path.join(process.cwd(), "public", media.url);
+        await fs.unlink(filePath);
+      } catch (e) {
+        console.error("Failed to delete local file:", e);
+      }
+    } else if (media.url.startsWith("https://")) {
+      // Vercel Blob - delete from blob storage
+      try {
+        await del(media.url);
+      } catch (e) {
+        console.error("Failed to delete from blob:", e);
+      }
     }
+    // Skip deletion for data: URLs (legacy base64)
 
     // Delete from database
     await prisma.media.delete({ where: { id } });
@@ -165,9 +179,8 @@ export async function updateMediaAlt(
 // Local file upload for development (without Vercel Blob)
 /**
  * Local file upload for development (without Vercel Blob)
- * WARNING: This stores files as base64 data URLs in the database.
- * This is NOT recommended for production - use uploadMedia with Vercel Blob instead.
- * This function is provided only for local development/testing purposes.
+ * Stores files in public/uploads directory for local development.
+ * For production, use uploadMedia with Vercel Blob instead.
  */
 export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse> {
   const session = await auth();
@@ -185,7 +198,7 @@ export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse>
 
     // Validate file (size, MIME type, and extension)
     const validation = validateFile(file, {
-      maxSizeMB: 5, // Lower limit for local storage
+      maxSizeMB: 10, // Same limit as Vercel Blob
       allowedTypes: ["image", "video", "audio", "document"],
     });
 
@@ -195,21 +208,35 @@ export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse>
 
     const type = validation.fileType || "other";
 
-    // Sanitize filename
+    // Sanitize filename and add timestamp to prevent collisions
+    const timestamp = Date.now();
     const sanitizedName = file.name
       .replace(/[^a-zA-Z0-9._-]/g, "_")
       .replace(/_{2,}/g, "_");
+    const uniqueName = `${timestamp}-${sanitizedName}`;
 
-    // Create a data URL for development (NOT for production!)
+    // Write file to public/uploads directory
+    const fs = await import("fs/promises");
+    const path = await import("path");
+    
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", folder);
+    
+    // Create folder if it doesn't exist
+    await fs.mkdir(uploadsDir, { recursive: true });
+    
+    const filePath = path.join(uploadsDir, uniqueName);
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const base64 = buffer.toString("base64");
-    const dataUrl = `data:${file.type};base64,${base64}`;
+    
+    await fs.writeFile(filePath, buffer);
+    
+    // URL path for accessing the file
+    const url = `/uploads/${folder}/${uniqueName}`;
 
     const media = await prisma.media.create({
       data: {
         name: sanitizedName,
-        url: dataUrl,
+        url,
         type,
         mimeType: file.type,
         size: file.size,
@@ -218,7 +245,7 @@ export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse>
     });
 
     revalidatePath("/admin/media");
-    return { success: true, data: media, message: "File berhasil diupload (local mode)" };
+    return { success: true, data: media, message: "File berhasil diupload" };
   } catch (error) {
     console.error("Upload error:", error);
     return { success: false, error: "Gagal mengupload file" };

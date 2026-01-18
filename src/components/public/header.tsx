@@ -19,8 +19,29 @@ import { DateTimeDisplay } from "@/components/ui/datetime-display";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/use-translation";
 
-// Navigation items with translation keys
-const getNavItems = (t: (key: string) => string) => [
+// Menu item from database
+interface MenuItem {
+  id: string;
+  label: string;
+  url: string | null;
+  pageSlug: string | null;
+  type: string;
+  order: number;
+  isVisible: boolean;
+  openNew: boolean;
+  children?: MenuItem[];
+}
+
+// Navigation item for internal use (transformed from MenuItem or default)
+interface NavItem {
+  label: string;
+  href: string;
+  openNew?: boolean;
+  children?: NavItem[];
+}
+
+// Default navigation items with translation keys (fallback when no menu in database)
+const getDefaultNavItems = (t: (key: string) => string): NavItem[] => [
   { label: t("nav.home"), href: "/" },
   {
     label: t("nav.profile"),
@@ -50,18 +71,52 @@ const getNavItems = (t: (key: string) => string) => [
   { label: t("nav.contact"), href: "/kontak" },
 ];
 
+// Transform database menu items to NavItem format
+function transformMenuItems(items: MenuItem[]): NavItem[] {
+  return items.map((item) => {
+    // Determine href based on type
+    let href = "/";
+    if (item.type === "page" && item.pageSlug) {
+      href = item.pageSlug.startsWith("/") ? item.pageSlug : `/${item.pageSlug}`;
+    } else if (item.type === "link" && item.url) {
+      href = item.url;
+    } else if (item.type === "dropdown" && item.children?.length) {
+      // For dropdown, use first child's href or just #
+      const firstChild = item.children[0];
+      if (firstChild?.pageSlug) {
+        href = firstChild.pageSlug.startsWith("/") ? firstChild.pageSlug : `/${firstChild.pageSlug}`;
+      } else if (firstChild?.url) {
+        href = firstChild.url;
+      } else {
+        href = "#";
+      }
+    }
+
+    return {
+      label: item.label,
+      href,
+      openNew: item.openNew,
+      children: item.children?.length ? transformMenuItems(item.children) : undefined,
+    };
+  });
+}
+
 interface PublicHeaderProps {
   siteName?: string;
   logo?: string | null;
+  menuItems?: MenuItem[];
 }
 
-export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProps) {
+export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: PublicHeaderProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useTranslation();
   
-  const navItems = getNavItems(t);
+  // Use menu from database if available, otherwise use default
+  const navItems: NavItem[] = menuItems.length > 0 
+    ? transformMenuItems(menuItems) 
+    : getDefaultNavItems(t);
 
   // Handle scroll effect
   useEffect(() => {
@@ -102,6 +157,7 @@ export function PublicHeader({ siteName = "EduProfile", logo }: PublicHeaderProp
                   height={40}
                   className="object-contain h-10 w-auto"
                   style={{ maxHeight: '40px' }}
+                  priority
                 />
               </div>
             ) : (
