@@ -639,6 +639,30 @@ model Announcement {
 }
 
 // ==========================================
+// GRADE LEVELS (Kelas yang dibuka)
+// ==========================================
+
+model GradeLevel {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Day Care", "Kelompok Bermain", "TK A", "TK B"
+  slug        String   @unique
+  description String?  @db.Text
+  ageRange    String?  // e.g., "12 Bulan - 3 Tahun", "3-4 Tahun"
+  minAge      Int?     // Minimum age in months
+  maxAge      Int?     // Maximum age in months
+  quota       Int?     // Kuota siswa
+  image       String?
+  icon        String?
+  features    Json?    // Array of features/benefits
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("grade_levels")
+}
+
+// ==========================================
 // ACHIEVEMENTS
 // ==========================================
 

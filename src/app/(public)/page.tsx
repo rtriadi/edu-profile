@@ -41,6 +41,7 @@ const getHomeData = unstable_cache(
         facilities,
         testimonials,
         upcomingEvents,
+        gradeLevels,
         stats,
       ] = await Promise.all([
         prisma.schoolProfile.findFirst(),
@@ -75,6 +76,10 @@ const getHomeData = unstable_cache(
           orderBy: { startDate: "asc" },
           take: 3,
         }),
+        prisma.gradeLevel.findMany({
+          where: { isActive: true },
+          orderBy: { order: "asc" },
+        }).catch(() => []),
         Promise.all([
           prisma.staff.count({ where: { isActive: true } }),
           prisma.alumni.count({ where: { isPublished: true } }),
@@ -92,6 +97,7 @@ const getHomeData = unstable_cache(
         facilities,
         testimonials,
         upcomingEvents,
+        gradeLevels,
         stats: {
           staff: stats[0],
           alumni: stats[1],
@@ -108,6 +114,7 @@ const getHomeData = unstable_cache(
         facilities: [],
         testimonials: [],
         upcomingEvents: [],
+        gradeLevels: [],
         stats: {
           staff: 0,
           alumni: 0,
@@ -373,6 +380,99 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Grade Levels Section */}
+        {data.gradeLevels && data.gradeLevels.length > 0 && (
+          <section className="py-20 md:py-28 bg-muted/50">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-16">
+                <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
+                  Kelas Kami
+                </Badge>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+                  Jenjang Pendidikan
+                </h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Pilihan kelas yang tersedia untuk putra-putri Anda
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {data.gradeLevels.map((grade, index) => {
+                  const features = Array.isArray(grade.features) ? grade.features as string[] : [];
+                  return (
+                  <Card
+                    key={grade.id}
+                    className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border overflow-hidden"
+                  >
+                    <div className={`h-2 ${
+                      index % 4 === 0
+                        ? "bg-blue-500"
+                        : index % 4 === 1
+                          ? "bg-green-500"
+                          : index % 4 === 2
+                            ? "bg-purple-500"
+                            : "bg-orange-500"
+                    }`} />
+                    <CardHeader className="pb-2">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
+                          index % 4 === 0
+                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                            : index % 4 === 1
+                              ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                              : index % 4 === 2
+                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                : "bg-orange-500/10 text-orange-600 dark:text-orange-400"
+                        }`}
+                      >
+                        <GraduationCap className="h-6 w-6" />
+                      </div>
+                      <CardTitle className="text-lg text-card-foreground">
+                        {grade.name}
+                      </CardTitle>
+                      {grade.ageRange && (
+                        <p className="text-sm text-muted-foreground">
+                          Usia: {grade.ageRange}
+                        </p>
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {grade.description && (
+                        <CardDescription className="line-clamp-2">
+                          {grade.description}
+                        </CardDescription>
+                      )}
+                      {grade.quota && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Users className="h-4 w-4" />
+                          <span>Kuota: {grade.quota} siswa</span>
+                        </div>
+                      )}
+                      {grade.features && Array.isArray(grade.features) && (grade.features as string[]).length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {(grade.features as string[]).slice(0, 3).map((feature, i) => (
+                            <Badge key={i} variant="secondary" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                  );
+                })}
+              </div>
+              <div className="text-center mt-12">
+                <Button variant="outline" size="lg" asChild className="group">
+                  <Link href="/ppdb">
+                    Daftar Sekarang
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Programs Section */}
         {data.programs.length > 0 && (
