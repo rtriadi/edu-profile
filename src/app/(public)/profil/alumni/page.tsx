@@ -1,33 +1,31 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { GraduationCap, Briefcase, Award, User } from "lucide-react";
-import { unstable_cache } from "next/cache";
+
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Alumni",
   description: "Daftar alumni sekolah yang berprestasi",
 };
 
-const getAlumniData = unstable_cache(
-  async () => {
-    try {
-      const alumni = await prisma.alumni.findMany({
-        where: { isPublished: true },
-        orderBy: { graduationYear: "desc" },
-      });
-      return alumni;
-    } catch (error) {
-      console.error("Error fetching alumni data:", error);
-      return [];
-    }
-  },
-  ["alumni-page-data"],
-  { revalidate: 60, tags: ["alumni"] }
-);
+async function getAlumniData() {
+  try {
+    const alumni = await prisma.alumni.findMany({
+      where: { isPublished: true },
+      orderBy: { graduationYear: "desc" },
+    });
+    return alumni;
+  } catch (error) {
+    console.error("Error fetching alumni data:", error);
+    return [];
+  }
+}
 
 export default async function AlumniPage() {
   const alumni = await getAlumniData();

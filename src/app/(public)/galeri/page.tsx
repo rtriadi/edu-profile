@@ -2,13 +2,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, Image as ImageIcon } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Galeri",
@@ -22,56 +23,52 @@ interface GaleriPageProps {
   }>;
 }
 
-const getGalleries = unstable_cache(
-  async (page: number, type?: string) => {
-    const limit = 12;
-    const skip = (page - 1) * limit;
+async function getGalleries(page: number, type?: string) {
+  const limit = 12;
+  const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = { isPublished: true };
-    if (type && type !== "all") {
-      where.type = type.toUpperCase();
-    }
+  const where: Record<string, unknown> = { isPublished: true };
+  if (type && type !== "all") {
+    where.type = type.toUpperCase();
+  }
 
-    try {
-      const [galleries, total] = await Promise.all([
-        prisma.gallery.findMany({
-          where,
-          include: {
-            items: {
-              take: 1,
-              orderBy: { order: "asc" },
-            },
-            _count: {
-              select: { items: true },
-            },
+  try {
+    const [galleries, total] = await Promise.all([
+      prisma.gallery.findMany({
+        where,
+        include: {
+          items: {
+            take: 1,
+            orderBy: { order: "asc" },
           },
-          orderBy: { eventDate: "desc" },
-          skip,
-          take: limit,
-        }),
-        prisma.gallery.count({ where }),
-      ]);
-
-      return {
-        galleries,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
+          _count: {
+            select: { items: true },
+          },
         },
-      };
-    } catch (error) {
-      console.error("Error fetching galleries:", error);
-      return {
-        galleries: [],
-        pagination: { page: 1, limit: 12, total: 0, totalPages: 0 },
-      };
-    }
-  },
-  ["galeri-page-data"],
-  { revalidate: 60, tags: ["galleries"] }
-);
+        orderBy: { eventDate: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.gallery.count({ where }),
+    ]);
+
+    return {
+      galleries,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching galleries:", error);
+    return {
+      galleries: [],
+      pagination: { page: 1, limit: 12, total: 0, totalPages: 0 },
+    };
+  }
+}
 
 export default async function GaleriPage({ searchParams }: GaleriPageProps) {
   const params = await searchParams;

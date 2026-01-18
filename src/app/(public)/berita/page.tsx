@@ -2,13 +2,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Calendar, Eye } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Berita & Artikel",
@@ -22,57 +23,53 @@ interface BeritaPageProps {
   }>;
 }
 
-const getPosts = unstable_cache(
-  async (page: number, categorySlug?: string) => {
-    const limit = 9;
-    const skip = (page - 1) * limit;
+async function getPosts(page: number, categorySlug?: string) {
+  const limit = 9;
+  const skip = (page - 1) * limit;
 
-    const where: Record<string, unknown> = { status: "PUBLISHED" };
-    if (categorySlug) {
-      where.category = { slug: categorySlug };
-    }
+  const where: Record<string, unknown> = { status: "PUBLISHED" };
+  if (categorySlug) {
+    where.category = { slug: categorySlug };
+  }
 
-    try {
-      const [posts, total, categories] = await Promise.all([
-        prisma.post.findMany({
-          where,
-          include: {
-            category: { select: { name: true, slug: true, color: true } },
-            author: { select: { name: true } },
-          },
-          orderBy: { publishedAt: "desc" },
-          skip,
-          take: limit,
-        }),
-        prisma.post.count({ where }),
-        prisma.category.findMany({
-          include: { _count: { select: { posts: true } } },
-          orderBy: { order: "asc" },
-        }),
-      ]);
-
-      return {
-        posts,
-        categories,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit),
+  try {
+    const [posts, total, categories] = await Promise.all([
+      prisma.post.findMany({
+        where,
+        include: {
+          category: { select: { name: true, slug: true, color: true } },
+          author: { select: { name: true } },
         },
-      };
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      return {
-        posts: [],
-        categories: [],
-        pagination: { page: 1, limit: 9, total: 0, totalPages: 0 },
-      };
-    }
-  },
-  ["berita-page-data"],
-  { revalidate: 60, tags: ["posts", "categories"] }
-);
+        orderBy: { publishedAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.post.count({ where }),
+      prisma.category.findMany({
+        include: { _count: { select: { posts: true } } },
+        orderBy: { order: "asc" },
+      }),
+    ]);
+
+    return {
+      posts,
+      categories,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return {
+      posts: [],
+      categories: [],
+      pagination: { page: 1, limit: 9, total: 0, totalPages: 0 },
+    };
+  }
+}
 
 export default async function BeritaPage({ searchParams }: BeritaPageProps) {
   const params = await searchParams;

@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, CheckCircle, FileText, Clock, Users, ArrowRight } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,31 +8,29 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "PPDB Online",
   description: "Pendaftaran Peserta Didik Baru Online",
 };
 
-const getPPDBData = unstable_cache(
-  async () => {
-    try {
-      const [activePeriod, schoolProfile] = await Promise.all([
-        prisma.pPDBPeriod.findFirst({
-          where: { isActive: true },
-          orderBy: { createdAt: "desc" },
-        }),
-        prisma.schoolProfile.findFirst(),
-      ]);
+async function getPPDBData() {
+  try {
+    const [activePeriod, schoolProfile] = await Promise.all([
+      prisma.pPDBPeriod.findFirst({
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.schoolProfile.findFirst(),
+    ]);
 
-      return { activePeriod, schoolProfile };
-    } catch (error) {
-      console.error("Error fetching PPDB data:", error);
-      return { activePeriod: null, schoolProfile: null };
-    }
-  },
-  ["ppdb-page-data"],
-  { revalidate: 60, tags: ["ppdb", "school-profile"] }
-);
+    return { activePeriod, schoolProfile };
+  } catch (error) {
+    console.error("Error fetching PPDB data:", error);
+    return { activePeriod: null, schoolProfile: null };
+  }
+}
 
 export default async function PPDBPage() {
   const { activePeriod, schoolProfile } = await getPPDBData();

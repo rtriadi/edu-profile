@@ -1,32 +1,30 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { Building2, CheckCircle } from "lucide-react";
-import { unstable_cache } from "next/cache";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Fasilitas Sekolah",
   description: "Fasilitas dan sarana prasarana sekolah",
 };
 
-const getFacilitiesData = unstable_cache(
-  async () => {
-    try {
-      const facilities = await prisma.facility.findMany({
-        where: { isPublished: true },
-        orderBy: { order: "asc" },
-      });
-      return facilities;
-    } catch (error) {
-      console.error("Error fetching facilities data:", error);
-      return [];
-    }
-  },
-  ["facilities-page-data"],
-  { revalidate: 60, tags: ["facilities"] }
-);
+async function getFacilitiesData() {
+  try {
+    const facilities = await prisma.facility.findMany({
+      where: { isPublished: true },
+      orderBy: { order: "asc" },
+    });
+    return facilities;
+  } catch (error) {
+    console.error("Error fetching facilities data:", error);
+    return [];
+  }
+}
 
 export default async function FasilitasPage() {
   const facilities = await getFacilitiesData();

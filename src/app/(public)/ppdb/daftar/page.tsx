@@ -1,30 +1,28 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { unstable_cache } from "next/cache";
+
 
 import { prisma } from "@/lib/prisma";
 import { PPDBRegistrationForm } from "@/components/public/ppdb-registration-form";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Formulir Pendaftaran PPDB",
   description: "Formulir Pendaftaran Peserta Didik Baru Online",
 };
 
-const getActivePeriod = unstable_cache(
-  async () => {
-    try {
-      const period = await prisma.pPDBPeriod.findFirst({
-        where: { isActive: true },
-      });
-      return period;
-    } catch (error) {
-      console.error("Error fetching active PPDB period:", error);
-      return null;
-    }
-  },
-  ["ppdb-daftar-period"],
-  { revalidate: 60, tags: ["ppdb"] }
-);
+async function getActivePeriod() {
+  try {
+    const period = await prisma.pPDBPeriod.findFirst({
+      where: { isActive: true },
+    });
+    return period;
+  } catch (error) {
+    console.error("Error fetching active PPDB period:", error);
+    return null;
+  }
+}
 
 export default async function PPDBDaftarPage() {
   const activePeriod = await getActivePeriod();

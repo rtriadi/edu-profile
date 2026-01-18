@@ -16,7 +16,6 @@ import {
   Award,
   Target,
 } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,102 +30,100 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 
-const getHomeData = unstable_cache(
-  async () => {
-    try {
-      const [
-        schoolProfile,
-        recentPosts,
-        programs,
-        facilities,
-        testimonials,
-        upcomingEvents,
-        gradeLevels,
-        stats,
-      ] = await Promise.all([
-        prisma.schoolProfile.findFirst(),
-        prisma.post.findMany({
-          where: { status: "PUBLISHED" },
-          orderBy: { publishedAt: "desc" },
-          take: 3,
-          include: {
-            category: { select: { name: true, color: true } },
-          },
-        }),
-        prisma.program.findMany({
-          where: { isActive: true, type: "FEATURED" },
-          orderBy: { order: "asc" },
-          take: 4,
-        }),
-        prisma.facility.findMany({
-          where: { isPublished: true },
-          orderBy: { order: "asc" },
-          take: 6,
-        }),
-        prisma.testimonial.findMany({
-          where: { isPublished: true },
-          orderBy: { order: "asc" },
-          take: 3,
-        }),
-        prisma.event.findMany({
-          where: {
-            isPublished: true,
-            startDate: { gte: new Date() },
-          },
-          orderBy: { startDate: "asc" },
-          take: 3,
-        }),
-        prisma.gradeLevel.findMany({
-          where: { isActive: true },
-          orderBy: { order: "asc" },
-        }).catch(() => []),
-        Promise.all([
-          prisma.staff.count({ where: { isActive: true } }),
-          prisma.alumni.count({ where: { isPublished: true } }),
-          prisma.achievement.count({ where: { isPublished: true } }),
-          prisma.program.count({
-            where: { isActive: true, type: "EXTRACURRICULAR" },
-          }),
-        ]),
-      ]);
+export const dynamic = "force-dynamic";
 
-      return {
-        schoolProfile,
-        recentPosts,
-        programs,
-        facilities,
-        testimonials,
-        upcomingEvents,
-        gradeLevels,
-        stats: {
-          staff: stats[0],
-          alumni: stats[1],
-          achievements: stats[2],
-          extracurriculars: stats[3],
+async function getHomeData() {
+  try {
+    const [
+      schoolProfile,
+      recentPosts,
+      programs,
+      facilities,
+      testimonials,
+      upcomingEvents,
+      gradeLevels,
+      stats,
+    ] = await Promise.all([
+      prisma.schoolProfile.findFirst(),
+      prisma.post.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { publishedAt: "desc" },
+        take: 3,
+        include: {
+          category: { select: { name: true, color: true } },
         },
-      };
-    } catch (error) {
-      console.error("Error fetching home data:", error);
-      return {
-        schoolProfile: null,
-        recentPosts: [],
-        programs: [],
-        facilities: [],
-        testimonials: [],
-        upcomingEvents: [],
-        gradeLevels: [],
-        stats: {
-          staff: 0,
-          alumni: 0,
-          achievements: 0,
-          extracurriculars: 0,
+      }),
+      prisma.program.findMany({
+        where: { isActive: true, type: "FEATURED" },
+        orderBy: { order: "asc" },
+        take: 4,
+      }),
+      prisma.facility.findMany({
+        where: { isPublished: true },
+        orderBy: { order: "asc" },
+        take: 6,
+      }),
+      prisma.testimonial.findMany({
+        where: { isPublished: true },
+        orderBy: { order: "asc" },
+        take: 3,
+      }),
+      prisma.event.findMany({
+        where: {
+          isPublished: true,
+          startDate: { gte: new Date() },
         },
-      };
-    }
-  },
-  ["home-page-data"],
-  { revalidate: 60, tags: ["school-profile", "posts", "programs", "facilities", "testimonials", "events"] }
-);
+        orderBy: { startDate: "asc" },
+        take: 3,
+      }),
+      prisma.gradeLevel.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
+      }).catch(() => []),
+      Promise.all([
+        prisma.staff.count({ where: { isActive: true } }),
+        prisma.alumni.count({ where: { isPublished: true } }),
+        prisma.achievement.count({ where: { isPublished: true } }),
+        prisma.program.count({
+          where: { isActive: true, type: "EXTRACURRICULAR" },
+        }),
+      ]),
+    ]);
+
+    return {
+      schoolProfile,
+      recentPosts,
+      programs,
+      facilities,
+      testimonials,
+      upcomingEvents,
+      gradeLevels,
+      stats: {
+        staff: stats[0],
+        alumni: stats[1],
+        achievements: stats[2],
+        extracurriculars: stats[3],
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching home data:", error);
+    return {
+      schoolProfile: null,
+      recentPosts: [],
+      programs: [],
+      facilities: [],
+      testimonials: [],
+      upcomingEvents: [],
+      gradeLevels: [],
+      stats: {
+        staff: 0,
+        alumni: 0,
+        achievements: 0,
+        extracurriculars: 0,
+      },
+    };
+  }
+}
 
 export default async function HomePage() {
   const [data, siteConfig] = await Promise.all([

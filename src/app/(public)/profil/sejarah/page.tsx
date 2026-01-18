@@ -1,35 +1,33 @@
 import { Metadata } from "next";
 import { History, Calendar, Award } from "lucide-react";
-import { unstable_cache } from "next/cache";
+
 
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Sejarah Sekolah",
   description: "Sejarah dan perjalanan sekolah kami",
 };
 
-const getSejarahData = unstable_cache(
-  async () => {
-    try {
-      const schoolProfile = await prisma.schoolProfile.findFirst({
-        select: {
-          name: true,
-          history: true,
-          foundedYear: true,
-          accreditation: true,
-        },
-      });
-      return schoolProfile;
-    } catch (error) {
-      console.error("Error fetching sejarah data:", error);
-      return null;
-    }
-  },
-  ["sejarah-page-data"],
-  { revalidate: 60, tags: ["school-profile"] }
-);
+async function getSejarahData() {
+  try {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      select: {
+        name: true,
+        history: true,
+        foundedYear: true,
+        accreditation: true,
+      },
+    });
+    return schoolProfile;
+  } catch (error) {
+    console.error("Error fetching sejarah data:", error);
+    return null;
+  }
+}
 
 export default async function SejarahPage() {
   const schoolProfile = await getSejarahData();

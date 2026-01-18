@@ -5,34 +5,31 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { ArrowLeft, Calendar, Image as ImageIcon, Video } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 interface GalleryDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const getGalleryBySlug = unstable_cache(
-  async (slug: string) => {
-    try {
-      return await prisma.gallery.findUnique({
-        where: { slug },
-        include: {
-          items: {
-            orderBy: { order: "asc" },
-          },
+async function getGalleryBySlug(slug: string) {
+  try {
+    return await prisma.gallery.findUnique({
+      where: { slug },
+      include: {
+        items: {
+          orderBy: { order: "asc" },
         },
-      });
-    } catch (error) {
-      console.error("Error fetching gallery:", error);
-      return null;
-    }
-  },
-  ["gallery-detail"],
-  { revalidate: 60, tags: ["galleries"] }
-);
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching gallery:", error);
+    return null;
+  }
+}
 
 export async function generateMetadata({
   params,

@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 import { BlockRenderer } from "@/components/page-builder";
 import type { Block } from "@/types";
+
+export const dynamic = "force-dynamic";
 
 interface DynamicPageProps {
   params: Promise<{
@@ -12,38 +13,30 @@ interface DynamicPageProps {
   }>;
 }
 
-const getPageForMetadata = unstable_cache(
-  async (slug: string) => {
-    try {
-      return await prisma.page.findUnique({
-        where: { slug },
-        select: { title: true, excerpt: true, seoTitle: true, seoDesc: true, ogImage: true },
-      });
-    } catch {
-      return null;
-    }
-  },
-  ["page-metadata"],
-  { revalidate: 60, tags: ["pages"] }
-);
+async function getPageForMetadata(slug: string) {
+  try {
+    return await prisma.page.findUnique({
+      where: { slug },
+      select: { title: true, excerpt: true, seoTitle: true, seoDesc: true, ogImage: true },
+    });
+  } catch {
+    return null;
+  }
+}
 
-const getPage = unstable_cache(
-  async (slug: string) => {
-    try {
-      const page = await prisma.page.findUnique({
-        where: { slug, status: "PUBLISHED" },
-        include: {
-          author: { select: { name: true } },
-        },
-      });
-      return page;
-    } catch {
-      return null;
-    }
-  },
-  ["page-content"],
-  { revalidate: 60, tags: ["pages"] }
-);
+async function getPage(slug: string) {
+  try {
+    const page = await prisma.page.findUnique({
+      where: { slug, status: "PUBLISHED" },
+      include: {
+        author: { select: { name: true } },
+      },
+    });
+    return page;
+  } catch {
+    return null;
+  }
+}
 
 export async function generateMetadata({ params }: DynamicPageProps): Promise<Metadata> {
   const { slug } = await params;

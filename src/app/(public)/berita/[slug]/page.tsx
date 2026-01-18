@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, Eye, ArrowLeft, Share2 } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,26 +12,24 @@ import { formatDate } from "@/lib/utils";
 import { BlockRenderer } from "@/components/page-builder";
 import type { Block } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 interface PostPageProps {
   params: Promise<{
     slug: string;
   }>;
 }
 
-const getPostForMetadata = unstable_cache(
-  async (slug: string) => {
-    try {
-      return await prisma.post.findUnique({
-        where: { slug },
-        select: { title: true, excerpt: true, seoTitle: true, seoDesc: true, featuredImg: true },
-      });
-    } catch {
-      return null;
-    }
-  },
-  ["post-metadata"],
-  { revalidate: 60, tags: ["posts"] }
-);
+async function getPostForMetadata(slug: string) {
+  try {
+    return await prisma.post.findUnique({
+      where: { slug },
+      select: { title: true, excerpt: true, seoTitle: true, seoDesc: true, featuredImg: true },
+    });
+  } catch {
+    return null;
+  }
+}
 
 async function getPost(slug: string) {
   try {
@@ -59,32 +56,28 @@ async function getPost(slug: string) {
   }
 }
 
-const getRelatedPosts = unstable_cache(
-  async (categoryId: string, currentId: string) => {
-    try {
-      return await prisma.post.findMany({
-        where: {
-          categoryId,
-          status: "PUBLISHED",
-          NOT: { id: currentId },
-        },
-        take: 3,
-        orderBy: { publishedAt: "desc" },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          featuredImg: true,
-          publishedAt: true,
-        },
-      });
-    } catch {
-      return [];
-    }
-  },
-  ["related-posts"],
-  { revalidate: 60, tags: ["posts"] }
-);
+async function getRelatedPosts(categoryId: string, currentId: string) {
+  try {
+    return await prisma.post.findMany({
+      where: {
+        categoryId,
+        status: "PUBLISHED",
+        NOT: { id: currentId },
+      },
+      take: 3,
+      orderBy: { publishedAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        featuredImg: true,
+        publishedAt: true,
+      },
+    });
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;

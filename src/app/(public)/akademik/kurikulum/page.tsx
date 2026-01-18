@@ -1,9 +1,11 @@
 import { Metadata } from "next";
 import { BookOpen, Clock, Target } from "lucide-react";
-import { unstable_cache } from "next/cache";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kurikulum",
@@ -21,34 +23,30 @@ interface OperatingHours {
   sunday?: string;
 }
 
-const getKurikulumData = unstable_cache(
-  async () => {
-    try {
-      const [schoolProfile, curriculumPrograms] = await Promise.all([
-        prisma.schoolProfile.findFirst({
-          select: { 
-            name: true, 
-            schoolLevel: true,
-            operatingHours: true,
-          },
-        }),
-        prisma.program.findMany({
-          where: { 
-            type: "CURRICULUM",
-            isActive: true,
-          },
-          orderBy: [{ order: "asc" }, { name: "asc" }],
-        }),
-      ]);
-      return { schoolProfile, curriculumPrograms };
-    } catch (error) {
-      console.error("Error fetching kurikulum data:", error);
-      return { schoolProfile: null, curriculumPrograms: [] };
-    }
-  },
-  ["kurikulum-page-data"],
-  { revalidate: 60, tags: ["school-profile", "programs"] }
-);
+async function getKurikulumData() {
+  try {
+    const [schoolProfile, curriculumPrograms] = await Promise.all([
+      prisma.schoolProfile.findFirst({
+        select: { 
+          name: true, 
+          schoolLevel: true,
+          operatingHours: true,
+        },
+      }),
+      prisma.program.findMany({
+        where: { 
+          type: "CURRICULUM",
+          isActive: true,
+        },
+        orderBy: [{ order: "asc" }, { name: "asc" }],
+      }),
+    ]);
+    return { schoolProfile, curriculumPrograms };
+  } catch (error) {
+    console.error("Error fetching kurikulum data:", error);
+    return { schoolProfile: null, curriculumPrograms: [] };
+  }
+}
 
 // Helper to format operating hours
 function formatOperatingHours(hours: OperatingHours | null) {

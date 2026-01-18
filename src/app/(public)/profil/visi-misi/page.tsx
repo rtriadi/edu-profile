@@ -1,35 +1,33 @@
 import { Metadata } from "next";
 import { Eye, Target, CheckCircle } from "lucide-react";
-import { unstable_cache } from "next/cache";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Visi & Misi",
   description: "Visi dan Misi Sekolah Kami",
 };
 
-const getVisiMisiData = unstable_cache(
-  async () => {
-    try {
-      const schoolProfile = await prisma.schoolProfile.findFirst({
-        select: {
-          name: true,
-          vision: true,
-          mission: true,
-          tagline: true,
-        },
-      });
-      return schoolProfile;
-    } catch (error) {
-      console.error("Error fetching visi-misi data:", error);
-      return null;
-    }
-  },
-  ["visi-misi-page-data"],
-  { revalidate: 60, tags: ["school-profile"] }
-);
+async function getVisiMisiData() {
+  try {
+    const schoolProfile = await prisma.schoolProfile.findFirst({
+      select: {
+        name: true,
+        vision: true,
+        mission: true,
+        tagline: true,
+      },
+    });
+    return schoolProfile;
+  } catch (error) {
+    console.error("Error fetching visi-misi data:", error);
+    return null;
+  }
+}
 
 export default async function VisiMisiPage() {
   const schoolProfile = await getVisiMisiData();

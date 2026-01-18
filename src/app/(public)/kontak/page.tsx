@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { ContactForm } from "@/components/public/contact-form";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Hubungi Kami",
@@ -22,20 +23,16 @@ interface OperatingHours {
   sunday?: string;
 }
 
-// Cache the contact data to avoid connection pool issues during build
-const getContactData = unstable_cache(
-  async () => {
-    try {
-      const schoolProfile = await prisma.schoolProfile.findFirst();
-      return schoolProfile;
-    } catch (error) {
-      console.error("Error fetching contact data:", error);
-      return null;
-    }
-  },
-  ["contact-page-data"],
-  { revalidate: 60, tags: ["school-profile"] }
-);
+// Fetch contact data
+async function getContactData() {
+  try {
+    const schoolProfile = await prisma.schoolProfile.findFirst();
+    return schoolProfile;
+  } catch (error) {
+    console.error("Error fetching contact data:", error);
+    return null;
+  }
+}
 
 // Helper to format operating hours for display
 function getOperatingHoursDisplay(hours: OperatingHours | null) {

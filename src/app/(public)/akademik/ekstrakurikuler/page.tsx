@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Image from "next/image";
-import { unstable_cache } from "next/cache";
+
 import { 
   Music, 
   Palette, 
@@ -16,30 +16,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Ekstrakurikuler",
   description: "Kegiatan ekstrakurikuler sekolah kami",
 };
 
-const getEkstrakurikulerData = unstable_cache(
-  async () => {
-    try {
-      const programs = await prisma.program.findMany({
-        where: { 
-          isActive: true,
-          type: "EXTRACURRICULAR",
-        },
-        orderBy: { order: "asc" },
-      });
-      return programs;
-    } catch (error) {
-      console.error("Error fetching ekstrakurikuler data:", error);
-      return [];
-    }
-  },
-  ["ekstrakurikuler-page-data"],
-  { revalidate: 60, tags: ["programs"] }
-);
+async function getEkstrakurikulerData() {
+  try {
+    const programs = await prisma.program.findMany({
+      where: { 
+        isActive: true,
+        type: "EXTRACURRICULAR",
+      },
+      orderBy: { order: "asc" },
+    });
+    return programs;
+  } catch (error) {
+    console.error("Error fetching ekstrakurikuler data:", error);
+    return [];
+  }
+}
 
 // Default ekstrakurikuler if no data in database
 const defaultEkskul = [

@@ -3,45 +3,42 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { Calendar, MapPin } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Agenda & Kegiatan",
   description: "Kalender kegiatan dan agenda sekolah",
 };
 
-const getAgendaData = unstable_cache(
-  async () => {
-    try {
-      const now = new Date();
-      const [events, upcomingEvents] = await Promise.all([
-        prisma.event.findMany({
-          where: { isPublished: true },
-          orderBy: { startDate: "desc" },
-          take: 20,
-        }),
-        prisma.event.findMany({
-          where: {
-            isPublished: true,
-            startDate: { gte: now },
-          },
-          orderBy: { startDate: "asc" },
-          take: 5,
-        }),
-      ]);
-      return { events, upcomingEvents };
-    } catch (error) {
-      console.error("Error fetching agenda data:", error);
-      return { events: [], upcomingEvents: [] };
-    }
-  },
-  ["agenda-page-data"],
-  { revalidate: 60, tags: ["events"] }
-);
+async function getAgendaData() {
+  try {
+    const now = new Date();
+    const [events, upcomingEvents] = await Promise.all([
+      prisma.event.findMany({
+        where: { isPublished: true },
+        orderBy: { startDate: "desc" },
+        take: 20,
+      }),
+      prisma.event.findMany({
+        where: {
+          isPublished: true,
+          startDate: { gte: now },
+        },
+        orderBy: { startDate: "asc" },
+        take: 5,
+      }),
+    ]);
+    return { events, upcomingEvents };
+  } catch (error) {
+    console.error("Error fetching agenda data:", error);
+    return { events: [], upcomingEvents: [] };
+  }
+}
 
 export default async function AgendaPage() {
   const { events, upcomingEvents } = await getAgendaData();

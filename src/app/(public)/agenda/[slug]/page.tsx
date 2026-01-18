@@ -5,30 +5,27 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { ArrowLeft, Calendar, MapPin, Clock } from "lucide-react";
-import { unstable_cache } from "next/cache";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
-const getEventBySlug = unstable_cache(
-  async (slug: string) => {
-    try {
-      return await prisma.event.findUnique({
-        where: { slug },
-      });
-    } catch (error) {
-      console.error("Error fetching event:", error);
-      return null;
-    }
-  },
-  ["event-detail"],
-  { revalidate: 60, tags: ["events"] }
-);
+async function getEventBySlug(slug: string) {
+  try {
+    return await prisma.event.findUnique({
+      where: { slug },
+    });
+  } catch (error) {
+    console.error("Error fetching event:", error);
+    return null;
+  }
+}
 
 export async function generateMetadata({
   params,

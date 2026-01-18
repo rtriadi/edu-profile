@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import { 
   GraduationCap, 
   Users, 
@@ -15,49 +14,47 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Profil Sekolah",
   description: "Mengenal lebih dekat tentang sekolah kami",
 };
 
-const getProfileData = unstable_cache(
-  async () => {
-    try {
-      const [schoolProfile, stats] = await Promise.all([
-        prisma.schoolProfile.findFirst(),
-        Promise.all([
-          prisma.staff.count({ where: { isActive: true } }),
-          prisma.staff.count({ where: { isActive: true, isTeacher: true } }),
-          prisma.facility.count({ where: { isPublished: true } }),
-          prisma.achievement.count({ where: { isPublished: true } }),
-        ]),
-      ]);
+async function getProfileData() {
+  try {
+    const [schoolProfile, stats] = await Promise.all([
+      prisma.schoolProfile.findFirst(),
+      Promise.all([
+        prisma.staff.count({ where: { isActive: true } }),
+        prisma.staff.count({ where: { isActive: true, isTeacher: true } }),
+        prisma.facility.count({ where: { isPublished: true } }),
+        prisma.achievement.count({ where: { isPublished: true } }),
+      ]),
+    ]);
 
-      return {
-        schoolProfile,
-        stats: {
-          totalStaff: stats[0],
-          totalTeachers: stats[1],
-          totalFacilities: stats[2],
-          totalAchievements: stats[3],
-        },
-      };
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
-      return {
-        schoolProfile: null,
-        stats: {
-          totalStaff: 0,
-          totalTeachers: 0,
-          totalFacilities: 0,
-          totalAchievements: 0,
-        },
-      };
-    }
-  },
-  ["profil-page-data"],
-  { revalidate: 60, tags: ["school-profile", "staff", "facilities", "achievements"] }
-);
+    return {
+      schoolProfile,
+      stats: {
+        totalStaff: stats[0],
+        totalTeachers: stats[1],
+        totalFacilities: stats[2],
+        totalAchievements: stats[3],
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching profile data:", error);
+    return {
+      schoolProfile: null,
+      stats: {
+        totalStaff: 0,
+        totalTeachers: 0,
+        totalFacilities: 0,
+        totalAchievements: 0,
+      },
+    };
+  }
+}
 
 export default async function ProfilPage() {
   const { schoolProfile, stats } = await getProfileData();

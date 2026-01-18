@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { Users, GraduationCap, Mail } from "lucide-react";
-import { unstable_cache } from "next/cache";
+
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,38 +9,36 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
 import { getInitials } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Guru & Staff",
   description: "Kenali guru dan staff sekolah kami",
 };
 
-const getStaffData = unstable_cache(
-  async () => {
-    try {
-      const [leadership, teachers, staff] = await Promise.all([
-        prisma.staff.findMany({
-          where: { isActive: true, department: "Pimpinan" },
-          orderBy: { order: "asc" },
-        }),
-        prisma.staff.findMany({
-          where: { isActive: true, isTeacher: true, NOT: { department: "Pimpinan" } },
-          orderBy: { order: "asc" },
-        }),
-        prisma.staff.findMany({
-          where: { isActive: true, isTeacher: false, NOT: { department: "Pimpinan" } },
-          orderBy: { order: "asc" },
-        }),
-      ]);
+async function getStaffData() {
+  try {
+    const [leadership, teachers, staff] = await Promise.all([
+      prisma.staff.findMany({
+        where: { isActive: true, department: "Pimpinan" },
+        orderBy: { order: "asc" },
+      }),
+      prisma.staff.findMany({
+        where: { isActive: true, isTeacher: true, NOT: { department: "Pimpinan" } },
+        orderBy: { order: "asc" },
+      }),
+      prisma.staff.findMany({
+        where: { isActive: true, isTeacher: false, NOT: { department: "Pimpinan" } },
+        orderBy: { order: "asc" },
+      }),
+    ]);
 
-      return { leadership, teachers, staff };
-    } catch (error) {
-      console.error("Error fetching staff data:", error);
-      return { leadership: [], teachers: [], staff: [] };
-    }
-  },
-  ["guru-staff-page-data"],
-  { revalidate: 60, tags: ["staff"] }
-);
+    return { leadership, teachers, staff };
+  } catch (error) {
+    console.error("Error fetching staff data:", error);
+    return { leadership: [], teachers: [], staff: [] };
+  }
+}
 
 export default async function GuruStaffPage() {
   const { leadership, teachers, staff } = await getStaffData();
