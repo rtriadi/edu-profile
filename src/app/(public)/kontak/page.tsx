@@ -1,14 +1,9 @@
 import { Metadata } from "next";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/prisma";
-import { PublicHeader } from "@/components/public/header";
-import { PublicFooter } from "@/components/public/footer";
 import { ContactForm } from "@/components/public/contact-form";
 
 export const metadata: Metadata = {
@@ -16,19 +11,26 @@ export const metadata: Metadata = {
   description: "Hubungi kami untuk informasi lebih lanjut",
 };
 
-async function getContactData() {
-  const schoolProfile = await prisma.schoolProfile.findFirst();
-  return schoolProfile;
-}
+// Cache the contact data to avoid connection pool issues during build
+const getContactData = unstable_cache(
+  async () => {
+    try {
+      const schoolProfile = await prisma.schoolProfile.findFirst();
+      return schoolProfile;
+    } catch (error) {
+      console.error("Error fetching contact data:", error);
+      return null;
+    }
+  },
+  ["contact-page-data"],
+  { revalidate: 60, tags: ["school-profile"] }
+);
 
 export default async function KontakPage() {
   const schoolProfile = await getContactData();
 
   return (
-    <>
-      <PublicHeader />
-
-      <main className="flex-1">
+    <main className="flex-1">
         {/* Hero */}
         <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
           <div className="container mx-auto px-4">
@@ -148,8 +150,5 @@ export default async function KontakPage() {
           )}
         </div>
       </main>
-
-      <PublicFooter />
-    </>
   );
 }

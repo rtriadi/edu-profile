@@ -4,10 +4,7 @@ import Image from "next/image";
 import { BookOpen, Trophy, Sparkles } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { getProgramsByType } from "@/actions/programs";
-import { PublicHeader } from "@/components/public/header";
-import { PublicFooter } from "@/components/public/footer";
 
 export const metadata: Metadata = {
   title: "Program Akademik",
@@ -85,45 +82,39 @@ export default async function AkademikPage() {
   );
 
   return (
-    <>
-      <PublicHeader />
-
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
-          <div className="container mx-auto px-4">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">Program Akademik</h1>
-            <p className="text-primary-foreground/80">
-              Jelajahi program pendidikan dan kegiatan yang kami tawarkan
-            </p>
-          </div>
-        </section>
-
-        <div className="container mx-auto px-4 py-12">
-          {featured.length > 0 && renderProgramSection(
-            "Program Unggulan",
-            featured,
-            "FEATURED",
-            "Program unggulan yang menjadi kebanggaan sekolah"
-          )}
-
-          {renderProgramSection(
-            "Kurikulum",
-            curriculum,
-            "CURRICULUM",
-            "Program pembelajaran sesuai kurikulum nasional"
-          )}
-
-          {renderProgramSection(
-            "Ekstrakurikuler",
-            extracurricular,
-            "EXTRACURRICULAR",
-            "Kegiatan pengembangan bakat dan minat siswa"
-          )}
+    <main className="flex-1">
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Program Akademik</h1>
+          <p className="text-primary-foreground/80">
+            Jelajahi program pendidikan dan kegiatan yang kami tawarkan
+          </p>
         </div>
-      </main>
+      </section>
 
-      <PublicFooter />
-    </>
+      <div className="container mx-auto px-4 py-12">
+        {featured.length > 0 && renderProgramSection(
+          "Program Unggulan",
+          featured,
+          "FEATURED",
+          "Program unggulan yang menjadi kebanggaan sekolah"
+        )}
+
+        {renderProgramSection(
+          "Kurikulum",
+          curriculum,
+          "CURRICULUM",
+          "Program pembelajaran sesuai kurikulum nasional"
+        )}
+
+        {renderProgramSection(
+          "Ekstrakurikuler",
+          extracurricular,
+          "EXTRACURRICULAR",
+          "Kegiatan pengembangan bakat dan minat siswa"
+        )}
+      </div>
+    </main>
   );
 }

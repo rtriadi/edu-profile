@@ -1,119 +1,121 @@
 import { Metadata } from "next";
 import Image from "next/image";
-import { Users, GraduationCap, Mail, Phone } from "lucide-react";
+import { Users, GraduationCap, Mail } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
 import { getInitials } from "@/lib/utils";
-import { PublicHeader } from "@/components/public/header";
-import { PublicFooter } from "@/components/public/footer";
 
 export const metadata: Metadata = {
   title: "Guru & Staff",
   description: "Kenali guru dan staff sekolah kami",
 };
 
-async function getStaffData() {
-  const [leadership, teachers, staff] = await Promise.all([
-    prisma.staff.findMany({
-      where: { isActive: true, department: "Pimpinan" },
-      orderBy: { order: "asc" },
-    }),
-    prisma.staff.findMany({
-      where: { isActive: true, isTeacher: true, NOT: { department: "Pimpinan" } },
-      orderBy: { order: "asc" },
-    }),
-    prisma.staff.findMany({
-      where: { isActive: true, isTeacher: false, NOT: { department: "Pimpinan" } },
-      orderBy: { order: "asc" },
-    }),
-  ]);
+const getStaffData = unstable_cache(
+  async () => {
+    try {
+      const [leadership, teachers, staff] = await Promise.all([
+        prisma.staff.findMany({
+          where: { isActive: true, department: "Pimpinan" },
+          orderBy: { order: "asc" },
+        }),
+        prisma.staff.findMany({
+          where: { isActive: true, isTeacher: true, NOT: { department: "Pimpinan" } },
+          orderBy: { order: "asc" },
+        }),
+        prisma.staff.findMany({
+          where: { isActive: true, isTeacher: false, NOT: { department: "Pimpinan" } },
+          orderBy: { order: "asc" },
+        }),
+      ]);
 
-  return { leadership, teachers, staff };
-}
+      return { leadership, teachers, staff };
+    } catch (error) {
+      console.error("Error fetching staff data:", error);
+      return { leadership: [], teachers: [], staff: [] };
+    }
+  },
+  ["guru-staff-page-data"],
+  { revalidate: 60, tags: ["staff"] }
+);
 
 export default async function GuruStaffPage() {
   const { leadership, teachers, staff } = await getStaffData();
 
   return (
-    <>
-      <PublicHeader />
+    <main className="flex-1">
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Guru & Staff</h1>
+          <p className="text-primary-foreground/80">
+            Kenali para pendidik dan tenaga kependidikan kami
+          </p>
+        </div>
+      </section>
 
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">Guru & Staff</h1>
-            <p className="text-primary-foreground/80">
-              Kenali para pendidik dan tenaga kependidikan kami
-            </p>
-          </div>
-        </section>
+      <div className="container mx-auto px-4 py-12">
+        {/* Leadership */}
+        {leadership.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+              <Users className="h-6 w-6 text-primary" />
+              Pimpinan Sekolah
+            </h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {leadership.map((person) => (
+                <StaffCard key={person.id} person={person} />
+              ))}
+            </div>
+          </section>
+        )}
 
-        <div className="container mx-auto px-4 py-12">
-          {/* Leadership */}
-          {leadership.length > 0 && (
-            <section className="mb-12">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Users className="h-6 w-6 text-primary" />
-                Pimpinan Sekolah
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {leadership.map((person) => (
-                  <StaffCard key={person.id} person={person} />
+        {/* Tabs for Teachers and Staff */}
+        <Tabs defaultValue="teachers">
+          <TabsList className="mb-6">
+            <TabsTrigger value="teachers" className="gap-2">
+              <GraduationCap className="h-4 w-4" />
+              Guru ({teachers.length})
+            </TabsTrigger>
+            <TabsTrigger value="staff" className="gap-2">
+              <Users className="h-4 w-4" />
+              Staff ({staff.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="teachers">
+            {teachers.length === 0 ? (
+              <p className="text-center text-muted-foreground py-12">
+                Belum ada data guru
+              </p>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {teachers.map((person) => (
+                  <StaffCard key={person.id} person={person} compact />
                 ))}
               </div>
-            </section>
-          )}
+            )}
+          </TabsContent>
 
-          {/* Tabs for Teachers and Staff */}
-          <Tabs defaultValue="teachers">
-            <TabsList className="mb-6">
-              <TabsTrigger value="teachers" className="gap-2">
-                <GraduationCap className="h-4 w-4" />
-                Guru ({teachers.length})
-              </TabsTrigger>
-              <TabsTrigger value="staff" className="gap-2">
-                <Users className="h-4 w-4" />
-                Staff ({staff.length})
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="teachers">
-              {teachers.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">
-                  Belum ada data guru
-                </p>
-              ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {teachers.map((person) => (
-                    <StaffCard key={person.id} person={person} compact />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="staff">
-              {staff.length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">
-                  Belum ada data staff
-                </p>
-              ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {staff.map((person) => (
-                    <StaffCard key={person.id} person={person} compact />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-
-      <PublicFooter />
-    </>
+          <TabsContent value="staff">
+            {staff.length === 0 ? (
+              <p className="text-center text-muted-foreground py-12">
+                Belum ada data staff
+              </p>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {staff.map((person) => (
+                  <StaffCard key={person.id} person={person} compact />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </main>
   );
 }
 
