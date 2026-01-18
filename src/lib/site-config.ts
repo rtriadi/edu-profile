@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 // Site configuration interface
 export interface SiteConfig {
@@ -51,68 +51,76 @@ const defaultConfig: SiteConfig = {
 };
 
 // Cache the site config to avoid repeated database calls
-export const getSiteConfig = cache(async (): Promise<SiteConfig> => {
-  try {
-    const [settings, schoolProfile] = await Promise.all([
-      prisma.setting.findMany({
-        where: {
-          group: { in: ["general", "seo", "theme"] },
-        },
-      }),
-      prisma.schoolProfile.findFirst(),
-    ]);
+export const getSiteConfig = unstable_cache(
+  async (): Promise<SiteConfig> => {
+    try {
+      const [settings, schoolProfile] = await Promise.all([
+        prisma.setting.findMany({
+          where: {
+            group: { in: ["general", "seo", "theme"] },
+          },
+        }),
+        prisma.schoolProfile.findFirst(),
+      ]);
 
-    // Convert settings array to object
-    const settingsMap: Record<string, unknown> = {};
-    for (const setting of settings) {
-      settingsMap[setting.key] = setting.value;
+      // Convert settings array to object
+      const settingsMap: Record<string, unknown> = {};
+      for (const setting of settings) {
+        settingsMap[setting.key] = setting.value;
+      }
+
+      return {
+        // General settings
+        siteName: (settingsMap.siteName as string) || schoolProfile?.name || defaultConfig.siteName,
+        siteTagline: (settingsMap.siteTagline as string) || schoolProfile?.tagline || defaultConfig.siteTagline,
+        language: (settingsMap.language as string) || defaultConfig.language,
+        timezone: (settingsMap.timezone as string) || defaultConfig.timezone,
+        maintenanceMode: (settingsMap.maintenanceMode as boolean) || defaultConfig.maintenanceMode,
+        // SEO settings
+        siteTitle: (settingsMap.siteTitle as string) || defaultConfig.siteTitle,
+        siteDescription: (settingsMap.siteDescription as string) || defaultConfig.siteDescription,
+        siteKeywords: (settingsMap.siteKeywords as string) || defaultConfig.siteKeywords,
+        ogImage: (settingsMap.ogImage as string) || defaultConfig.ogImage,
+        googleAnalyticsId: (settingsMap.googleAnalyticsId as string) || defaultConfig.googleAnalyticsId,
+        // Theme settings
+        primaryColor: (settingsMap.primaryColor as string) || defaultConfig.primaryColor,
+        secondaryColor: (settingsMap.secondaryColor as string) || defaultConfig.secondaryColor,
+        accentColor: (settingsMap.accentColor as string) || defaultConfig.accentColor,
+        // School profile
+        schoolName: schoolProfile?.name || defaultConfig.schoolName,
+        schoolEmail: schoolProfile?.email || defaultConfig.schoolEmail,
+        schoolPhone: schoolProfile?.phone || defaultConfig.schoolPhone,
+        schoolAddress: schoolProfile?.address || defaultConfig.schoolAddress,
+        schoolLogo: schoolProfile?.logo || defaultConfig.schoolLogo,
+        schoolAccreditation: schoolProfile?.accreditation || defaultConfig.schoolAccreditation,
+      };
+    } catch (error) {
+      console.error("Error loading site config:", error);
+      return defaultConfig;
     }
-
-    return {
-      // General settings
-      siteName: (settingsMap.siteName as string) || schoolProfile?.name || defaultConfig.siteName,
-      siteTagline: (settingsMap.siteTagline as string) || schoolProfile?.tagline || defaultConfig.siteTagline,
-      language: (settingsMap.language as string) || defaultConfig.language,
-      timezone: (settingsMap.timezone as string) || defaultConfig.timezone,
-      maintenanceMode: (settingsMap.maintenanceMode as boolean) || defaultConfig.maintenanceMode,
-      // SEO settings
-      siteTitle: (settingsMap.siteTitle as string) || defaultConfig.siteTitle,
-      siteDescription: (settingsMap.siteDescription as string) || defaultConfig.siteDescription,
-      siteKeywords: (settingsMap.siteKeywords as string) || defaultConfig.siteKeywords,
-      ogImage: (settingsMap.ogImage as string) || defaultConfig.ogImage,
-      googleAnalyticsId: (settingsMap.googleAnalyticsId as string) || defaultConfig.googleAnalyticsId,
-      // Theme settings
-      primaryColor: (settingsMap.primaryColor as string) || defaultConfig.primaryColor,
-      secondaryColor: (settingsMap.secondaryColor as string) || defaultConfig.secondaryColor,
-      accentColor: (settingsMap.accentColor as string) || defaultConfig.accentColor,
-      // School profile
-      schoolName: schoolProfile?.name || defaultConfig.schoolName,
-      schoolEmail: schoolProfile?.email || defaultConfig.schoolEmail,
-      schoolPhone: schoolProfile?.phone || defaultConfig.schoolPhone,
-      schoolAddress: schoolProfile?.address || defaultConfig.schoolAddress,
-      schoolLogo: schoolProfile?.logo || defaultConfig.schoolLogo,
-      schoolAccreditation: schoolProfile?.accreditation || defaultConfig.schoolAccreditation,
-    };
-  } catch (error) {
-    console.error("Error loading site config:", error);
-    return defaultConfig;
-  }
-});
+  },
+  ["site-config"],
+  { revalidate: 60, tags: ["site-config", "settings", "school-profile"] }
+);
 
 // Get just the site name (for quick access)
-export const getSiteName = cache(async (): Promise<string> => {
-  try {
-    const siteName = await prisma.setting.findUnique({
-      where: { key: "siteName" },
-    });
-    if (siteName?.value) {
-      return siteName.value as string;
+export const getSiteName = unstable_cache(
+  async (): Promise<string> => {
+    try {
+      const siteName = await prisma.setting.findUnique({
+        where: { key: "siteName" },
+      });
+      if (siteName?.value) {
+        return siteName.value as string;
+      }
+      const schoolProfile = await prisma.schoolProfile.findFirst({
+        select: { name: true },
+      });
+      return schoolProfile?.name || defaultConfig.siteName;
+    } catch {
+      return defaultConfig.siteName;
     }
-    const schoolProfile = await prisma.schoolProfile.findFirst({
-      select: { name: true },
-    });
-    return schoolProfile?.name || defaultConfig.siteName;
-  } catch {
-    return defaultConfig.siteName;
-  }
-});
+  },
+  ["site-name"],
+  { revalidate: 60, tags: ["site-config", "settings", "school-profile"] }
+);
