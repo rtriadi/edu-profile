@@ -97,7 +97,7 @@ export function AlumniForm({ alumni }: AlumniFormProps) {
       } else {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Terjadi kesalahan");
     }
   };

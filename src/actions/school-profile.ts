@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth, canAccess } from "@/lib/auth";
 import { schoolProfileSchema, type SchoolProfileInput } from "@/lib/validations";

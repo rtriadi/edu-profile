@@ -395,7 +395,6 @@ export default async function HomePage() {
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {data.gradeLevels.map((grade, index) => {
-                  const features = Array.isArray(grade.features) ? grade.features as string[] : [];
                   return (
                   <Card
                     key={grade.id}

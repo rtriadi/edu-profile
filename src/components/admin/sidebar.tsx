@@ -104,6 +104,11 @@ const schoolMenuItems = [
     icon: Building2,
   },
   {
+    title: "Kelas",
+    url: "/admin/grade-levels",
+    icon: GraduationCap,
+  },
+  {
     title: "Guru & Staff",
     url: "/admin/staff",
     icon: Users,

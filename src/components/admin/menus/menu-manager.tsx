@@ -105,6 +105,22 @@ interface MenuManagerProps {
   pages: Page[];
 }
 
+// Predefined system routes
+const SYSTEM_ROUTES = [
+  { label: "Beranda", url: "/", description: "Halaman utama" },
+  { label: "Profil Sekolah", url: "/profil", description: "Informasi tentang sekolah" },
+  { label: "Akademik", url: "/akademik", description: "Program akademik" },
+  { label: "Berita", url: "/berita", description: "Berita dan artikel" },
+  { label: "Galeri", url: "/galeri", description: "Galeri foto dan video" },
+  { label: "Kontak", url: "/kontak", description: "Informasi kontak" },
+  { label: "Pendaftaran", url: "/ppdb", description: "Pendaftaran siswa baru" },
+  { label: "Fasilitas", url: "/fasilitas", description: "Fasilitas sekolah" },
+  { label: "Ekstrakurikuler", url: "/ekstrakurikuler", description: "Kegiatan ekstrakurikuler" },
+  { label: "Prestasi", url: "/prestasi", description: "Prestasi sekolah dan siswa" },
+  { label: "Agenda", url: "/agenda", description: "Kalender kegiatan" },
+  { label: "Pengumuman", url: "/pengumuman", description: "Pengumuman terbaru" },
+] as const;
+
 export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
   const router = useRouter();
   const [menus, setMenus] = useState<Menu[]>(initialMenus);
@@ -191,8 +207,8 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
     setIsLoading(true);
     const result = await createMenuItem(selectedMenuId, {
       label: itemForm.label,
-      type: itemForm.type as "link" | "page" | "dropdown" | "megamenu",
-      url: itemForm.type === "link" ? itemForm.url : undefined,
+      type: itemForm.type as "link" | "page" | "dropdown" | "megamenu" | "route",
+      url: (itemForm.type === "link" || itemForm.type === "route") ? itemForm.url : undefined,
       pageSlug: itemForm.type === "page" ? itemForm.pageSlug : undefined,
       parentId: itemForm.parentId || undefined,
       order: 0,
@@ -227,8 +243,8 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
     setIsLoading(true);
     const result = await updateMenuItem(editingItem.id, {
       label: itemForm.label,
-      type: itemForm.type as "link" | "page" | "dropdown" | "megamenu",
-      url: itemForm.type === "link" ? itemForm.url : undefined,
+      type: itemForm.type as "link" | "page" | "dropdown" | "megamenu" | "route",
+      url: (itemForm.type === "link" || itemForm.type === "route") ? itemForm.url : undefined,
       pageSlug: itemForm.type === "page" ? itemForm.pageSlug : undefined,
       isVisible: itemForm.isVisible,
       openNew: itemForm.openNew,
@@ -335,6 +351,11 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
             <Badge variant="outline" className="text-xs">
               {item.openNew && <ExternalLink className="h-3 w-3 mr-1" />}
               Link
+            </Badge>
+          )}
+          {item.type === "route" && item.url && (
+            <Badge variant="default" className="text-xs">
+              {item.url}
             </Badge>
           )}
           {item.type === "dropdown" && (
@@ -531,7 +552,8 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="link">Link External</SelectItem>
-                        <SelectItem value="page">Halaman Internal</SelectItem>
+                        <SelectItem value="page">Halaman CMS</SelectItem>
+                        <SelectItem value="route">Rute Sistem</SelectItem>
                         <SelectItem value="dropdown">Dropdown</SelectItem>
                       </SelectContent>
                     </Select>
@@ -566,17 +588,50 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                       </Select>
                     </div>
                   )}
+                  {itemForm.type === "route" && (
+                    <div>
+                      <Label>Rute Sistem</Label>
+                      <Select
+                        value={itemForm.url}
+                        onValueChange={(v) => {
+                          const route = SYSTEM_ROUTES.find(r => r.url === v);
+                          setItemForm({ 
+                            ...itemForm, 
+                            url: v,
+                            label: itemForm.label || route?.label || ""
+                          });
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih rute sistem" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SYSTEM_ROUTES.map((route) => (
+                            <SelectItem key={route.url} value={route.url}>
+                              <div className="flex flex-col">
+                                <span>{route.label}</span>
+                                <span className="text-xs text-muted-foreground">{route.url}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Pilih halaman sistem yang sudah tersedia di website
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <Label>Parent (Opsional)</Label>
                     <Select
-                      value={itemForm.parentId}
-                      onValueChange={(v) => setItemForm({ ...itemForm, parentId: v })}
+                      value={itemForm.parentId || "_none"}
+                      onValueChange={(v) => setItemForm({ ...itemForm, parentId: v === "_none" ? "" : v })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Tidak ada (Root)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Tidak ada (Root)</SelectItem>
+                        <SelectItem value="_none">Tidak ada (Root)</SelectItem>
                         {selectedMenu &&
                           getAllItems(selectedMenu.items)
                             .filter((i) => i.type === "dropdown")
@@ -663,7 +718,8 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="link">Link External</SelectItem>
-                  <SelectItem value="page">Halaman Internal</SelectItem>
+                  <SelectItem value="page">Halaman CMS</SelectItem>
+                  <SelectItem value="route">Rute Sistem</SelectItem>
                   <SelectItem value="dropdown">Dropdown</SelectItem>
                 </SelectContent>
               </Select>
@@ -695,6 +751,39 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            )}
+            {itemForm.type === "route" && (
+              <div>
+                <Label>Rute Sistem</Label>
+                <Select
+                  value={itemForm.url}
+                  onValueChange={(v) => {
+                    const route = SYSTEM_ROUTES.find(r => r.url === v);
+                    setItemForm({ 
+                      ...itemForm, 
+                      url: v,
+                      label: itemForm.label || route?.label || ""
+                    });
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih rute sistem" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SYSTEM_ROUTES.map((route) => (
+                      <SelectItem key={route.url} value={route.url}>
+                        <div className="flex flex-col">
+                          <span>{route.label}</span>
+                          <span className="text-xs text-muted-foreground">{route.url}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Pilih halaman sistem yang sudah tersedia di website
+                </p>
               </div>
             )}
             <div className="flex items-center gap-4">

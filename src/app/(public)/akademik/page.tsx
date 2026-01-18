@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { BookOpen, Trophy, Sparkles } from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProgramsByType } from "@/actions/programs";
 
 export const metadata: Metadata = {

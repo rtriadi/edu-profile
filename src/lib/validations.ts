@@ -428,7 +428,7 @@ export const menuItemSchema = z.object({
   label: z.string().min(1, "Label diperlukan").max(100, "Label maksimal 100 karakter"),
   url: z.string().max(500, "URL maksimal 500 karakter").optional(),
   pageSlug: z.string().optional(),
-  type: z.enum(["link", "page", "dropdown", "megamenu"]).default("link"),
+  type: z.enum(["link", "page", "dropdown", "megamenu", "route"]).default("link"),
   parentId: z.string().optional(),
   order: z.number().int().min(0).default(0),
   isVisible: z.boolean().default(true),

@@ -1,7 +1,6 @@
 import { Metadata } from "next";
-import { Plus, Pencil, Trash2, FolderOpen } from "lucide-react";
+import { FolderOpen } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { getCategories, deleteCategory } from "@/actions/posts";
+import { getCategories } from "@/actions/posts";
 import { CategoryDialog } from "@/components/admin/posts/category-dialog";
 
 export const metadata: Metadata = {

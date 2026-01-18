@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Plus, GraduationCap, ToggleLeft, ToggleRight, Pencil, Trash2 } from "lucide-react";
+import { Plus, GraduationCap, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {

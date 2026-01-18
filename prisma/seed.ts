@@ -93,27 +93,74 @@ async function main() {
     },
   });
 
-  // Create header menu items
-  const menuItems = [
-    { label: "Beranda", url: "/", order: 0 },
-    { label: "Profil", pageSlug: "profil", order: 1 },
-    { label: "Akademik", pageSlug: "akademik", order: 2 },
-    { label: "Berita", url: "/berita", order: 3 },
-    { label: "Galeri", url: "/galeri", order: 4 },
-    { label: "PPDB", url: "/ppdb", order: 5 },
-    { label: "Kontak", url: "/kontak", order: 6 },
-  ];
+  // Create header menu items with proper structure
+  // First, create parent items
+  const berandaItem = await prisma.menuItem.create({
+    data: {
+      menuId: headerMenu.id,
+      label: "Beranda",
+      url: "/",
+      type: "link",
+      order: 0,
+      isVisible: true,
+    },
+  });
 
-  for (const item of menuItems) {
-    await prisma.menuItem.create({
-      data: {
-        ...item,
-        menuId: headerMenu.id,
-        isVisible: true,
-      },
-    });
-  }
-  console.log("✅ Created header menu");
+  // Profil dropdown with children
+  const profilItem = await prisma.menuItem.create({
+    data: {
+      menuId: headerMenu.id,
+      label: "Profil",
+      type: "dropdown",
+      order: 1,
+      isVisible: true,
+    },
+  });
+
+  // Profil children
+  await prisma.menuItem.createMany({
+    data: [
+      { menuId: headerMenu.id, parentId: profilItem.id, label: "Tentang Kami", url: "/profil", type: "link", order: 0, isVisible: true },
+      { menuId: headerMenu.id, parentId: profilItem.id, label: "Visi & Misi", url: "/profil/visi-misi", type: "link", order: 1, isVisible: true },
+      { menuId: headerMenu.id, parentId: profilItem.id, label: "Sejarah", url: "/profil/sejarah", type: "link", order: 2, isVisible: true },
+      { menuId: headerMenu.id, parentId: profilItem.id, label: "Struktur Organisasi", url: "/profil/struktur", type: "link", order: 3, isVisible: true },
+      { menuId: headerMenu.id, parentId: profilItem.id, label: "Guru & Staff", url: "/profil/guru-staff", type: "link", order: 4, isVisible: true },
+      { menuId: headerMenu.id, parentId: profilItem.id, label: "Fasilitas", url: "/profil/fasilitas", type: "link", order: 5, isVisible: true },
+    ],
+  });
+
+  // Akademik dropdown with children
+  const akademikItem = await prisma.menuItem.create({
+    data: {
+      menuId: headerMenu.id,
+      label: "Akademik",
+      type: "dropdown",
+      order: 2,
+      isVisible: true,
+    },
+  });
+
+  // Akademik children
+  await prisma.menuItem.createMany({
+    data: [
+      { menuId: headerMenu.id, parentId: akademikItem.id, label: "Kurikulum", url: "/akademik/kurikulum", type: "link", order: 0, isVisible: true },
+      { menuId: headerMenu.id, parentId: akademikItem.id, label: "Ekstrakurikuler", url: "/akademik/ekstrakurikuler", type: "link", order: 1, isVisible: true },
+      { menuId: headerMenu.id, parentId: akademikItem.id, label: "Program Unggulan", url: "/akademik/program-unggulan", type: "link", order: 2, isVisible: true },
+      { menuId: headerMenu.id, parentId: akademikItem.id, label: "Prestasi", url: "/akademik/prestasi", type: "link", order: 3, isVisible: true },
+    ],
+  });
+
+  // Other menu items
+  await prisma.menuItem.createMany({
+    data: [
+      { menuId: headerMenu.id, label: "Berita", url: "/berita", type: "link", order: 3, isVisible: true },
+      { menuId: headerMenu.id, label: "Galeri", url: "/galeri", type: "link", order: 4, isVisible: true },
+      { menuId: headerMenu.id, label: "PPDB", url: "/ppdb", type: "link", order: 5, isVisible: true },
+      { menuId: headerMenu.id, label: "Kontak", url: "/kontak", type: "link", order: 6, isVisible: true },
+    ],
+  });
+
+  console.log("✅ Created header menu with dropdown structure");
 
   const footerMenu = await prisma.menu.upsert({
     where: { location: "footer" },

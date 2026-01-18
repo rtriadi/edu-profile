@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getContactMessages, markMessageAsRead, deleteContactMessage } from "@/actions/contact";
+import { getContactMessages } from "@/actions/contact";
 import { MessagesTable } from "@/components/admin/messages/messages-table";
 
 export const metadata: Metadata = {

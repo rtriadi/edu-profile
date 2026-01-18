@@ -47,7 +47,7 @@ export function DeleteButton({
       } else {
         toast.error(result.error || "Gagal menghapus");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Terjadi kesalahan");
     } finally {
       setIsDeleting(false);

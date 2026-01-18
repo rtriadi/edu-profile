@@ -89,7 +89,7 @@ export function DownloadForm({ download }: DownloadFormProps) {
       } else {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Terjadi kesalahan");
     }
   };

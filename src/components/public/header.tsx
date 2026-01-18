@@ -182,7 +182,7 @@ export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: 
                       variant="ghost"
                       className={cn(
                         "gap-1 font-medium transition-colors",
-                        pathname.startsWith(item.href) && "bg-accent text-accent-foreground"
+                        pathname !== "/" && item.href !== "/" && pathname.startsWith(item.href) && "bg-accent text-accent-foreground"
                       )}
                     >
                       {item.label}
@@ -212,7 +212,7 @@ export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: 
                   asChild
                   className={cn(
                     "font-medium transition-colors",
-                    pathname === item.href && "bg-accent text-accent-foreground"
+                    (pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href + "/"))) && "bg-accent text-accent-foreground"
                   )}
                 >
                   <Link href={item.href}>{item.label}</Link>
