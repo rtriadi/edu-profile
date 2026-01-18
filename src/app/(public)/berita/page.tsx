@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
+import { getSiteConfig } from "@/lib/site-config";
+import { getTranslations, type Language } from "@/lib/translations";
 
 export const dynamic = "force-dynamic";
 
@@ -74,16 +76,23 @@ async function getPosts(page: number, categorySlug?: string) {
 export default async function BeritaPage({ searchParams }: BeritaPageProps) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
-  const { posts, categories, pagination } = await getPosts(page, params.category);
+  
+  const [data, siteConfig] = await Promise.all([
+    getPosts(page, params.category),
+    getSiteConfig(),
+  ]);
+
+  const { posts, categories, pagination } = data;
+  const t = getTranslations(siteConfig.language as Language);
 
   return (
     <main className="flex-1">
       {/* Hero */}
       <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Berita & Artikel</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">{t.pages.news.title}</h1>
           <p className="text-primary-foreground/80">
-            Kabar terbaru dan informasi penting dari sekolah kami
+            {t.pages.news.description}
           </p>
         </div>
       </section>
@@ -94,7 +103,7 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
           <div className="flex-1">
             {posts.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                <p>Belum ada berita yang dipublikasikan</p>
+                <p>{t.pages.news.noNews}</p>
               </div>
             ) : (
               <>
@@ -137,7 +146,7 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
                           <span>{post.publishedAt && formatDate(post.publishedAt)}</span>
                           <span className="flex items-center gap-1">
                             <Eye className="h-3 w-3" />
-                            {post.views}
+                            {post.views} {t.pages.news.views}
                           </span>
                         </div>
                       </CardContent>
@@ -151,7 +160,7 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
                     {page > 1 && (
                       <Button variant="outline" asChild>
                         <Link href={`/berita?page=${page - 1}${params.category ? `&category=${params.category}` : ""}`}>
-                          Sebelumnya
+                          {t.common.previous}
                         </Link>
                       </Button>
                     )}
@@ -161,7 +170,7 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
                     {page < pagination.totalPages && (
                       <Button variant="outline" asChild>
                         <Link href={`/berita?page=${page + 1}${params.category ? `&category=${params.category}` : ""}`}>
-                          Selanjutnya
+                          {t.common.next}
                         </Link>
                       </Button>
                     )}
@@ -185,7 +194,7 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
                     !params.category ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                   }`}
                 >
-                  Semua Kategori
+                  {t.pages.news.allCategories}
                 </Link>
                 {categories.map((category) => (
                   <Link
