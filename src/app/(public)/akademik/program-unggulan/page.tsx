@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { Star, Award, Zap, Target } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,21 +12,25 @@ export const metadata: Metadata = {
   description: "Program unggulan sekolah kami",
 };
 
-async function getProgramUnggulanData() {
-  try {
-    const programs = await prisma.program.findMany({
-      where: { 
-        isActive: true,
-        type: "FEATURED",
-      },
-      orderBy: { order: "asc" },
-    });
-    return programs;
-  } catch (error) {
-    console.error("Error fetching program unggulan data:", error);
-    return [];
-  }
-}
+const getProgramUnggulanData = unstable_cache(
+  async () => {
+    try {
+      const programs = await prisma.program.findMany({
+        where: { 
+          isActive: true,
+          type: "FEATURED",
+        },
+        orderBy: { order: "asc" },
+      });
+      return programs;
+    } catch (error) {
+      console.error("Error fetching program unggulan data:", error);
+      return [];
+    }
+  },
+  ["program-unggulan-page-data"],
+  { revalidate: 60, tags: ["programs"] }
+);
 
 export default async function ProgramUnggulanPage() {
   const programs = await getProgramUnggulanData();

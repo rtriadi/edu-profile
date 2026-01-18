@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { Trophy, Medal, Award, Calendar } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,19 +12,23 @@ export const metadata: Metadata = {
   description: "Prestasi dan pencapaian siswa dan sekolah kami",
 };
 
-async function getPrestasiData() {
-  try {
-    const achievements = await prisma.achievement.findMany({
-      where: { isPublished: true },
-      orderBy: { date: "desc" },
-      take: 20,
-    });
-    return achievements;
-  } catch (error) {
-    console.error("Error fetching prestasi data:", error);
-    return [];
-  }
-}
+const getPrestasiData = unstable_cache(
+  async () => {
+    try {
+      const achievements = await prisma.achievement.findMany({
+        where: { isPublished: true },
+        orderBy: { date: "desc" },
+        take: 20,
+      });
+      return achievements;
+    } catch (error) {
+      console.error("Error fetching prestasi data:", error);
+      return [];
+    }
+  },
+  ["prestasi-page-data"],
+  { revalidate: 60, tags: ["achievements"] }
+);
 
 function getLevelBadgeColor(level: string) {
   switch (level?.toLowerCase()) {

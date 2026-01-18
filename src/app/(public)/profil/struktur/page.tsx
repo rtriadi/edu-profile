@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import { Users, GraduationCap, UserCheck, Building } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
@@ -10,24 +11,28 @@ export const metadata: Metadata = {
   description: "Struktur organisasi sekolah kami",
 };
 
-async function getStrukturData() {
-  try {
-    const [schoolProfile, leadership] = await Promise.all([
-      prisma.schoolProfile.findFirst({
-        select: { name: true },
-      }),
-      prisma.staff.findMany({
-        where: { isActive: true },
-        orderBy: { order: "asc" },
-        take: 10,
-      }),
-    ]);
-    return { schoolProfile, leadership };
-  } catch (error) {
-    console.error("Error fetching struktur data:", error);
-    return { schoolProfile: null, leadership: [] };
-  }
-}
+const getStrukturData = unstable_cache(
+  async () => {
+    try {
+      const [schoolProfile, leadership] = await Promise.all([
+        prisma.schoolProfile.findFirst({
+          select: { name: true },
+        }),
+        prisma.staff.findMany({
+          where: { isActive: true },
+          orderBy: { order: "asc" },
+          take: 10,
+        }),
+      ]);
+      return { schoolProfile, leadership };
+    } catch (error) {
+      console.error("Error fetching struktur data:", error);
+      return { schoolProfile: null, leadership: [] };
+    }
+  },
+  ["struktur-page-data"],
+  { revalidate: 60, tags: ["school-profile", "staff"] }
+);
 
 export default async function StrukturPage() {
   const { schoolProfile, leadership } = await getStrukturData();

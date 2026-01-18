@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { BookOpen, GraduationCap, Clock, Target } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
@@ -9,17 +10,21 @@ export const metadata: Metadata = {
   description: "Kurikulum dan program pembelajaran sekolah kami",
 };
 
-async function getKurikulumData() {
-  try {
-    const schoolProfile = await prisma.schoolProfile.findFirst({
-      select: { name: true, schoolLevel: true },
-    });
-    return schoolProfile;
-  } catch (error) {
-    console.error("Error fetching kurikulum data:", error);
-    return null;
-  }
-}
+const getKurikulumData = unstable_cache(
+  async () => {
+    try {
+      const schoolProfile = await prisma.schoolProfile.findFirst({
+        select: { name: true, schoolLevel: true },
+      });
+      return schoolProfile;
+    } catch (error) {
+      console.error("Error fetching kurikulum data:", error);
+      return null;
+    }
+  },
+  ["kurikulum-page-data"],
+  { revalidate: 60, tags: ["school-profile"] }
+);
 
 export default async function KurikulumPage() {
   const schoolProfile = await getKurikulumData();
