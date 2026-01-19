@@ -239,12 +239,15 @@ export async function reorderPrograms(
   }
 
   try {
-    for (const item of items) {
-      await prisma.program.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      });
-    }
+    // Use transaction for atomicity and performance
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.program.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        })
+      )
+    );
 
     revalidatePath("/admin/programs");
     revalidatePath("/akademik");

@@ -95,15 +95,19 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { siteName, logo, menuItems } = await getLayoutData();
-  const locale = await getLocale();
+  // Parallel fetch to avoid waterfall
+  const [layoutData, locale] = await Promise.all([
+    getLayoutData(),
+    getLocale(),
+  ]);
+  const { siteName, logo, menuItems } = layoutData;
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PublicHeader 
-        siteName={siteName} 
-        logo={logo} 
-        menuItems={menuItems} 
+      <PublicHeader
+        siteName={siteName}
+        logo={logo}
+        menuItems={menuItems}
         currentLocale={locale}
       />
       {children}

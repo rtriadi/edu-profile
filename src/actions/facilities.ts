@@ -219,12 +219,15 @@ export async function reorderFacilities(
   }
 
   try {
-    for (const item of items) {
-      await prisma.facility.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      });
-    }
+    // Use transaction for atomicity and performance
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.facility.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        })
+      )
+    );
 
     revalidatePath("/admin/facilities");
     revalidatePath("/profil/fasilitas");

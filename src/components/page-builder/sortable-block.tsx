@@ -105,6 +105,7 @@ export function SortableBlock({
           variant="ghost"
           size="icon"
           className="h-7 w-7"
+          aria-label="Tambah blok di bawah"
           onClick={(e) => {
             e.stopPropagation();
             onAddBelow();
@@ -115,7 +116,7 @@ export function SortableBlock({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7">
+            <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Pengaturan blok">
               <Settings className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>

@@ -78,7 +78,7 @@ export function BlockToolbar({ onSelect, onClose }: BlockToolbarProps) {
     <div className="border rounded-lg bg-background shadow-lg p-4 mb-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">Pilih Jenis Blok</h3>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Tutup">
           <X className="h-4 w-4" />
         </Button>
       </div>

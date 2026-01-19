@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth, canAccess } from "@/lib/auth";
 import { schoolProfileSchema, type SchoolProfileInput } from "@/lib/validations";
@@ -81,6 +81,8 @@ export async function updateSchoolProfile(
     revalidatePath("/");
     revalidatePath("/profil");
     revalidatePath("/kontak");
+    updateTag("school-profile");
+    updateTag("site-config");
 
     return { success: true, data: profile, message: "Profil sekolah berhasil diperbarui" };
   } catch (error) {

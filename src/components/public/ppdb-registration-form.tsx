@@ -168,7 +168,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                   <FormItem>
                     <FormLabel>Nama Lengkap *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nama lengkap sesuai akta" {...field} />
+                      <Input placeholder="Nama lengkap sesuai akta" autoComplete="name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,7 +210,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                   <FormItem>
                     <FormLabel>Tanggal Lahir *</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" autoComplete="bday" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -299,10 +299,11 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                 <FormItem>
                   <FormLabel>Alamat Lengkap *</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Alamat lengkap tempat tinggal" 
+                    <Textarea
+                      placeholder="Alamat lengkap tempat tinggal"
                       rows={3}
-                      {...field} 
+                      autoComplete="street-address"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -358,7 +359,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                     <FormItem>
                       <FormLabel>No. Telepon</FormLabel>
                       <FormControl>
-                        <Input placeholder="08xxxxxxxxxx" {...field} />
+                        <Input placeholder="08xxxxxxxxxx" type="tel" inputMode="tel" autoComplete="tel" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -404,7 +405,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                     <FormItem>
                       <FormLabel>No. Telepon</FormLabel>
                       <FormControl>
-                        <Input placeholder="08xxxxxxxxxx" {...field} />
+                        <Input placeholder="08xxxxxxxxxx" type="tel" inputMode="tel" autoComplete="tel" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -437,7 +438,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                     <FormItem>
                       <FormLabel>No. Telepon</FormLabel>
                       <FormControl>
-                        <Input placeholder="08xxxxxxxxxx" {...field} />
+                        <Input placeholder="08xxxxxxxxxx" type="tel" inputMode="tel" autoComplete="tel" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -450,7 +451,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="email@example.com" {...field} />
+                        <Input type="email" placeholder="email@example.com" autoComplete="email" spellCheck={false} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -1,8 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { auth, canAccess } from "@/lib/auth";
 import type { ApiResponse } from "@/types";
 
 // ==========================================
@@ -53,7 +53,7 @@ export async function setSetting(
   group: string = "general"
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -66,7 +66,9 @@ export async function setSetting(
 
     revalidatePath("/admin/settings");
     revalidatePath("/");
-    
+    updateTag("site-config");
+    updateTag("settings");
+
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
     console.error("Set setting error:", error);
@@ -78,31 +80,35 @@ export async function setSettings(
   settings: { key: string; value: unknown; group?: string }[]
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
   try {
-    for (const setting of settings) {
-      await prisma.setting.upsert({
-        where: { key: setting.key },
-        create: { 
-          key: setting.key, 
-          value: setting.value as object, 
-          group: setting.group || "general" 
-        },
-        update: { 
-          value: setting.value as object,
-          group: setting.group || "general",
-        },
-      });
-    }
+    // Use transaction for atomicity and performance
+    await prisma.$transaction(
+      settings.map((setting) =>
+        prisma.setting.upsert({
+          where: { key: setting.key },
+          create: {
+            key: setting.key,
+            value: setting.value as object,
+            group: setting.group || "general",
+          },
+          update: {
+            value: setting.value as object,
+            group: setting.group || "general",
+          },
+        })
+      )
+    );
 
     revalidatePath("/admin/settings");
     revalidatePath("/");
-    // Force revalidate all pages that depend on settings
     revalidatePath("/", "layout");
-    
+    updateTag("site-config");
+    updateTag("settings");
+
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
     console.error("Set settings error:", error);
@@ -112,7 +118,7 @@ export async function setSettings(
 
 export async function deleteSetting(key: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -120,6 +126,9 @@ export async function deleteSetting(key: string): Promise<ApiResponse> {
     await prisma.setting.delete({ where: { key } });
 
     revalidatePath("/admin/settings");
+    updateTag("site-config");
+    updateTag("settings");
+
     return { success: true, message: "Pengaturan berhasil dihapus" };
   } catch (error) {
     console.error("Delete setting error:", error);

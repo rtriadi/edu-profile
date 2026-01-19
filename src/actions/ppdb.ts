@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { auth, canAccess } from "@/lib/auth";
 import { rateLimitByIp, sanitizeText, sanitizeEmail, sanitizePhone } from "@/lib/security";
 import type { ApiResponse } from "@/types";
 
@@ -77,30 +77,33 @@ export async function createPPDBPeriod(data: {
   isActive?: boolean;
 }): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
   try {
-    // If setting as active, deactivate other periods first
-    if (data.isActive) {
-      await prisma.pPDBPeriod.updateMany({
-        where: { isActive: true },
-        data: { isActive: false },
-      });
-    }
+    // Use transaction for atomicity
+    const period = await prisma.$transaction(async (tx) => {
+      // If setting as active, deactivate other periods first
+      if (data.isActive) {
+        await tx.pPDBPeriod.updateMany({
+          where: { isActive: true },
+          data: { isActive: false },
+        });
+      }
 
-    const period = await prisma.pPDBPeriod.create({
-      data: {
-        name: data.name,
-        academicYear: data.academicYear,
-        description: data.description,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        quota: data.quota,
-        requirements: data.requirements,
-        isActive: data.isActive ?? false,
-      },
+      return tx.pPDBPeriod.create({
+        data: {
+          name: data.name,
+          academicYear: data.academicYear,
+          description: data.description,
+          startDate: data.startDate,
+          endDate: data.endDate,
+          quota: data.quota,
+          requirements: data.requirements,
+          isActive: data.isActive ?? false,
+        },
+      });
     });
 
     revalidatePath("/admin/ppdb");
@@ -126,22 +129,25 @@ export async function updatePPDBPeriod(
   }
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
   try {
-    // If setting as active, deactivate other periods first
-    if (data.isActive) {
-      await prisma.pPDBPeriod.updateMany({
-        where: { isActive: true, NOT: { id } },
-        data: { isActive: false },
-      });
-    }
+    // Use transaction for atomicity
+    const period = await prisma.$transaction(async (tx) => {
+      // If setting as active, deactivate other periods first
+      if (data.isActive) {
+        await tx.pPDBPeriod.updateMany({
+          where: { isActive: true, NOT: { id } },
+          data: { isActive: false },
+        });
+      }
 
-    const period = await prisma.pPDBPeriod.update({
-      where: { id },
-      data,
+      return tx.pPDBPeriod.update({
+        where: { id },
+        data,
+      });
     });
 
     revalidatePath("/admin/ppdb");
@@ -156,7 +162,7 @@ export async function updatePPDBPeriod(
 
 export async function deletePPDBPeriod(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -185,7 +191,7 @@ export async function deletePPDBPeriod(id: string): Promise<ApiResponse> {
 
 export async function togglePPDBPeriodActive(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -195,17 +201,20 @@ export async function togglePPDBPeriodActive(id: string): Promise<ApiResponse> {
       return { success: false, error: "Periode tidak ditemukan" };
     }
 
-    // If activating, deactivate others first
-    if (!period.isActive) {
-      await prisma.pPDBPeriod.updateMany({
-        where: { isActive: true },
-        data: { isActive: false },
-      });
-    }
+    // Use transaction for atomicity
+    await prisma.$transaction(async (tx) => {
+      // If activating, deactivate others first
+      if (!period.isActive) {
+        await tx.pPDBPeriod.updateMany({
+          where: { isActive: true },
+          data: { isActive: false },
+        });
+      }
 
-    await prisma.pPDBPeriod.update({
-      where: { id },
-      data: { isActive: !period.isActive },
+      await tx.pPDBPeriod.update({
+        where: { id },
+        data: { isActive: !period.isActive },
+      });
     });
 
     revalidatePath("/admin/ppdb");

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -116,6 +116,7 @@ export async function createMenu(data: MenuInput): Promise<ApiResponse> {
     });
 
     revalidatePath("/admin/menus");
+    updateTag("menus");
     return { success: true, data: menu, message: "Menu berhasil dibuat" };
   } catch (error) {
     console.error("Create menu error:", error);
@@ -157,6 +158,7 @@ export async function updateMenu(
     });
 
     revalidatePath("/admin/menus");
+    updateTag("menus");
     return { success: true, data: menu, message: "Menu berhasil diperbarui" };
   } catch (error) {
     console.error("Update menu error:", error);
@@ -174,6 +176,7 @@ export async function deleteMenu(id: string): Promise<ApiResponse> {
     await prisma.menu.delete({ where: { id } });
 
     revalidatePath("/admin/menus");
+    updateTag("menus");
     return { success: true, message: "Menu berhasil dihapus" };
   } catch (error) {
     console.error("Delete menu error:", error);
@@ -221,6 +224,7 @@ export async function createMenuItem(
 
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("menus");
     return { success: true, data: menuItem, message: "Item menu berhasil ditambahkan" };
   } catch (error) {
     console.error("Create menu item error:", error);
@@ -261,6 +265,7 @@ export async function updateMenuItem(
 
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("menus");
     return { success: true, data: menuItem, message: "Item menu berhasil diperbarui" };
   } catch (error) {
     console.error("Update menu item error:", error);
@@ -280,6 +285,7 @@ export async function deleteMenuItem(id: string): Promise<ApiResponse> {
 
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("menus");
     return { success: true, message: "Item menu berhasil dihapus" };
   } catch (error) {
     console.error("Delete menu item error:", error);
@@ -296,18 +302,22 @@ export async function reorderMenuItems(
   }
 
   try {
-    for (const item of items) {
-      await prisma.menuItem.update({
-        where: { id: item.id },
-        data: { 
-          order: item.order,
-          parentId: item.parentId ?? null,
-        },
-      });
-    }
+    // Use transaction for atomicity and performance
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.menuItem.update({
+          where: { id: item.id },
+          data: {
+            order: item.order,
+            parentId: item.parentId ?? null,
+          },
+        })
+      )
+    );
 
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("menus");
     return { success: true, message: "Urutan menu berhasil diperbarui" };
   } catch (error) {
     console.error("Reorder menu items error:", error);
@@ -334,6 +344,7 @@ export async function toggleMenuItemVisibility(id: string): Promise<ApiResponse>
 
     revalidatePath("/admin/menus");
     revalidatePath("/");
+    updateTag("menus");
     return {
       success: true,
       message: item.isVisible

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ThemeStyles } from "@/components/theme-styles";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { GoogleAnalytics } from "@/components/google-analytics";
 import { getSiteConfig } from "@/lib/site-config";
 import { validateGoogleAnalyticsId } from "@/lib/security";
 
@@ -72,24 +73,6 @@ export default async function RootLayout({
     <html lang={config.language || "id"} suppressHydrationWarning>
       <head>
         <ThemeStyles />
-        {validGaId && (
-          <>
-            <script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${validGaId}`}
-            />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-                  gtag('config', '${validGaId}');
-                `,
-              }}
-            />
-          </>
-        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -98,6 +81,8 @@ export default async function RootLayout({
           {children}
           <ScrollToTop />
         </Providers>
+        {/* Defer GA loading until after hydration for better performance */}
+        {validGaId && <GoogleAnalytics gaId={validGaId} />}
       </body>
     </html>
   );

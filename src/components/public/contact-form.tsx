@@ -58,6 +58,7 @@ export function ContactForm() {
           <Input
             id="name"
             placeholder="Masukkan nama lengkap"
+            autoComplete="name"
             {...register("name")}
             disabled={isSubmitting}
           />
@@ -72,6 +73,8 @@ export function ContactForm() {
             id="email"
             type="email"
             placeholder="email@example.com"
+            autoComplete="email"
+            spellCheck={false}
             {...register("email")}
             disabled={isSubmitting}
           />
@@ -87,7 +90,9 @@ export function ContactForm() {
           <Input
             id="phone"
             type="tel"
+            inputMode="tel"
             placeholder="08xxxxxxxxxx"
+            autoComplete="tel"
             {...register("phone")}
             disabled={isSubmitting}
           />

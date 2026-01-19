@@ -99,10 +99,11 @@ export function SettingsTabs() {
           getGeneralSettings(),
         ]);
 
-        if (theme) setThemeSettings({ ...themeSettings, ...theme });
-        if (seo) setSeoSettings({ ...seoSettings, ...seo });
-        if (email) setEmailSettings({ ...emailSettings, ...email });
-        if (general) setGeneralSettings({ ...generalSettings, ...general });
+        // Use functional updates to avoid stale closure issues
+        if (theme) setThemeSettings((prev) => ({ ...prev, ...theme }));
+        if (seo) setSeoSettings((prev) => ({ ...prev, ...seo }));
+        if (email) setEmailSettings((prev) => ({ ...prev, ...email }));
+        if (general) setGeneralSettings((prev) => ({ ...prev, ...general }));
       } catch (error) {
         console.error("Error loading settings:", error);
       } finally {

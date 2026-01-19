@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { put, del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+import { auth, canAccess } from "@/lib/auth";
 import { validateFile } from "@/lib/security";
 import type { ApiResponse } from "@/types";
 
@@ -71,7 +71,7 @@ export async function getMedia(params?: {
 
 export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -162,7 +162,7 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
 
 export async function deleteMedia(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -209,7 +209,7 @@ export async function updateMediaAlt(
   alt: string
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -235,7 +235,7 @@ export async function updateMediaAlt(
  */
 export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse> {
   const session = await auth();
-  if (!session) {
+  if (!session || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 

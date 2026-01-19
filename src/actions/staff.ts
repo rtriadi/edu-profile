@@ -195,12 +195,15 @@ export async function reorderStaff(
   }
 
   try {
-    for (const item of items) {
-      await prisma.staff.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      });
-    }
+    // Use transaction for atomicity and performance
+    await prisma.$transaction(
+      items.map((item) =>
+        prisma.staff.update({
+          where: { id: item.id },
+          data: { order: item.order },
+        })
+      )
+    );
 
     revalidatePath("/admin/staff");
     return { success: true, message: "Urutan staff berhasil diperbarui" };
