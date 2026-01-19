@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { MenuManager } from "@/components/admin/menus/menu-manager";
 import { getMenus } from "@/actions/menus";
 import { prisma } from "@/lib/prisma";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, BookOpen, MousePointer, Layers } from "lucide-react";
 import {
   Accordion,

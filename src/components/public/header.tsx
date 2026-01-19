@@ -197,7 +197,7 @@ export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: 
           <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) =>
               item.children ? (
-                <DropdownMenu key={item.href}>
+                <DropdownMenu key={`dropdown-${item.label}-${item.href}`}>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"

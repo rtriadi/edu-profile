@@ -54,13 +54,10 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
   }
 
   try {
-    // Check if Vercel Blob is configured
+    // Auto-detect environment: use Vercel Blob in production, local storage in development
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      console.error("BLOB_READ_WRITE_TOKEN not configured");
-      return { 
-        success: false, 
-        error: "Storage tidak dikonfigurasi. Pastikan BLOB_READ_WRITE_TOKEN sudah diatur di environment variables." 
-      };
+      // Fall back to local upload for development
+      return uploadMediaLocal(formData);
     }
 
     const file = formData.get("file") as File;

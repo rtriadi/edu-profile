@@ -133,8 +133,9 @@ export default async function HomePage() {
   ]);
   const { schoolProfile } = data;
   
-  // Get translations based on admin language setting
-  const t = getTranslations(siteConfig.language as Language);
+  // Get translations based on admin language setting with validation
+  const language: Language = siteConfig.language === "en" ? "en" : "id";
+  const t = getTranslations(language);
 
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
 
