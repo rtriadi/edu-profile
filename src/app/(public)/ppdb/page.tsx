@@ -56,7 +56,7 @@ export default async function PPDBPage() {
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Penerimaan Peserta Didik Baru
           </h1>
-          <p className="text-xl text-primary-foreground/90 mb-6">
+          <p className="text-xl text-primary-foreground/90 mb-6" suppressHydrationWarning>
             {activePeriod?.name || `Tahun Ajaran ${new Date().getFullYear()}/${new Date().getFullYear() + 1}`}
           </p>
           {activePeriod && (

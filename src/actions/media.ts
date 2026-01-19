@@ -15,7 +15,16 @@ export async function getMedia(params?: {
 }) {
   const session = await auth();
   if (!session) {
-    throw new Error("Unauthorized");
+    // Return empty result instead of throwing to prevent Server Component crash
+    return {
+      data: [],
+      pagination: {
+        page: 1,
+        limit: params?.limit || 24,
+        total: 0,
+        totalPages: 0,
+      },
+    };
   }
 
   const page = params?.page || 1;
@@ -26,25 +35,38 @@ export async function getMedia(params?: {
   if (params?.folder) where.folder = params.folder;
   if (params?.type) where.type = params.type;
 
-  const [media, total] = await Promise.all([
-    prisma.media.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip,
-      take: limit,
-    }),
-    prisma.media.count({ where }),
-  ]);
+  try {
+    const [media, total] = await Promise.all([
+      prisma.media.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.media.count({ where }),
+    ]);
 
-  return {
-    data: media,
-    pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
+    return {
+      data: media,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching media:", error);
+    return {
+      data: [],
+      pagination: {
+        page: 1,
+        limit,
+        total: 0,
+        totalPages: 0,
+      },
+    };
+  }
 }
 
 export async function uploadMedia(formData: FormData): Promise<ApiResponse> {

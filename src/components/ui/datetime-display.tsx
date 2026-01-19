@@ -114,7 +114,7 @@ export function DateTimeDisplayStatic({
   });
 
   return (
-    <div className={`flex items-center gap-2 text-sm ${className}`}>
+    <div className={`flex items-center gap-2 text-sm ${className}`} suppressHydrationWarning>
       <Clock className="h-4 w-4" />
       <span>{formattedTime}</span>
       {showTimezone && (

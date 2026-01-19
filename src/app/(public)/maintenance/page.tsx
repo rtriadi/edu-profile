@@ -93,7 +93,7 @@ export default async function MaintenancePage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-sm text-slate-500">
+        <div className="mt-12 text-sm text-slate-500" suppressHydrationWarning>
           &copy; {new Date().getFullYear()} {siteConfig.siteName}
         </div>
       </div>

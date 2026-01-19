@@ -169,7 +169,7 @@ export default async function AdminDashboardPage() {
                           {post.category.name}
                         </span>
                         <span>•</span>
-                        <span>
+                        <span suppressHydrationWarning>
                           {new Date(post.createdAt).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "short",

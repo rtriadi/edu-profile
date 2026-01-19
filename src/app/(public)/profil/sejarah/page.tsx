@@ -66,7 +66,7 @@ export default async function SejarahPage() {
                 <Card>
                   <CardContent className="pt-6 text-center">
                     <History className="h-8 w-8 text-primary mx-auto mb-2" />
-                    <div className="text-3xl font-bold text-primary">
+                    <div className="text-3xl font-bold text-primary" suppressHydrationWarning>
                       {yearsEstablished}+
                     </div>
                     <div className="text-sm text-muted-foreground">Tahun Pengalaman</div>
