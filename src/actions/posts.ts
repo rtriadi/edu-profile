@@ -12,7 +12,9 @@ export async function getPosts(params?: {
   limit?: number;
   search?: string;
   categoryId?: string;
+  categorySlug?: string;
   status?: Status;
+  locale?: string;
 }) {
   const page = params?.page || 1;
   const limit = params?.limit || 10;
@@ -30,9 +32,17 @@ export async function getPosts(params?: {
   if (params?.categoryId) {
     where.categoryId = params.categoryId;
   }
+
+  if (params?.categorySlug) {
+    where.category = { slug: params.categorySlug };
+  }
   
   if (params?.status) {
     where.status = params.status;
+  }
+
+  if (params?.locale) {
+    where.locale = params.locale;
   }
 
   const [posts, total] = await Promise.all([

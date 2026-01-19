@@ -3,6 +3,7 @@ import { PublicFooter } from "@/components/public/footer";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import { getMenuByLocation } from "@/actions/menus";
+import { getLocale } from "@/actions/locale";
 
 // Dynamic rendering - fetch fresh data on each request
 // This prevents build-time database errors on Vercel
@@ -89,10 +90,16 @@ export default async function PublicLayout({
   children: React.ReactNode;
 }) {
   const { siteName, logo, menuItems } = await getLayoutData();
+  const locale = await getLocale();
 
   return (
     <div className="min-h-screen flex flex-col">
-      <PublicHeader siteName={siteName} logo={logo} menuItems={menuItems} />
+      <PublicHeader 
+        siteName={siteName} 
+        logo={logo} 
+        menuItems={menuItems} 
+        currentLocale={locale}
+      />
       {children}
       <PublicFooter />
     </div>

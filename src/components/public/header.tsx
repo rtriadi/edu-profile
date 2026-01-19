@@ -18,6 +18,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { DateTimeDisplay } from "@/components/ui/datetime-display";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/use-translation";
+import { LanguageSwitcher } from "./language-switcher";
 
 // Menu item from database
 interface MenuItem {
@@ -124,9 +125,15 @@ interface PublicHeaderProps {
   siteName?: string;
   logo?: string | null;
   menuItems?: MenuItem[];
+  currentLocale?: "id" | "en";
 }
 
-export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: PublicHeaderProps) {
+export function PublicHeader({ 
+  siteName = "EduProfile", 
+  logo, 
+  menuItems = [], 
+  currentLocale = "id" 
+}: PublicHeaderProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -250,6 +257,7 @@ export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: 
               format="full"
               className="text-xs text-muted-foreground"
             />
+            <LanguageSwitcher currentLocale={currentLocale} />
             <ThemeToggle />
             <Button asChild className="shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all">
               <Link href="/ppdb">{t("nav.register")}</Link>
@@ -258,6 +266,7 @@ export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: 
 
           {/* Mobile Menu */}
           <div className="flex items-center gap-2 lg:hidden">
+            <LanguageSwitcher currentLocale={currentLocale} />
             <ThemeToggle />
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>

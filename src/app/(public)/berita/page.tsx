@@ -10,6 +10,8 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
+import { getPosts, getCategories } from "@/actions/posts";
+import { getLocale } from "@/actions/locale";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
 export const dynamic = "force-dynamic";
@@ -26,64 +28,24 @@ interface BeritaPageProps {
   }>;
 }
 
-async function getPosts(page: number, categorySlug?: string) {
-  const limit = 9;
-  const skip = (page - 1) * limit;
-
-  const where: Record<string, unknown> = { status: "PUBLISHED" };
-  if (categorySlug) {
-    where.category = { slug: categorySlug };
-  }
-
-  try {
-    const [posts, total, categories] = await Promise.all([
-      prisma.post.findMany({
-        where,
-        include: {
-          category: { select: { name: true, slug: true, color: true } },
-          author: { select: { name: true } },
-        },
-        orderBy: { publishedAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      prisma.post.count({ where }),
-      prisma.category.findMany({
-        include: { _count: { select: { posts: true } } },
-        orderBy: { order: "asc" },
-      }),
-    ]);
-
-    return {
-      posts,
-      categories,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    return {
-      posts: [],
-      categories: [],
-      pagination: { page: 1, limit: 9, total: 0, totalPages: 0 },
-    };
-  }
-}
-
 export default async function BeritaPage({ searchParams }: BeritaPageProps) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
+  const locale = await getLocale();
   
-  const [data, siteConfig] = await Promise.all([
-    getPosts(page, params.category),
+  const [postsData, categories, siteConfig] = await Promise.all([
+    getPosts({ 
+      page, 
+      limit: 9, 
+      categorySlug: params.category,
+      status: "PUBLISHED",
+      locale
+    }),
+    getCategories(),
     getSiteConfig(),
   ]);
 
-  const { posts, categories, pagination } = data;
+  const { data: posts, pagination } = postsData;
   const t = getTranslations(siteConfig.language as Language);
 
   return (
