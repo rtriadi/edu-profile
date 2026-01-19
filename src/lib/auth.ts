@@ -4,29 +4,6 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import type { Role } from "@prisma/client";
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      image?: string | null;
-      role: Role;
-    };
-  }
-
-  interface User {
-    role: Role;
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string;
-    role: Role;
-  }
-}
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // Note: Adapter is not needed for Credentials provider with JWT strategy
   // adapter: PrismaAdapter(prisma) as Adapter,
