@@ -6,7 +6,7 @@ import { BlockRenderer } from "@/components/page-builder";
 import type { Block } from "@/types";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface DynamicPageProps {
   params: Promise<{

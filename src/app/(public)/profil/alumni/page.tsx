@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Alumni",

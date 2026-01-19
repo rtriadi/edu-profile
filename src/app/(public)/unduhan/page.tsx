@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { getPublishedDownloads } from "@/actions/downloads";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Pusat Unduhan",

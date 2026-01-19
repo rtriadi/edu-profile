@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getProgramBySlug, getAllProgramSlugs } from "@/actions/programs";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 interface ProgramDetailPageProps {
   params: Promise<{ slug: string }>;

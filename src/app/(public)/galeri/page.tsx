@@ -12,7 +12,7 @@ import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Galeri",

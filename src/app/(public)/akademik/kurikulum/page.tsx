@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Kurikulum",
@@ -87,58 +87,33 @@ export default async function KurikulumPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-primary" />
-                    Kurikulum Merdeka
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Sekolah kami menerapkan Kurikulum Merdeka yang memberikan 
-                    fleksibilitas kepada guru untuk menyesuaikan pembelajaran 
-                    dengan kebutuhan dan karakteristik siswa.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
-                    Pembelajaran Berbasis Proyek
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Pendekatan Project-Based Learning (PBL) diterapkan untuk 
-                    mengembangkan keterampilan berpikir kritis, kreativitas, 
-                    dan kolaborasi siswa.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
             {/* Program Kurikulum dari Database */}
-            {curriculumPrograms.length > 0 && (
+            {curriculumPrograms.length > 0 ? (
               <div className="mb-12">
-                <h2 className="text-2xl font-bold mb-6">Program Kurikulum</h2>
-                <div className="grid gap-4">
+                <div className="grid gap-6">
                   {curriculumPrograms.map((program) => (
-                    <Card key={program.id}>
-                      <CardHeader>
-                        <CardTitle className="text-lg">{program.name}</CardTitle>
+                    <Card key={program.id} className="overflow-hidden">
+                      <CardHeader className="bg-muted/50">
+                        <CardTitle className="flex items-center gap-2 text-xl">
+                          <BookOpen className="h-6 w-6 text-primary" />
+                          {program.name}
+                        </CardTitle>
                       </CardHeader>
                       {program.description && (
-                        <CardContent>
-                          <p className="text-muted-foreground">{program.description}</p>
+                        <CardContent className="pt-6">
+                          <p className="text-muted-foreground leading-relaxed text-lg">
+                            {program.description}
+                          </p>
                         </CardContent>
                       )}
                     </Card>
                   ))}
                 </div>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                <p>Belum ada informasi kurikulum yang tersedia.</p>
               </div>
             )}
 

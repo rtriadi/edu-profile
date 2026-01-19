@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "PPDB Online",

@@ -11,7 +11,7 @@ import { getInitials } from "@/lib/utils";
 
 // Dynamic rendering - fetch fresh data on each request
 // This prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Guru & Staff",

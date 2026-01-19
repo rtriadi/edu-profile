@@ -4,7 +4,7 @@ import { getSiteConfig } from "@/lib/site-config";
 import { prisma } from "@/lib/prisma";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function getSchoolContact() {
   try {

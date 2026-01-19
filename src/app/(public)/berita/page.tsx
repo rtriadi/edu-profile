@@ -14,7 +14,7 @@ import { getPosts, getCategories } from "@/actions/posts";
 import { getLocale } from "@/actions/locale";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Berita & Artikel",

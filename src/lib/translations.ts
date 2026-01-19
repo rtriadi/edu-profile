@@ -75,6 +75,7 @@ export interface Translations {
     alumni: string;
     achievements: string;
     extracurricular: string;
+    gradeLevels: string;
   };
   // Footer
   footer: {
@@ -261,6 +262,7 @@ const translations: Record<Language, Translations> = {
       alumni: "Alumni",
       achievements: "Prestasi",
       extracurricular: "Ekstrakurikuler",
+      gradeLevels: "Kelas Dibuka",
     },
     footer: {
       quickLinks: "Menu Cepat",
@@ -440,6 +442,7 @@ const translations: Record<Language, Translations> = {
       alumni: "Alumni",
       achievements: "Achievements",
       extracurricular: "Extracurricular",
+      gradeLevels: "Classes Opened",
     },
     footer: {
       quickLinks: "Quick Links",

@@ -16,6 +16,7 @@ import {
   Award,
   Target,
 } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,101 +32,103 @@ import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
-// Dynamic rendering - prevents build-time database errors on Vercel
-export const dynamic = "force-dynamic";
+// Use unstable_cache for data fetching to ensure caching even with dynamic layout (cookies)
+const getHomeData = unstable_cache(
+  async () => {
+    try {
+      // 1. Critical Data: School Profile
+      const schoolProfile = await prisma.schoolProfile.findFirst();
 
-async function getHomeData() {
-  try {
-    const [
-      schoolProfile,
-      recentPosts,
-      programs,
-      facilities,
-      testimonials,
-      upcomingEvents,
-      gradeLevels,
-      stats,
-    ] = await Promise.all([
-      prisma.schoolProfile.findFirst(),
-      prisma.post.findMany({
-        where: { status: "PUBLISHED" },
-        orderBy: { publishedAt: "desc" },
-        take: 3,
-        include: {
-          category: { select: { name: true, color: true } },
-        },
-      }),
-      prisma.program.findMany({
-        where: { isActive: true, type: "FEATURED" },
-        orderBy: { order: "asc" },
-        take: 4,
-      }),
-      prisma.facility.findMany({
-        where: { isPublished: true },
-        orderBy: { order: "asc" },
-        take: 6,
-      }),
-      prisma.testimonial.findMany({
-        where: { isPublished: true },
-        orderBy: { order: "asc" },
-        take: 3,
-      }),
-      prisma.event.findMany({
-        where: {
-          isPublished: true,
-          startDate: { gte: new Date() },
-        },
-        orderBy: { startDate: "asc" },
-        take: 3,
-      }),
-      prisma.gradeLevel.findMany({
-        where: { isActive: true },
-        orderBy: { order: "asc" },
-      }).catch(() => []),
-      Promise.all([
+      // 2. Primary Content: Posts, Programs, Events (3 concurrent connections)
+      const [recentPosts, programs, upcomingEvents] = await Promise.all([
+        prisma.post.findMany({
+          where: { status: "PUBLISHED" },
+          orderBy: { publishedAt: "desc" },
+          take: 3,
+          include: {
+            category: { select: { name: true, color: true } },
+          },
+        }),
+        prisma.program.findMany({
+          where: { isActive: true, type: "FEATURED" },
+          orderBy: { order: "asc" },
+          take: 4,
+        }),
+        prisma.event.findMany({
+          where: {
+            isPublished: true,
+            startDate: { gte: new Date() },
+          },
+          orderBy: { startDate: "asc" },
+          take: 3,
+        }),
+      ]);
+
+      // 3. Secondary Content: Facilities, Testimonials, GradeLevels (3 concurrent connections)
+      const [facilities, testimonials, gradeLevels] = await Promise.all([
+        prisma.facility.findMany({
+          where: { isPublished: true },
+          orderBy: { order: "asc" },
+          take: 6,
+        }),
+        prisma.testimonial.findMany({
+          where: { isPublished: true },
+          orderBy: { order: "asc" },
+          take: 3,
+        }),
+        prisma.gradeLevel.findMany({
+          where: { isActive: true },
+          orderBy: { order: "asc" },
+        }).catch(() => []),
+      ]);
+
+      // 4. Statistics: Counts (4 concurrent connections)
+      const stats = await Promise.all([
         prisma.staff.count({ where: { isActive: true } }),
         prisma.alumni.count({ where: { isPublished: true } }),
-        prisma.achievement.count({ where: { isPublished: true } }),
+        prisma.gradeLevel.count({ where: { isActive: true } }),
         prisma.program.count({
           where: { isActive: true, type: "EXTRACURRICULAR" },
         }),
-      ]),
-    ]);
+      ]);
 
-    return {
-      schoolProfile,
-      recentPosts,
-      programs,
-      facilities,
-      testimonials,
-      upcomingEvents,
-      gradeLevels,
-      stats: {
-        staff: stats[0],
-        alumni: stats[1],
-        achievements: stats[2],
-        extracurriculars: stats[3],
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching home data:", error);
-    return {
-      schoolProfile: null,
-      recentPosts: [],
-      programs: [],
-      facilities: [],
-      testimonials: [],
-      upcomingEvents: [],
-      gradeLevels: [],
-      stats: {
-        staff: 0,
-        alumni: 0,
-        achievements: 0,
-        extracurriculars: 0,
-      },
-    };
-  }
-}
+      return {
+        schoolProfile,
+        recentPosts,
+        programs,
+        facilities,
+        testimonials,
+        upcomingEvents,
+        gradeLevels,
+        stats: {
+          staff: stats[0],
+          alumni: stats[1],
+          gradeLevels: stats[2],
+          extracurriculars: stats[3],
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching home data:", error);
+      return {
+        schoolProfile: null,
+        recentPosts: [],
+        programs: [],
+        facilities: [],
+        testimonials: [],
+        upcomingEvents: [],
+        gradeLevels: [],
+        stats: {
+          staff: 0,
+          alumni: 0,
+          gradeLevels: 0,
+          extracurriculars: 0,
+        },
+      };
+    }
+  },
+  ["home-data"],
+  { revalidate: 60, tags: ["home", "posts", "programs", "events"] }
+);
 
 export default async function HomePage() {
   const [data, siteConfig] = await Promise.all([
@@ -229,12 +232,12 @@ export default async function HomePage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
-                      <Trophy className="h-6 w-6 text-white" />
+                      <BookOpen className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-white/70">Prestasi</p>
+                      <p className="text-sm text-white/70">{t.stats.gradeLevels}</p>
                       <p className="font-bold text-white text-lg">
-                        {data.stats.achievements}+ Penghargaan
+                        {data.stats.gradeLevels} {t.stats.gradeLevels}
                       </p>
                     </div>
                   </div>
@@ -297,9 +300,9 @@ export default async function HomePage() {
                 suffix="+"
               />
               <StatCard
-                icon={Trophy}
-                value={data.stats.achievements}
-                label={t.stats.achievements}
+                icon={BookOpen}
+                value={data.stats.gradeLevels}
+                label={t.stats.gradeLevels}
               />
               <StatCard
                 icon={Calendar}
