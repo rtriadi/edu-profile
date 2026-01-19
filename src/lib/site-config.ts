@@ -51,6 +51,7 @@ const defaultConfig: SiteConfig = {
 };
 
 // Cache the site config to avoid repeated database calls
+// Short revalidation time (5 seconds) for quick settings updates
 export const getSiteConfig = unstable_cache(
   async (): Promise<SiteConfig> => {
     try {
@@ -107,7 +108,7 @@ export const getSiteConfig = unstable_cache(
     }
   },
   ["site-config"],
-  { revalidate: 60, tags: ["site-config", "settings", "school-profile"] }
+  { revalidate: 5, tags: ["site-config", "settings", "school-profile"] }
 );
 
 // Get just the site name (for quick access)

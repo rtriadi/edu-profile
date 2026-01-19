@@ -246,6 +246,7 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
       type: itemForm.type as "link" | "page" | "dropdown" | "megamenu" | "route",
       url: (itemForm.type === "link" || itemForm.type === "route") ? itemForm.url : undefined,
       pageSlug: itemForm.type === "page" ? itemForm.pageSlug : undefined,
+      parentId: itemForm.parentId || undefined,
       isVisible: itemForm.isVisible,
       openNew: itemForm.openNew,
       icon: itemForm.icon || undefined,
@@ -801,6 +802,29 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                 </p>
               </div>
             )}
+            {/* Parent Selection for Edit */}
+            <div>
+              <Label>Parent (Opsional)</Label>
+              <Select
+                value={itemForm.parentId || "_none"}
+                onValueChange={(v) => setItemForm({ ...itemForm, parentId: v === "_none" ? "" : v })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Tidak ada (Root)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">Tidak ada (Root)</SelectItem>
+                  {selectedMenu &&
+                    getAllItems(selectedMenu.items)
+                      .filter((i) => i.type === "dropdown" && i.id !== editingItem?.id)
+                      .map((item) => (
+                        <SelectItem key={item.id} value={item.id}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <Switch

@@ -99,6 +99,8 @@ export async function setSettings(
 
     revalidatePath("/admin/settings");
     revalidatePath("/");
+    // Force revalidate all pages that depend on settings
+    revalidatePath("/", "layout");
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
     console.error("Set settings error:", error);

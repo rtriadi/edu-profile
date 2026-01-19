@@ -54,12 +54,6 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
   }
 
   try {
-    // Auto-detect environment: use Vercel Blob in production, local storage in development
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      // Fall back to local upload for development
-      return uploadMediaLocal(formData);
-    }
-
     const file = formData.get("file") as File;
     const folder = (formData.get("folder") as string) || "general";
 
@@ -77,28 +71,43 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
       return { success: false, error: validation.error || "File tidak valid" };
     }
 
+    // Check environment - use Vercel Blob in production, local in development
+    const isProduction = process.env.NODE_ENV === "production";
+    const hasBlobToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+
+    // In production without blob token, or in development, use local upload
+    if (!hasBlobToken) {
+      console.log("Using local upload (no BLOB_READ_WRITE_TOKEN)");
+      return uploadMediaLocal(formData);
+    }
+
     const type = validation.fileType || "other";
 
-    // Sanitize filename - remove special characters
+    // Sanitize filename - remove special characters and add timestamp
+    const timestamp = Date.now();
     const sanitizedName = file.name
       .replace(/[^a-zA-Z0-9._-]/g, "_")
       .replace(/_{2,}/g, "_");
+    const uniqueName = `${timestamp}-${sanitizedName}`;
 
     // Upload to Vercel Blob
     let blob;
     try {
-      blob = await put(`${folder}/${sanitizedName}`, file, {
+      blob = await put(`${folder}/${uniqueName}`, file, {
         access: "public",
       });
     } catch (blobError) {
       console.error("Vercel Blob upload failed:", blobError);
-      // If Blob upload fails, try local upload as fallback
+      // If Blob upload fails in production, return error with details
+      if (isProduction) {
+        return { 
+          success: false, 
+          error: `Upload gagal: ${blobError instanceof Error ? blobError.message : 'Unknown error'}. Pastikan BLOB_READ_WRITE_TOKEN sudah dikonfigurasi di Vercel.` 
+        };
+      }
+      // In development, fallback to local
       return uploadMediaLocal(formData);
     }
-
-    // Get image dimensions if it's an image
-    let width: number | undefined;
-    let height: number | undefined;
 
     // Save to database
     const media = await prisma.media.create({
@@ -108,8 +117,6 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
         type,
         mimeType: file.type,
         size: file.size,
-        width,
-        height,
         folder,
       },
     });
@@ -118,7 +125,7 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
     return { success: true, data: media, message: "File berhasil diupload" };
   } catch (error) {
     console.error("Upload error:", error);
-    return { success: false, error: "Gagal mengupload file" };
+    return { success: false, error: `Gagal mengupload file: ${error instanceof Error ? error.message : 'Unknown error'}` };
   }
 }
 
