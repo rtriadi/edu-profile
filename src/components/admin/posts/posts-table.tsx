@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useOptimistic, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -99,22 +99,33 @@ const statusColors: Record<Status, string> = {
 export function PostsTable({ posts, pagination }: PostsTableProps) {
   const router = useRouter();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const [optimisticPosts, removeOptimisticPost] = useOptimistic(
+    posts,
+    (state, idToRemove: string) => state.filter((p) => p.id !== idToRemove)
+  );
 
   const handleDelete = async () => {
     if (!deleteId) return;
 
-    setIsDeleting(true);
-    const result = await deletePost(deleteId);
+    const id = deleteId;
+    setDeleteId(null); // Close dialog immediately
 
-    if (result.success) {
-      toast.success(result.message);
-    } else {
-      toast.error(result.error);
-    }
+    startTransition(async () => {
+      // Apply optimistic update
+      removeOptimisticPost(id);
+      
+      // Call server action
+      const result = await deletePost(id);
 
-    setIsDeleting(false);
-    setDeleteId(null);
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.error);
+        router.refresh(); // Revert optimistic update on error
+      }
+    });
   };
 
   const handleToggleFeatured = async (id: string) => {
@@ -148,14 +159,14 @@ export function PostsTable({ posts, pagination }: PostsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {posts.length === 0 ? (
+            {optimisticPosts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
                   Tidak ada berita ditemukan
                 </TableCell>
               </TableRow>
             ) : (
-              posts.map((post) => (
+              optimisticPosts.map((post) => (
                 <TableRow key={post.id}>
                   <TableCell>
                     <div className="flex items-start gap-3">
@@ -315,13 +326,13 @@ export function PostsTable({ posts, pagination }: PostsTableProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Batal</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              disabled={isDeleting}
+              disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? "Menghapus..." : "Hapus"}
+              {isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

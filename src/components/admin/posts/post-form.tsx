@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Loader2, Save, Eye } from "lucide-react";
@@ -83,6 +83,7 @@ interface PostFormData {
 export function PostForm({ post, categories, tags }: PostFormProps) {
   const router = useRouter();
   const isEditing = !!post;
+  const [isPending, startTransition] = useTransition();
 
   const existingTagIds = post?.tags?.map((t) => t.tag.id) || [];
   const [selectedTags, setSelectedTags] = useState<string[]>(existingTagIds);
@@ -147,8 +148,10 @@ export function PostForm({ post, categories, tags }: PostFormProps) {
 
     if (result.success) {
       toast.success(result.message);
-      router.push("/admin/posts");
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+        router.push("/admin/posts");
+      });
     } else {
       toast.error(result.error);
     }
@@ -409,8 +412,8 @@ export function PostForm({ post, categories, tags }: PostFormProps) {
 
       {/* Action Buttons */}
       <div className="flex items-center gap-4">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
+        <Button type="submit" disabled={isSubmitting || isPending}>
+          {isSubmitting || isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Menyimpan...
@@ -434,7 +437,7 @@ export function PostForm({ post, categories, tags }: PostFormProps) {
           type="button"
           variant="outline"
           onClick={() => router.back()}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isPending}
         >
           Batal
         </Button>
