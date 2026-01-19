@@ -81,7 +81,7 @@ export async function updateSchoolProfile(
     revalidatePath("/");
     revalidatePath("/profil");
     revalidatePath("/kontak");
-    
+
     return { success: true, data: profile, message: "Profil sekolah berhasil diperbarui" };
   } catch (error) {
     console.error("Update school profile error:", error);

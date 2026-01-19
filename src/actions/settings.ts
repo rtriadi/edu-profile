@@ -67,10 +67,6 @@ export async function setSetting(
     revalidatePath("/admin/settings");
     revalidatePath("/");
     
-    // Invalidate data cache
-    revalidateTag("settings");
-    revalidateTag("site-config");
-    
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
     console.error("Set setting error:", error);
