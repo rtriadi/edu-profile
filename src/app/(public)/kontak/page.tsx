@@ -193,16 +193,39 @@ export default async function KontakPage() {
               <div>
                 <h2 className="text-2xl font-bold mb-6">{t.pages.contact.findUs}</h2>
                 <div className="aspect-video bg-muted rounded-lg overflow-hidden relative">
-                  <iframe
-                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&q=${schoolProfile.latitude},${schoolProfile.longitude}`}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
+                  {process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ? (
+                    <iframe
+                      src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&q=${schoolProfile.latitude},${schoolProfile.longitude}`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                  ) : (
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      allowFullScreen
+                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${schoolProfile.longitude - 0.005}%2C${schoolProfile.latitude - 0.005}%2C${schoolProfile.longitude + 0.005}%2C${schoolProfile.latitude + 0.005}&layer=mapnik&marker=${schoolProfile.latitude}%2C${schoolProfile.longitude}`}
+                    ></iframe>
+                  )}
                 </div>
+                {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY && (
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    <a 
+                      href={`https://www.openstreetmap.org/?mlat=${schoolProfile.latitude}&mlon=${schoolProfile.longitude}#map=17/${schoolProfile.latitude}/${schoolProfile.longitude}`} 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      Lihat peta lebih besar
+                    </a>
+                  </p>
+                )}
               </div>
             )}
           </div>

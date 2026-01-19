@@ -645,10 +645,9 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                         <SelectItem value="_none">Tidak ada (Root)</SelectItem>
                         {selectedMenu &&
                           getAllItems(selectedMenu.items)
-                            .filter((i) => i.type === "dropdown")
                             .map((item) => (
                               <SelectItem key={item.id} value={item.id}>
-                                {item.label}
+                                {item.label} <span className="text-xs text-muted-foreground ml-2">({item.type})</span>
                               </SelectItem>
                             ))}
                       </SelectContent>
@@ -821,10 +820,10 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                   <SelectItem value="_none">Tidak ada (Root)</SelectItem>
                   {selectedMenu &&
                     getAllItems(selectedMenu.items)
-                      .filter((i) => i.type === "dropdown" && i.id !== editingItem?.id)
+                      .filter((i) => i.id !== editingItem?.id)
                       .map((item) => (
                         <SelectItem key={item.id} value={item.id}>
-                          {item.label}
+                          {item.label} <span className="text-xs text-muted-foreground ml-2">({item.type})</span>
                         </SelectItem>
                       ))}
                 </SelectContent>
