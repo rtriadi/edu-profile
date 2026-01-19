@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,8 +21,13 @@ import { loginSchema, type LoginInput } from "@/lib/validations";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    searchParams.get("error") === "Configuration" 
+      ? "Email atau Password salah." 
+      : searchParams.get("error")
+  );
 
   const {
     register,
@@ -43,7 +48,11 @@ export default function LoginForm() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        if (result.error === "Configuration" || result.error === "CredentialsSignin") {
+          setError("Email atau Password salah.");
+        } else {
+          setError(result.error);
+        }
         return;
       }
 

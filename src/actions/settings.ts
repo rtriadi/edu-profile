@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import type { ApiResponse } from "@/types";
@@ -66,6 +66,11 @@ export async function setSetting(
 
     revalidatePath("/admin/settings");
     revalidatePath("/");
+    
+    // Invalidate data cache
+    revalidateTag("settings");
+    revalidateTag("site-config");
+    
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
     console.error("Set setting error:", error);
@@ -101,6 +106,11 @@ export async function setSettings(
     revalidatePath("/");
     // Force revalidate all pages that depend on settings
     revalidatePath("/", "layout");
+    
+    // Invalidate data cache
+    revalidateTag("settings");
+    revalidateTag("site-config");
+    
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
     console.error("Set settings error:", error);

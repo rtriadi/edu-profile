@@ -307,6 +307,28 @@ export async function updateRegistrationStatus(
   }
 }
 
+export async function getAllPPDBRegistrations(periodId?: string) {
+  const session = await auth();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+
+  const where: Record<string, unknown> = {};
+  if (periodId) {
+    where.periodId = periodId;
+  }
+
+  const registrations = await prisma.pPDBRegistration.findMany({
+    where,
+    include: {
+      period: { select: { name: true, academicYear: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return registrations;
+}
+
 // ==========================================
 // PUBLIC REGISTRATION ACTION
 // ==========================================
