@@ -305,8 +305,13 @@ export function PostsTable({ posts, pagination }: PostsTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Berita?</AlertDialogTitle>
             <AlertDialogDescription>
-              Berita akan dihapus secara permanen. Tindakan ini tidak dapat
-              dibatalkan.
+              Berita <span className="font-medium text-foreground">&quot;{posts.find(p => p.id === deleteId)?.title}&quot;</span> akan dihapus secara permanen.
+              {posts.find(p => p.id === deleteId)?.views ? (
+                <span className="block mt-2 text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-950/30 p-2 rounded border border-yellow-200 dark:border-yellow-900">
+                  ⚠️ Berita ini sudah dilihat {posts.find(p => p.id === deleteId)?.views} kali.
+                </span>
+              ) : null}
+              <span className="block mt-2">Tindakan ini tidak dapat dibatalkan.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

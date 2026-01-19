@@ -128,34 +128,38 @@ export async function createPost(data: PostInput): Promise<ApiResponse> {
       return { success: false, error: "Slug sudah digunakan" };
     }
 
-    // Create post
-    const post = await prisma.post.create({
-      data: {
-        title: validated.title,
-        slug: validated.slug,
-        content: validated.content || [],
-        excerpt: validated.excerpt,
-        featuredImg: validated.featuredImg,
-        status: validated.status,
-        categoryId: validated.categoryId,
-        authorId: session.user.id,
-        isFeatured: validated.isFeatured,
-        seoTitle: validated.seoTitle,
-        seoDesc: validated.seoDesc,
-        locale: validated.locale,
-        publishedAt: validated.status === "PUBLISHED" ? new Date() : null,
-      },
-    });
-
-    // Add tags if provided (using transaction for batch insert)
-    if (validated.tags && validated.tags.length > 0) {
-      await prisma.postToTag.createMany({
-        data: validated.tags.map((tagId) => ({
-          postId: post.id,
-          tagId,
-        })),
+    // Create post with transaction
+    const post = await prisma.$transaction(async (tx) => {
+      const newPost = await tx.post.create({
+        data: {
+          title: validated.title,
+          slug: validated.slug,
+          content: validated.content || [],
+          excerpt: validated.excerpt,
+          featuredImg: validated.featuredImg,
+          status: validated.status,
+          categoryId: validated.categoryId,
+          authorId: session.user.id,
+          isFeatured: validated.isFeatured,
+          seoTitle: validated.seoTitle,
+          seoDesc: validated.seoDesc,
+          locale: validated.locale,
+          publishedAt: validated.status === "PUBLISHED" ? new Date() : null,
+        },
       });
-    }
+
+      // Add tags if provided
+      if (validated.tags && validated.tags.length > 0) {
+        await tx.postToTag.createMany({
+          data: validated.tags.map((tagId) => ({
+            postId: newPost.id,
+            tagId,
+          })),
+        });
+      }
+
+      return newPost;
+    });
 
     revalidatePath("/admin/posts");
     revalidatePath("/berita");
@@ -199,42 +203,46 @@ export async function updatePost(
       publishedAt = null;
     }
 
-    // Update post
-    const post = await prisma.post.update({
-      where: { id },
-      data: {
-        title: data.title,
-        slug: data.slug,
-        content: data.content,
-        excerpt: data.excerpt,
-        featuredImg: data.featuredImg,
-        status: data.status,
-        categoryId: data.categoryId,
-        isFeatured: data.isFeatured,
-        seoTitle: data.seoTitle,
-        seoDesc: data.seoDesc,
-        locale: data.locale,
-        publishedAt,
-      },
-    });
-
-    // Update tags if provided
-    if (data.tags !== undefined) {
-      // Remove existing tags
-      await prisma.postToTag.deleteMany({
-        where: { postId: id },
+    // Update post with transaction
+    const post = await prisma.$transaction(async (tx) => {
+      const updatedPost = await tx.post.update({
+        where: { id },
+        data: {
+          title: data.title,
+          slug: data.slug,
+          content: data.content,
+          excerpt: data.excerpt,
+          featuredImg: data.featuredImg,
+          status: data.status,
+          categoryId: data.categoryId,
+          isFeatured: data.isFeatured,
+          seoTitle: data.seoTitle,
+          seoDesc: data.seoDesc,
+          locale: data.locale,
+          publishedAt,
+        },
       });
 
-      // Add new tags (using transaction for batch insert)
-      if (data.tags.length > 0) {
-        await prisma.postToTag.createMany({
-          data: data.tags.map((tagId) => ({
-            postId: post.id,
-            tagId,
-          })),
+      // Update tags if provided
+      if (data.tags !== undefined) {
+        // Remove existing tags
+        await tx.postToTag.deleteMany({
+          where: { postId: id },
         });
+
+        // Add new tags
+        if (data.tags.length > 0) {
+          await tx.postToTag.createMany({
+            data: data.tags.map((tagId) => ({
+              postId: updatedPost.id,
+              tagId,
+            })),
+          });
+        }
       }
-    }
+
+      return updatedPost;
+    });
 
     revalidatePath("/admin/posts");
     revalidatePath(`/admin/posts/${id}`);
