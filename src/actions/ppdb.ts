@@ -77,7 +77,7 @@ export async function createPPDBPeriod(data: {
   isActive?: boolean;
 }): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -129,7 +129,7 @@ export async function updatePPDBPeriod(
   }
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -162,7 +162,7 @@ export async function updatePPDBPeriod(
 
 export async function deletePPDBPeriod(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -191,7 +191,7 @@ export async function deletePPDBPeriod(id: string): Promise<ApiResponse> {
 
 export async function togglePPDBPeriodActive(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 

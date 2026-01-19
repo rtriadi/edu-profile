@@ -15,7 +15,7 @@ export async function updateSchoolProfile(
   data: SchoolProfileInput
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 

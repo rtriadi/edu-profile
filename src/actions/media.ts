@@ -71,7 +71,7 @@ export async function getMedia(params?: {
 
 export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "EDITOR")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -162,7 +162,7 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
 
 export async function deleteMedia(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "EDITOR")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -209,7 +209,7 @@ export async function updateMediaAlt(
   alt: string
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "EDITOR")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -235,7 +235,7 @@ export async function updateMediaAlt(
  */
 export async function uploadMediaLocal(formData: FormData): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "EDITOR")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "EDITOR")) {
     return { success: false, error: "Unauthorized" };
   }
 

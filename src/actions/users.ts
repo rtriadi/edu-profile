@@ -13,7 +13,7 @@ export async function getUsers(params?: {
   search?: string;
 }) {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     throw new Error("Unauthorized");
   }
 
@@ -86,7 +86,7 @@ export async function getUserById(id: string) {
 
 export async function createUser(data: UserInput): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -132,7 +132,7 @@ export async function updateUser(
   data: Partial<UserInput>
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -182,7 +182,7 @@ export async function updateUser(
 
 export async function deleteUser(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "SUPERADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "SUPERADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -204,7 +204,7 @@ export async function deleteUser(id: string): Promise<ApiResponse> {
 
 export async function toggleUserStatus(id: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 

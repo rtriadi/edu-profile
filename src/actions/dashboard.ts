@@ -5,7 +5,7 @@ import { auth, canAccess } from "@/lib/auth";
 
 export async function getDashboardStats() {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "EDITOR")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "EDITOR")) {
     // Return empty stats instead of throwing to prevent Server Component crash
     return {
       counts: {

@@ -53,7 +53,7 @@ export async function setSetting(
   group: string = "general"
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -80,7 +80,7 @@ export async function setSettings(
   settings: { key: string; value: unknown; group?: string }[]
 ): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
@@ -118,7 +118,7 @@ export async function setSettings(
 
 export async function deleteSetting(key: string): Promise<ApiResponse> {
   const session = await auth();
-  if (!session || !canAccess(session.user.role, "ADMIN")) {
+  if (!session?.user?.role || !canAccess(session.user.role, "ADMIN")) {
     return { success: false, error: "Unauthorized" };
   }
 
