@@ -232,6 +232,7 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
         isVisible: true,
         openNew: false,
         icon: "",
+        cssClass: "",
       });
       router.refresh();
     } else {
@@ -301,7 +302,7 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
       parentId: item.parentId || "",
       isVisible: item.isVisible,
       openNew: item.openNew,
-        icon: item.icon || "",
+      icon: item.icon || "",
       cssClass: item.cssClass || "",
     });
   };

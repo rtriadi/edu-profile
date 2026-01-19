@@ -75,7 +75,16 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
     const isProduction = process.env.NODE_ENV === "production";
     const hasBlobToken = !!process.env.BLOB_READ_WRITE_TOKEN;
 
-    // In production without blob token, or in development, use local upload
+    // In production, we MUST have the blob token
+    if (isProduction && !hasBlobToken) {
+      console.error("Upload failed: BLOB_READ_WRITE_TOKEN is missing in production");
+      return { 
+        success: false, 
+        error: "Konfigurasi Server Error: Token penyimpanan tidak ditemukan. Harap hubungi administrator." 
+      };
+    }
+
+    // In development without token, use local storage
     if (!hasBlobToken) {
       console.log("Using local upload (no BLOB_READ_WRITE_TOKEN)");
       return uploadMediaLocal(formData);
