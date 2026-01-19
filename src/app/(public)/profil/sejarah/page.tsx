@@ -5,8 +5,8 @@ import { History, Calendar, Award } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-// ISR: Revalidate every 5 minutes for static content
-export const revalidate = 300;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Sejarah Sekolah",

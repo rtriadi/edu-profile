@@ -7,8 +7,8 @@ import { ContactForm } from "@/components/public/contact-form";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
-// ISR: Revalidate every 5 minutes for contact page
-export const revalidate = 300;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Hubungi Kami",

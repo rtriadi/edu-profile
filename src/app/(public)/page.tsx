@@ -31,8 +31,8 @@ import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
-// ISR: Revalidate every 60 seconds for homepage
-export const revalidate = 60;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 async function getHomeData() {
   try {

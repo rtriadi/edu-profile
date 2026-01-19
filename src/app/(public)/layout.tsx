@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import { getMenuByLocation } from "@/actions/menus";
 
-// ISR: Revalidate every 60 seconds for layout data
-export const revalidate = 60;
+// Dynamic rendering - fetch fresh data on each request
+// This prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 // Menu item type for header
 interface MenuItem {

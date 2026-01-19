@@ -14,8 +14,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-// ISR: Revalidate every 5 minutes for profile page
-export const revalidate = 300;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Profil Sekolah",

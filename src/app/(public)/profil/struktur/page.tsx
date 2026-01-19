@@ -6,8 +6,8 @@ import { Users, GraduationCap, UserCheck, Building } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-// ISR: Revalidate every 5 minutes for organization structure
-export const revalidate = 300;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Struktur Organisasi",

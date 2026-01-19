@@ -7,8 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
-// ISR: Revalidate every 60 seconds for achievements
-export const revalidate = 60;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Prestasi",

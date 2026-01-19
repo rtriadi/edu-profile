@@ -6,8 +6,8 @@ import { BookOpen, Trophy, Sparkles } from "lucide-react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProgramsByType } from "@/actions/programs";
 
-// ISR: Revalidate every 60 seconds for academic programs
-export const revalidate = 60;
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Program Akademik",

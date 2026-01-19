@@ -12,23 +12,8 @@ import { formatDate } from "@/lib/utils";
 import { BlockRenderer } from "@/components/page-builder";
 import type { Block } from "@/types";
 
-// ISR: Revalidate every 60 seconds for individual posts
-export const revalidate = 60;
-
-// Generate static params for popular posts at build time
-export async function generateStaticParams() {
-  try {
-    const posts = await prisma.post.findMany({
-      where: { status: "PUBLISHED" },
-      select: { slug: true },
-      orderBy: { views: "desc" },
-      take: 20, // Pre-render top 20 popular posts
-    });
-    return posts.map((post) => ({ slug: post.slug }));
-  } catch {
-    return [];
-  }
-}
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 interface PostPageProps {
   params: Promise<{

@@ -7,18 +7,8 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getProgramBySlug, getAllProgramSlugs } from "@/actions/programs";
 
-// ISR: Revalidate every 60 seconds for program detail
-export const revalidate = 60;
-
-// Generate static params for programs at build time
-export async function generateStaticParams() {
-  try {
-    const slugs = await getAllProgramSlugs();
-    return slugs.map((slug) => ({ slug }));
-  } catch {
-    return [];
-  }
-}
+// Dynamic rendering - prevents build-time database errors on Vercel
+export const dynamic = "force-dynamic";
 
 interface ProgramDetailPageProps {
   params: Promise<{ slug: string }>;
