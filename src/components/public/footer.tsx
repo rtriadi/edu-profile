@@ -73,7 +73,7 @@ export async function PublicFooter() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-6">
               {schoolProfile?.logo ? (
-                <div className="relative h-12 w-auto min-w-[48px]">
+                <div className="relative h-12 w-auto min-w-12">
                   <Image
                     src={schoolProfile.logo}
                     alt={siteName}

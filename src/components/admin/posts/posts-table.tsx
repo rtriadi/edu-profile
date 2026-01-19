@@ -150,7 +150,7 @@ export function PostsTable({ posts, pagination }: PostsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[400px]">Judul</TableHead>
+              <TableHead className="min-w-[300px]">Judul</TableHead>
               <TableHead>Kategori</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Views</TableHead>

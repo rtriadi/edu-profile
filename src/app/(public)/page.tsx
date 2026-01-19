@@ -146,7 +146,7 @@ export default async function HomePage() {
   return (
     <main className="flex-1">
       {/* Hero Section - Works in both light and dark mode */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
           {/* Background - adapts to theme */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
 
@@ -154,11 +154,11 @@ export default async function HomePage() {
           <div className="absolute inset-0">
             <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
             <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-white/5 rounded-full blur-3xl" />
           </div>
 
           {/* Grid pattern overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4rem_4rem]" />
 
           <div className="container mx-auto px-4 relative z-10 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -585,10 +585,12 @@ export default async function HomePage() {
                       )}
                       <div className="absolute top-4 left-4">
                         <span
-                          className="text-xs px-3 py-1.5 rounded-full text-white font-medium shadow-lg"
-                          style={{
-                            backgroundColor: post.category.color || "#3B82F6",
-                          }}
+                          className="text-xs px-3 py-1.5 rounded-full text-white font-medium shadow-lg bg-primary"
+                          style={
+                            post.category.color
+                              ? { backgroundColor: post.category.color }
+                              : undefined
+                          }
                         >
                           {post.category.name}
                         </span>
@@ -687,7 +689,7 @@ export default async function HomePage() {
           <div className="container mx-auto px-4">
             <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-2xl">
               {/* Decorative elements */}
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:2.5rem_2.5rem]" />
               <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
               <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
 

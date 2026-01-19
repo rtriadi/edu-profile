@@ -114,7 +114,7 @@ export default async function PostPage({ params }: PostPageProps) {
     <main className="flex-1">
       {/* Hero Image */}
       {post.featuredImg && (
-        <div className="relative h-[300px] md:h-[400px] bg-muted">
+        <div className="relative h-80 md:h-96 bg-muted">
           <Image
             src={post.featuredImg}
             alt={post.title}
@@ -141,7 +141,7 @@ export default async function PostPage({ params }: PostPageProps) {
             <header className="mb-8">
               <Badge
                 className="mb-4"
-                style={{ backgroundColor: post.category.color || "#3B82F6" }}
+                style={post.category.color ? { backgroundColor: post.category.color } : undefined}
               >
                 {post.category.name}
               </Badge>

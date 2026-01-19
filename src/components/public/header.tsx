@@ -160,7 +160,7 @@ export function PublicHeader({
       {/* Skip to main content link for accessibility */}
       <a 
         href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
       >
         Langsung ke konten utama
       </a>
@@ -177,7 +177,7 @@ export function PublicHeader({
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             {logo ? (
-              <div className="relative h-10 w-auto min-w-[40px] group-hover:opacity-90 transition-all">
+              <div className="relative h-10 w-auto min-w-10 group-hover:opacity-90 transition-all">
                 <Image
                   src={logo}
                   alt={siteName}
@@ -275,10 +275,10 @@ export function PublicHeader({
                   <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 overflow-y-auto">
+              <SheetContent side="right" className="w-72 sm:w-96 p-0 overflow-y-auto">
                 <div className="flex items-center gap-3 p-6 border-b">
                   {logo ? (
-                    <div className="relative h-10 w-auto min-w-[40px]">
+                    <div className="relative h-10 w-auto min-w-10">
                       <Image 
                         src={logo} 
                         alt={siteName} 
