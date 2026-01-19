@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
+import { getTranslations, type Language } from "@/lib/translations";
 
 export const dynamic = "force-dynamic";
 
@@ -131,6 +132,9 @@ export default async function HomePage() {
     getSiteConfig(),
   ]);
   const { schoolProfile } = data;
+  
+  // Get translations based on admin language setting
+  const t = getTranslations(siteConfig.language as Language);
 
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
 
@@ -158,7 +162,7 @@ export default async function HomePage() {
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
                   <Sparkles className="h-4 w-4 text-yellow-300" />
                   <span className="text-sm font-medium text-white">
-                    Selamat Datang di {siteName}
+                    {t.home.welcome} {siteName}
                   </span>
                 </div>
 
@@ -171,7 +175,7 @@ export default async function HomePage() {
                 <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed">
                   {schoolProfile?.tagline ||
                     siteConfig.siteTagline ||
-                    "Mendidik Generasi Unggul dan Berkarakter untuk Masa Depan yang Gemilang"}
+                    t.home.heroSubtitle}
                 </p>
 
                 {/* CTA Buttons */}
@@ -182,7 +186,7 @@ export default async function HomePage() {
                     asChild
                   >
                     <Link href="/ppdb">
-                      Daftar Sekarang
+                      {t.home.registerNow}
                       <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
@@ -191,7 +195,7 @@ export default async function HomePage() {
                     className="border-2 border-white bg-transparent text-white hover:bg-white/20 hover:text-white font-semibold backdrop-blur-sm"
                     asChild
                   >
-                    <Link href="/profil">Tentang Kami</Link>
+                    <Link href="/profil">{t.home.aboutUs}</Link>
                   </Button>
                 </div>
 
@@ -282,23 +286,23 @@ export default async function HomePage() {
               <StatCard
                 icon={Users}
                 value={data.stats.staff}
-                label="Guru & Staff"
+                label={t.stats.teachers}
               />
               <StatCard
                 icon={GraduationCap}
                 value={data.stats.alumni}
-                label="Alumni"
+                label={t.stats.alumni}
                 suffix="+"
               />
               <StatCard
                 icon={Trophy}
                 value={data.stats.achievements}
-                label="Prestasi"
+                label={t.stats.achievements}
               />
               <StatCard
                 icon={Calendar}
                 value={data.stats.extracurriculars}
-                label="Ekstrakurikuler"
+                label={t.stats.extracurricular}
               />
             </div>
           </div>
@@ -310,7 +314,7 @@ export default async function HomePage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
                 <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-                  Tentang Kami
+                  {t.home.aboutUs}
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-foreground">
                   Membangun Generasi{" "}
@@ -476,14 +480,15 @@ export default async function HomePage() {
             <div className="container mx-auto px-4">
               <div className="text-center mb-16">
                 <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-                  Program Kami
+                  {t.home.ourPrograms}
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                  Program Unggulan
+                  {t.home.featuredPrograms}
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Program-program unggulan yang kami tawarkan untuk
-                  mengembangkan potensi siswa
+                  {siteConfig.language === "en" 
+                    ? "Featured programs we offer to develop student potential"
+                    : "Program-program unggulan yang kami tawarkan untuk mengembangkan potensi siswa"}
                 </p>
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -521,7 +526,7 @@ export default async function HomePage() {
               <div className="text-center mt-12">
                 <Button variant="outline" size="lg" asChild className="group">
                   <Link href="/akademik">
-                    Lihat Semua Program
+                    {t.common.seeAll}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
@@ -537,10 +542,10 @@ export default async function HomePage() {
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
                 <div>
                   <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-                    Berita Terbaru
+                    {t.home.latestNews}
                   </Badge>
                   <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-                    Kabar &amp; Informasi
+                    {t.home.newsInfo}
                   </h2>
                 </div>
                 <Button
@@ -549,7 +554,7 @@ export default async function HomePage() {
                   className="hidden md:flex group"
                 >
                   <Link href="/berita">
-                    Semua Berita
+                    {t.common.seeAll}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
@@ -622,13 +627,15 @@ export default async function HomePage() {
             <div className="container mx-auto px-4 relative z-10">
               <div className="text-center mb-16">
                 <Badge className="mb-4 bg-white/15 text-white hover:bg-white/20 border-white/20">
-                  Testimoni
+                  {t.home.testimonials}
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-                  Apa Kata Mereka
+                  {t.home.whatTheySay}
                 </h2>
                 <p className="text-white/80 max-w-2xl mx-auto">
-                  Testimoni dari alumni, orang tua, dan siswa kami
+                  {siteConfig.language === "en" 
+                    ? "Testimonials from alumni, parents, and our students"
+                    : "Testimoni dari alumni, orang tua, dan siswa kami"}
                 </p>
               </div>
               <div className="grid md:grid-cols-3 gap-6">

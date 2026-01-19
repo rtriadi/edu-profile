@@ -73,32 +73,51 @@ const getDefaultNavItems = (t: (key: string) => string): NavItem[] => [
 
 // Transform database menu items to NavItem format
 function transformMenuItems(items: MenuItem[]): NavItem[] {
-  return items.map((item) => {
-    // Determine href based on type
-    let href = "/";
-    if (item.type === "page" && item.pageSlug) {
-      href = item.pageSlug.startsWith("/") ? item.pageSlug : `/${item.pageSlug}`;
-    } else if (item.type === "link" && item.url) {
-      href = item.url;
-    } else if (item.type === "dropdown" && item.children?.length) {
-      // For dropdown, use first child's href or just #
-      const firstChild = item.children[0];
-      if (firstChild?.pageSlug) {
-        href = firstChild.pageSlug.startsWith("/") ? firstChild.pageSlug : `/${firstChild.pageSlug}`;
-      } else if (firstChild?.url) {
-        href = firstChild.url;
-      } else {
-        href = "#";
+  return items
+    .filter(item => item.isVisible) // Only process visible items
+    .map((item) => {
+      // Determine href based on type
+      let href = "/";
+      
+      if (item.type === "page" && item.pageSlug) {
+        // CMS page - use pageSlug as href
+        href = item.pageSlug.startsWith("/") ? item.pageSlug : `/${item.pageSlug}`;
+      } else if (item.type === "route" && item.url) {
+        // System route - use url directly (e.g., /profil, /akademik)
+        href = item.url;
+      } else if (item.type === "link" && item.url) {
+        // External link - use url
+        href = item.url;
+      } else if (item.type === "dropdown") {
+        // Dropdown parent - use first child's href or #
+        if (item.children?.length) {
+          const firstVisibleChild = item.children.find(c => c.isVisible);
+          if (firstVisibleChild) {
+            if (firstVisibleChild.type === "route" && firstVisibleChild.url) {
+              href = firstVisibleChild.url;
+            } else if (firstVisibleChild.type === "page" && firstVisibleChild.pageSlug) {
+              href = firstVisibleChild.pageSlug.startsWith("/") 
+                ? firstVisibleChild.pageSlug 
+                : `/${firstVisibleChild.pageSlug}`;
+            } else if (firstVisibleChild.url) {
+              href = firstVisibleChild.url;
+            }
+          }
+        }
+        // If no children or no valid href found, use #
+        if (href === "/") href = "#";
       }
-    }
 
-    return {
-      label: item.label,
-      href,
-      openNew: item.openNew,
-      children: item.children?.length ? transformMenuItems(item.children) : undefined,
-    };
-  });
+      // Get visible children
+      const visibleChildren = item.children?.filter(c => c.isVisible) || [];
+
+      return {
+        label: item.label,
+        href,
+        openNew: item.openNew,
+        children: visibleChildren.length > 0 ? transformMenuItems(visibleChildren) : undefined,
+      };
+    });
 }
 
 interface PublicHeaderProps {
@@ -113,9 +132,11 @@ export function PublicHeader({ siteName = "EduProfile", logo, menuItems = [] }: 
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useTranslation();
   
-  // Use menu from database if available, otherwise use default
-  const navItems: NavItem[] = menuItems.length > 0 
-    ? transformMenuItems(menuItems) 
+  // Use menu from database if available and valid, otherwise use default
+  // Transform first, then check if we got any valid items
+  const transformedItems = menuItems.length > 0 ? transformMenuItems(menuItems) : [];
+  const navItems: NavItem[] = transformedItems.length > 0 
+    ? transformedItems 
     : getDefaultNavItems(t);
 
   // Handle scroll effect

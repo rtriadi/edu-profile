@@ -54,6 +54,15 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
   }
 
   try {
+    // Check if Vercel Blob is configured
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.error("BLOB_READ_WRITE_TOKEN not configured");
+      return { 
+        success: false, 
+        error: "Storage tidak dikonfigurasi. Pastikan BLOB_READ_WRITE_TOKEN sudah diatur di environment variables." 
+      };
+    }
+
     const file = formData.get("file") as File;
     const folder = (formData.get("folder") as string) || "general";
 

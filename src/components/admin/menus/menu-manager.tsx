@@ -500,9 +500,14 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
             </div>
           ))}
           {menus.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              Belum ada menu
-            </p>
+            <div className="text-center py-6 space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Belum ada menu
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Klik tombol + untuk membuat menu baru
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -681,14 +686,24 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
                 {selectedMenu.items.map((item) => renderMenuItem(item))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-8">
-                Belum ada item di menu ini
-              </p>
+              <div className="text-center py-8 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Belum ada item di menu ini
+                </p>
+                <p className="text-xs text-muted-foreground max-w-md mx-auto">
+                  Klik "Tambah Item" untuk menambahkan navigasi. Gunakan tipe "Rute Sistem" untuk halaman bawaan seperti Beranda, Berita, dll.
+                </p>
+              </div>
             )
           ) : (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Pilih menu untuk melihat dan mengelola item
-            </p>
+            <div className="text-center py-8 space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Pilih menu untuk melihat dan mengelola item
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Klik salah satu menu di panel kiri untuk mulai mengedit
+              </p>
+            </div>
           )}
         </CardContent>
       </Card>

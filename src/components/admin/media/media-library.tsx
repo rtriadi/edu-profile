@@ -46,7 +46,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { uploadMediaLocal, deleteMedia, updateMediaAlt } from "@/actions/media";
+import { uploadMedia, deleteMedia, updateMediaAlt } from "@/actions/media";
 import { formatFileSize } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +100,7 @@ export function MediaLibrary({
       formData.append("file", file);
       formData.append("folder", "general");
 
-      const result = await uploadMediaLocal(formData);
+      const result = await uploadMedia(formData);
 
       if (result.success) {
         toast.success(`${file.name} berhasil diupload`);
