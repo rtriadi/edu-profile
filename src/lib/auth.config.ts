@@ -6,6 +6,9 @@ export const authConfig = {
     signIn: "/login",
     error: "/login",
   },
+  session: { strategy: "jwt" },
+  trustHost: true,
+  secret: process.env.AUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {

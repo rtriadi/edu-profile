@@ -9,9 +9,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   // Note: Adapter is not needed for Credentials provider with JWT strategy
   // adapter: PrismaAdapter(prisma) as Adapter,
-  session: { strategy: "jwt" },
-  trustHost: true,
-  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       name: "credentials",
