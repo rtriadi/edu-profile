@@ -10,71 +10,17 @@ import {
   UserCheck,
   Eye,
   TrendingUp,
+  LayoutDashboard,
 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
+import { getDashboardStats } from "@/actions/dashboard";
+import { RecentRegistrations } from "@/components/admin/dashboard/recent-registrations";
 
 export const metadata: Metadata = {
   title: "Dashboard | EduProfile CMS",
   description: "Panel admin EduProfile CMS",
 };
-
-async function getDashboardStats() {
-  const [
-    totalPosts,
-    totalPages,
-    totalStaff,
-    totalGalleries,
-    totalDownloads,
-    totalMessages,
-    unreadMessages,
-    totalEvents,
-    totalTestimonials,
-    totalAlumni,
-    recentPosts,
-  ] = await Promise.all([
-    prisma.post.count({ where: { status: "PUBLISHED" } }),
-    prisma.page.count({ where: { status: "PUBLISHED" } }),
-    prisma.staff.count({ where: { isActive: true } }),
-    prisma.gallery.count({ where: { isPublished: true } }),
-    prisma.download.count({ where: { isPublished: true } }),
-    prisma.contactMessage.count(),
-    prisma.contactMessage.count({ where: { isRead: false } }),
-    prisma.event.count({ where: { isPublished: true } }),
-    prisma.testimonial.count({ where: { isPublished: true } }),
-    prisma.alumni.count({ where: { isPublished: true } }),
-    prisma.post.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        views: true,
-        createdAt: true,
-        category: {
-          select: { name: true, color: true },
-        },
-      },
-    }),
-  ]);
-
-  return {
-    totalPosts,
-    totalPages,
-    totalStaff,
-    totalGalleries,
-    totalDownloads,
-    totalMessages,
-    unreadMessages,
-    totalEvents,
-    totalTestimonials,
-    totalAlumni,
-    recentPosts,
-  };
-}
 
 export default async function AdminDashboardPage() {
   const stats = await getDashboardStats();
@@ -82,7 +28,7 @@ export default async function AdminDashboardPage() {
   const statCards = [
     {
       title: "Total Berita",
-      value: stats.totalPosts,
+      value: stats.counts.posts,
       description: "Berita dipublikasikan",
       icon: Newspaper,
       color: "text-blue-600",
@@ -90,59 +36,27 @@ export default async function AdminDashboardPage() {
     },
     {
       title: "Halaman",
-      value: stats.totalPages,
+      value: stats.counts.pages,
       description: "Halaman aktif",
       icon: FileText,
       color: "text-green-600",
       bgColor: "bg-green-100",
     },
     {
-      title: "Guru & Staff",
-      value: stats.totalStaff,
-      description: "Staff aktif",
+      title: "Pendaftar PPDB",
+      value: stats.counts.registrations,
+      description: "Total pendaftar",
       icon: Users,
       color: "text-purple-600",
       bgColor: "bg-purple-100",
     },
     {
-      title: "Galeri",
-      value: stats.totalGalleries,
-      description: "Album galeri",
-      icon: Image,
-      color: "text-pink-600",
-      bgColor: "bg-pink-100",
-    },
-    {
-      title: "Event",
-      value: stats.totalEvents,
-      description: "Event & agenda",
-      icon: Calendar,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
-    },
-    {
-      title: "Download",
-      value: stats.totalDownloads,
-      description: "File tersedia",
-      icon: Download,
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-100",
-    },
-    {
-      title: "Pesan",
-      value: stats.totalMessages,
-      description: `${stats.unreadMessages} belum dibaca`,
+      title: "Pesan Masuk",
+      value: stats.counts.messages,
+      description: "Pesan dari kontak",
       icon: MessageSquare,
       color: "text-yellow-600",
       bgColor: "bg-yellow-100",
-    },
-    {
-      title: "Alumni",
-      value: stats.totalAlumni,
-      description: "Alumni terdaftar",
-      icon: UserCheck,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-100",
     },
   ];
 
@@ -173,10 +87,61 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* Recent Posts & Quick Actions */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Recent Posts */}
+        {/* Recent Registrations (PPDB is priority) */}
+        <RecentRegistrations registrations={stats.recentRegistrations} />
+
+        {/* Quick Actions */}
         <Card>
+          <CardHeader>
+            <CardTitle>Aksi Cepat</CardTitle>
+            <CardDescription>Pintasan untuk tugas umum</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              <QuickActionButton
+                href="/admin/posts/new"
+                icon={Newspaper}
+                label="Tulis Berita"
+                color="bg-blue-500"
+              />
+              <QuickActionButton
+                href="/admin/pages/new"
+                icon={FileText}
+                label="Buat Halaman"
+                color="bg-green-500"
+              />
+              <QuickActionButton
+                href="/admin/galleries/new"
+                icon={Image}
+                label="Upload Galeri"
+                color="bg-pink-500"
+              />
+              <QuickActionButton
+                href="/admin/events/new"
+                icon={Calendar}
+                label="Tambah Event"
+                color="bg-orange-500"
+              />
+              <QuickActionButton
+                href="/admin/ppdb/registrations"
+                icon={Users}
+                label="Cek PPDB"
+                color="bg-purple-500"
+              />
+              <QuickActionButton
+                href="/admin/messages"
+                icon={MessageSquare}
+                label="Lihat Pesan"
+                color="bg-yellow-500"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Recent Posts */}
+      <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
@@ -227,55 +192,6 @@ export default async function AdminDashboardPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Aksi Cepat</CardTitle>
-            <CardDescription>Pintasan untuk tugas umum</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3">
-              <QuickActionButton
-                href="/admin/posts/new"
-                icon={Newspaper}
-                label="Tulis Berita"
-                color="bg-blue-500"
-              />
-              <QuickActionButton
-                href="/admin/pages/new"
-                icon={FileText}
-                label="Buat Halaman"
-                color="bg-green-500"
-              />
-              <QuickActionButton
-                href="/admin/gallery/new"
-                icon={Image}
-                label="Upload Galeri"
-                color="bg-pink-500"
-              />
-              <QuickActionButton
-                href="/admin/events/new"
-                icon={Calendar}
-                label="Tambah Event"
-                color="bg-orange-500"
-              />
-              <QuickActionButton
-                href="/admin/staff/new"
-                icon={Users}
-                label="Tambah Staff"
-                color="bg-purple-500"
-              />
-              <QuickActionButton
-                href="/admin/messages"
-                icon={MessageSquare}
-                label="Lihat Pesan"
-                color="bg-yellow-500"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

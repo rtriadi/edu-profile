@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import type { ApiResponse } from "@/types";
@@ -106,10 +106,6 @@ export async function setSettings(
     revalidatePath("/");
     // Force revalidate all pages that depend on settings
     revalidatePath("/", "layout");
-    
-    // Invalidate data cache
-    revalidateTag("settings");
-    revalidateTag("site-config");
     
     return { success: true, message: "Pengaturan berhasil disimpan" };
   } catch (error) {
