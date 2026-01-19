@@ -64,9 +64,16 @@ export const getSiteConfig = unstable_cache(
       ]);
 
       // Convert settings array to object
+      // Settings are stored as JSON objects like { value: "..." } or direct values
       const settingsMap: Record<string, unknown> = {};
       for (const setting of settings) {
-        settingsMap[setting.key] = setting.value;
+        const val = setting.value;
+        // Handle both { value: "..." } format and direct values
+        if (val && typeof val === 'object' && 'value' in (val as Record<string, unknown>)) {
+          settingsMap[setting.key] = (val as Record<string, unknown>).value;
+        } else {
+          settingsMap[setting.key] = val;
+        }
       }
 
       return {

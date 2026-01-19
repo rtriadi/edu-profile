@@ -85,9 +85,16 @@ export async function uploadMedia(formData: FormData): Promise<ApiResponse> {
       .replace(/_{2,}/g, "_");
 
     // Upload to Vercel Blob
-    const blob = await put(`${folder}/${sanitizedName}`, file, {
-      access: "public",
-    });
+    let blob;
+    try {
+      blob = await put(`${folder}/${sanitizedName}`, file, {
+        access: "public",
+      });
+    } catch (blobError) {
+      console.error("Vercel Blob upload failed:", blobError);
+      // If Blob upload fails, try local upload as fallback
+      return uploadMediaLocal(formData);
+    }
 
     // Get image dimensions if it's an image
     let width: number | undefined;
