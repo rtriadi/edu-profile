@@ -7,7 +7,8 @@ import { ContactForm } from "@/components/public/contact-form";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 5 minutes for contact page
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Hubungi Kami",

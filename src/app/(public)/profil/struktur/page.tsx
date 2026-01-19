@@ -6,7 +6,8 @@ import { Users, GraduationCap, UserCheck, Building } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 5 minutes for organization structure
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Struktur Organisasi",

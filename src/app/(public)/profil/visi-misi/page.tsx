@@ -5,7 +5,8 @@ import { Eye, Target, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 5 minutes for static content
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Visi & Misi",

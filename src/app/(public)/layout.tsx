@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import { getMenuByLocation } from "@/actions/menus";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for layout data
+export const revalidate = 60;
 
 // Menu item type for header
 interface MenuItem {

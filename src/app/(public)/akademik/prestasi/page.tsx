@@ -7,7 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for achievements
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Prestasi",

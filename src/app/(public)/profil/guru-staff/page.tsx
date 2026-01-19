@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prisma } from "@/lib/prisma";
 import { getInitials } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for staff listing
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Guru & Staff",

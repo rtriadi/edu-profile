@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { menuSchema, menuItemSchema, type MenuInput, type MenuItemInput } from "@/lib/validations";
@@ -57,29 +58,38 @@ export async function getMenuById(id: string) {
 }
 
 export async function getMenuByLocation(location: string) {
-  const menu = await prisma.menu.findUnique({
-    where: { location },
-    include: {
-      items: {
-        where: { parentId: null, isVisible: true },
-        orderBy: { order: "asc" },
-        include: {
-          children: {
-            where: { isVisible: true },
-            orderBy: { order: "asc" },
-            include: {
-              children: {
-                where: { isVisible: true },
-                orderBy: { order: "asc" },
+  return getCachedMenuByLocation(location);
+}
+
+// Cached version of getMenuByLocation for better performance
+const getCachedMenuByLocation = unstable_cache(
+  async (location: string) => {
+    const menu = await prisma.menu.findUnique({
+      where: { location },
+      include: {
+        items: {
+          where: { parentId: null, isVisible: true },
+          orderBy: { order: "asc" },
+          include: {
+            children: {
+              where: { isVisible: true },
+              orderBy: { order: "asc" },
+              include: {
+                children: {
+                  where: { isVisible: true },
+                  orderBy: { order: "asc" },
+                },
               },
             },
           },
         },
       },
-    },
-  });
-  return menu;
-}
+    });
+    return menu;
+  },
+  ["menu-by-location"],
+  { revalidate: 60, tags: ["menus"] }
+);
 
 export async function createMenu(data: MenuInput): Promise<ApiResponse> {
   const session = await auth();

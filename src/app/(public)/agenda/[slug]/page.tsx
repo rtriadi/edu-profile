@@ -10,7 +10,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for event detail
+export const revalidate = 60;
+
+// Generate static params for events at build time
+export async function generateStaticParams() {
+  try {
+    const events = await prisma.event.findMany({
+      where: { isPublished: true },
+      select: { slug: true },
+      take: 20,
+    });
+    return events.map((event) => ({ slug: event.slug }));
+  } catch {
+    return [];
+  }
+}
 
 interface EventDetailPageProps {
   params: Promise<{ slug: string }>;

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PPDBRegistrationForm } from "@/components/public/ppdb-registration-form";
 
+// Dynamic for PPDB form - needs real-time period check
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {

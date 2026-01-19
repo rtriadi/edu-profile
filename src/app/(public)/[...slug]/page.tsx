@@ -5,7 +5,22 @@ import { prisma } from "@/lib/prisma";
 import { BlockRenderer } from "@/components/page-builder";
 import type { Block } from "@/types";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for CMS pages
+export const revalidate = 60;
+
+// Generate static params for CMS pages at build time
+export async function generateStaticParams() {
+  try {
+    const pages = await prisma.page.findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true },
+      take: 50,
+    });
+    return pages.map((page) => ({ slug: page.slug.split("/") }));
+  } catch {
+    return [];
+  }
+}
 
 interface DynamicPageProps {
   params: Promise<{

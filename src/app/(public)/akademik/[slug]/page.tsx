@@ -5,7 +5,20 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { getProgramBySlug } from "@/actions/programs";
+import { getProgramBySlug, getAllProgramSlugs } from "@/actions/programs";
+
+// ISR: Revalidate every 60 seconds for program detail
+export const revalidate = 60;
+
+// Generate static params for programs at build time
+export async function generateStaticParams() {
+  try {
+    const slugs = await getAllProgramSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
+}
 
 interface ProgramDetailPageProps {
   params: Promise<{ slug: string }>;

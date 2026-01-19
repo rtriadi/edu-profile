@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getPublishedDownloads } from "@/actions/downloads";
 
+// ISR: Revalidate every 60 seconds for downloads
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Pusat Unduhan",
   description: "Download file dan dokumen sekolah",

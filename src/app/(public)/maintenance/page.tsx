@@ -3,7 +3,8 @@ import { Construction, Mail, Phone } from "lucide-react";
 import { getSiteConfig } from "@/lib/site-config";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 30 seconds for maintenance page
+export const revalidate = 30;
 
 async function getSchoolContact() {
   try {

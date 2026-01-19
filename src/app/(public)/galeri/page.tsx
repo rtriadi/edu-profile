@@ -11,7 +11,8 @@ import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for gallery
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Galeri",

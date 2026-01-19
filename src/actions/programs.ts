@@ -77,6 +77,19 @@ export async function getProgramsByType(type: "CURRICULUM" | "EXTRACURRICULAR" |
   return programs;
 }
 
+// Get all program slugs for static generation
+export async function getAllProgramSlugs(): Promise<string[]> {
+  try {
+    const programs = await prisma.program.findMany({
+      where: { isActive: true },
+      select: { slug: true },
+    });
+    return programs.map((p) => p.slug);
+  } catch {
+    return [];
+  }
+}
+
 export async function createProgram(data: ProgramInput): Promise<ApiResponse> {
   const session = await auth();
   if (!session) {

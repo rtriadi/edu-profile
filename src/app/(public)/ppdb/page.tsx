@@ -8,7 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+// ISR: Revalidate every 60 seconds for PPDB page
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "PPDB Online",
