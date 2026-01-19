@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { signOut } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Bell,
@@ -11,9 +12,12 @@ import {
   ExternalLink,
   Moon,
   Sun,
+  RefreshCcw,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 
+import { clearSystemCache } from "@/actions/system";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -70,7 +74,26 @@ const pathTitles: Record<string, string> = {
 
 export function AdminHeader({ user }: AdminHeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const result = await clearSystemCache();
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error("Gagal membersihkan cache");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const getBreadcrumbs = () => {
     const paths = pathname.split("/").filter(Boolean);
@@ -120,6 +143,17 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           className="hidden md:flex text-xs text-muted-foreground"
         />
         
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+          title="Refresh Cache Sistem"
+        >
+          <RefreshCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          <span className="sr-only">Refresh Cache</span>
+        </Button>
+
         <Button variant="ghost" size="icon" asChild>
           <Link href="/" target="_blank">
             <ExternalLink className="h-4 w-4" />

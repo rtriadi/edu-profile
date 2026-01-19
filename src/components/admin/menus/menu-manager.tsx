@@ -145,6 +145,7 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
     isVisible: true,
     openNew: false,
     icon: "",
+    cssClass: "",
   });
 
   const selectedMenu = menus.find((m) => m.id === selectedMenuId);
@@ -210,11 +211,12 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
       type: itemForm.type as "link" | "page" | "dropdown" | "megamenu" | "route",
       url: (itemForm.type === "link" || itemForm.type === "route") ? itemForm.url : undefined,
       pageSlug: itemForm.type === "page" ? itemForm.pageSlug : undefined,
-      parentId: itemForm.parentId || undefined,
+      parentId: itemForm.parentId || undefined, // undefined is fine for create
       order: 0,
       isVisible: itemForm.isVisible,
       openNew: itemForm.openNew,
       icon: itemForm.icon || undefined,
+      cssClass: itemForm.cssClass || undefined,
     });
     setIsLoading(false);
 
@@ -246,10 +248,11 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
       type: itemForm.type as "link" | "page" | "dropdown" | "megamenu" | "route",
       url: (itemForm.type === "link" || itemForm.type === "route") ? itemForm.url : undefined,
       pageSlug: itemForm.type === "page" ? itemForm.pageSlug : undefined,
-      parentId: itemForm.parentId || undefined,
+      parentId: itemForm.parentId || null, // Send null to remove parent
       isVisible: itemForm.isVisible,
       openNew: itemForm.openNew,
       icon: itemForm.icon || undefined,
+      cssClass: itemForm.cssClass || undefined,
     });
     setIsLoading(false);
 
@@ -298,7 +301,8 @@ export function MenuManager({ menus: initialMenus, pages }: MenuManagerProps) {
       parentId: item.parentId || "",
       isVisible: item.isVisible,
       openNew: item.openNew,
-      icon: item.icon || "",
+        icon: item.icon || "",
+      cssClass: item.cssClass || "",
     });
   };
 

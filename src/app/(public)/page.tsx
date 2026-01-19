@@ -408,23 +408,23 @@ export default async function HomePage() {
                   >
                     <div className={`h-2 ${
                       index % 4 === 0
-                        ? "bg-blue-500"
+                        ? "bg-primary"
                         : index % 4 === 1
-                          ? "bg-green-500"
+                          ? "bg-secondary"
                           : index % 4 === 2
-                            ? "bg-purple-500"
-                            : "bg-orange-500"
+                            ? "bg-primary/80"
+                            : "bg-secondary/80"
                     }`} />
                     <CardHeader className="pb-2">
                       <div
                         className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
                           index % 4 === 0
-                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                            ? "bg-primary/10 text-primary"
                             : index % 4 === 1
-                              ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                              ? "bg-secondary/10 text-secondary"
                               : index % 4 === 2
-                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-                                : "bg-orange-500/10 text-orange-600 dark:text-orange-400"
+                                ? "bg-primary/5 text-primary/80"
+                                : "bg-secondary/5 text-secondary/80"
                         }`}
                       >
                         <GraduationCap className="h-6 w-6" />
@@ -503,12 +503,12 @@ export default async function HomePage() {
                       <div
                         className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
                           index % 4 === 0
-                            ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                            ? "bg-primary/10 text-primary"
                             : index % 4 === 1
-                              ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                              ? "bg-secondary/10 text-secondary"
                               : index % 4 === 2
-                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-                                : "bg-orange-500/10 text-orange-600 dark:text-orange-400"
+                                ? "bg-primary/5 text-primary/80"
+                                : "bg-secondary/5 text-secondary/80"
                         }`}
                       >
                         <GraduationCap className="h-7 w-7" />

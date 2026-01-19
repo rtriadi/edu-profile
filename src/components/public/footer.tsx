@@ -11,6 +11,7 @@ import {
   MapPin,
   ArrowUpRight,
 } from "lucide-react";
+import { getMenuByLocation } from "@/actions/menus";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
@@ -21,9 +22,10 @@ async function getFooterData() {
 }
 
 export async function PublicFooter() {
-  const [schoolProfile, siteConfig] = await Promise.all([
+  const [schoolProfile, siteConfig, footerMenu] = await Promise.all([
     getFooterData(),
     getSiteConfig(),
+    getMenuByLocation("footer"),
   ]);
   const socialMedia = schoolProfile?.socialMedia as Record<
     string,
@@ -34,9 +36,13 @@ export async function PublicFooter() {
   const currentYear = new Date().getFullYear();
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
 
-  // Quick links with translations
-  const quickLinks =
-    siteConfig.language === "en"
+  // Get menu items from database if available, otherwise use default quick links
+  const menuItems = footerMenu?.items && footerMenu.items.length > 0
+    ? footerMenu.items.map((item) => ({
+        label: item.label,
+        href: item.url || (item.pageSlug ? `/${item.pageSlug}` : "#"),
+      }))
+    : siteConfig.language === "en"
       ? [
           { label: "School Profile", href: "/profil" },
           { label: "Academic Programs", href: "/akademik" },
@@ -154,7 +160,7 @@ export async function PublicFooter() {
               {translations.footer.quickLinks}
             </h3>
             <ul className="space-y-3 text-sm">
-              {quickLinks.map((link) => (
+              {menuItems.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}

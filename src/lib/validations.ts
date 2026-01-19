@@ -429,7 +429,7 @@ export const menuItemSchema = z.object({
   url: z.string().max(500, "URL maksimal 500 karakter").optional(),
   pageSlug: z.string().optional(),
   type: z.enum(["link", "page", "dropdown", "megamenu", "route"]).default("link"),
-  parentId: z.string().optional(),
+  parentId: z.string().optional().nullable().or(z.literal("")),
   order: z.number().int().min(0).default(0),
   isVisible: z.boolean().default(true),
   openNew: z.boolean().default(false),
