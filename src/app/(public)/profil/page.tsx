@@ -13,6 +13,8 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
+import { getSiteConfig } from "@/lib/site-config";
+import { getTranslations, type Language } from "@/lib/translations";
 
 // Dynamic rendering - prevents build-time database errors on Vercel
 export const revalidate = 60;
@@ -58,7 +60,12 @@ async function getProfileData() {
 }
 
 export default async function ProfilPage() {
-  const { schoolProfile, stats } = await getProfileData();
+  const [{ schoolProfile, stats }, siteConfig] = await Promise.all([
+    getProfileData(),
+    getSiteConfig(),
+  ]);
+
+  const t = getTranslations(siteConfig.language as Language);
 
   return (
     <main className="flex-1">
@@ -66,15 +73,15 @@ export default async function ProfilPage() {
       <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            {schoolProfile?.name || "Profil Sekolah"}
+            {schoolProfile?.name || t.pages.profile.title}
           </h1>
           <p className="text-xl text-primary-foreground/90 max-w-2xl mx-auto">
-            {schoolProfile?.tagline || "Mendidik Generasi Unggul dan Berkarakter"}
+            {schoolProfile?.tagline || t.pages.profile.description}
           </p>
           {schoolProfile?.accreditation && (
             <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full">
               <Award className="h-5 w-5" />
-              <span>Akreditasi {schoolProfile.accreditation}</span>
+              <span>{t.home.accreditation} {schoolProfile.accreditation}</span>
             </div>
           )}
         </div>
@@ -84,10 +91,10 @@ export default async function ProfilPage() {
       <section className="py-12 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <StatCard icon={Users} value={stats.totalStaff} label="Total Staff" />
-            <StatCard icon={GraduationCap} value={stats.totalTeachers} label="Guru" />
-            <StatCard icon={Building2} value={stats.totalFacilities} label="Fasilitas" />
-            <StatCard icon={Trophy} value={stats.totalAchievements} label="Prestasi" />
+            <StatCard icon={Users} value={stats.totalStaff} label={t.stats.teachers} />
+            <StatCard icon={GraduationCap} value={stats.totalTeachers} label={t.nav.teachersStaff} />
+            <StatCard icon={Building2} value={stats.totalFacilities} label={t.pages.profile.facilities} />
+            <StatCard icon={Trophy} value={stats.totalAchievements} label={t.stats.achievements} />
           </div>
         </div>
       </section>
@@ -101,13 +108,13 @@ export default async function ProfilPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="h-5 w-5 text-primary" />
-                  Visi
+                  {t.pages.profile.vision}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
                   {schoolProfile?.vision || 
-                    "Menjadi sekolah unggulan yang menghasilkan lulusan berkarakter, cerdas, dan berwawasan global."}
+                    t.pages.profile.description}
                 </p>
               </CardContent>
             </Card>
@@ -117,13 +124,13 @@ export default async function ProfilPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Target className="h-5 w-5 text-primary" />
-                  Misi
+                  {t.pages.profile.mission}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
                   {schoolProfile?.mission || 
-                    "1. Menyelenggarakan pendidikan berkualitas\n2. Mengembangkan karakter siswa\n3. Memfasilitasi pengembangan bakat dan minat\n4. Menjalin kerjasama dengan masyarakat"}
+                    t.pages.profile.description}
                 </div>
               </CardContent>
             </Card>
@@ -138,7 +145,7 @@ export default async function ProfilPage() {
             <div className="max-w-3xl mx-auto">
               <div className="flex items-center gap-2 mb-6">
                 <History className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl md:text-3xl font-bold">Sejarah Sekolah</h2>
+                <h2 className="text-2xl md:text-3xl font-bold">{t.pages.profile.history}</h2>
               </div>
               <div className="prose prose-lg max-w-none text-muted-foreground">
                 <p className="whitespace-pre-line">{schoolProfile.history}</p>
@@ -152,26 +159,26 @@ export default async function ProfilPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-            Jelajahi Lebih Lanjut
+            {t.common.seeAll}
           </h2>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <QuickLinkCard
               href="/profil/guru-staff"
               icon={Users}
-              title="Guru & Staff"
-              description="Kenali para pendidik dan staff kami"
+              title={t.pages.profile.teachersStaff}
+              description={t.pages.profile.description}
             />
             <QuickLinkCard
               href="/profil/fasilitas"
               icon={Building2}
-              title="Fasilitas"
-              description="Lihat fasilitas yang tersedia"
+              title={t.pages.profile.facilities}
+              description={t.pages.profile.description}
             />
             <QuickLinkCard
               href="/akademik/prestasi"
               icon={Trophy}
-              title="Prestasi"
-              description="Pencapaian siswa dan sekolah"
+              title={t.stats.achievements}
+              description={t.pages.profile.description}
             />
           </div>
         </div>

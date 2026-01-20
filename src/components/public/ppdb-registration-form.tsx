@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, CheckCircle, User, Users, MapPin } from "lucide-react";
+import { Loader2, CheckCircle, User, Users, MapPin, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,8 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { createPublicRegistration } from "@/actions/ppdb";
 import { toast } from "sonner";
+import { useFormDraft } from "@/hooks/use-local-storage";
 
 const formSchema = z.object({
   studentName: z.string().min(1, "Nama siswa wajib diisi").max(100),
@@ -61,28 +63,59 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [registrationNo, setRegistrationNo] = useState("");
 
+  const defaultValues: FormData = {
+    studentName: "",
+    nisn: "",
+    birthPlace: "",
+    birthDate: "",
+    gender: undefined as unknown as "MALE" | "FEMALE",
+    religion: "",
+    address: "",
+    previousSchool: "",
+    fatherName: "",
+    fatherJob: "",
+    fatherPhone: "",
+    motherName: "",
+    motherJob: "",
+    motherPhone: "",
+    guardianName: "",
+    guardianPhone: "",
+    guardianEmail: "",
+  };
+
+  // Auto-save draft functionality
+  const { savedDraft, saveDraft, clearDraft, hasDraft } = useFormDraft<FormData>(
+    `ppdb-${periodId}`,
+    defaultValues,
+    1500 // Save after 1.5 seconds of inactivity
+  );
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      studentName: "",
-      nisn: "",
-      birthPlace: "",
-      birthDate: "",
-      gender: undefined,
-      religion: "",
-      address: "",
-      previousSchool: "",
-      fatherName: "",
-      fatherJob: "",
-      fatherPhone: "",
-      motherName: "",
-      motherJob: "",
-      motherPhone: "",
-      guardianName: "",
-      guardianPhone: "",
-      guardianEmail: "",
-    },
+    mode: "onBlur",
+    defaultValues: savedDraft || defaultValues,
   });
+
+  // Watch form changes and save draft
+  const formValues = form.watch();
+  useEffect(() => {
+    if (!isSuccess) {
+      saveDraft(formValues);
+    }
+  }, [formValues, saveDraft, isSuccess]);
+
+  // Restore draft on mount
+  useEffect(() => {
+    if (savedDraft && !isSuccess) {
+      form.reset(savedDraft);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleClearDraft = () => {
+    clearDraft();
+    form.reset(defaultValues);
+    toast.success("Draft berhasil dihapus");
+  };
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -109,6 +142,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
       });
 
       if (result.success) {
+        clearDraft(); // Clear draft on successful submission
         setIsSuccess(true);
         setRegistrationNo((result.data as { registrationNo?: string })?.registrationNo || "");
         toast.success(result.message);
@@ -151,6 +185,24 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Draft Restored Alert */}
+        {hasDraft && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>Data formulir sebelumnya telah dipulihkan.</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClearDraft}
+              >
+                Hapus Draft
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Data Siswa */}
         <Card>
           <CardHeader>

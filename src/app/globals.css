@@ -459,3 +459,25 @@ a, button {
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
   background: var(--foreground);
 }
+
+/* Dark mode image handling - reduce eye strain */
+.dark img:not([data-no-filter]) {
+  filter: brightness(0.9) contrast(1.05);
+}
+
+/* Exclude specific images from dark mode filter */
+.dark img[data-no-filter],
+.dark img.logo,
+.dark .no-dark-filter img {
+  filter: none;
+}
+
+/* Dark mode card and border improvements */
+.dark .card-hover:hover {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.2);
+}
+
+/* Improved contrast for muted elements in dark mode */
+.dark .text-muted-foreground {
+  opacity: 0.85;
+}

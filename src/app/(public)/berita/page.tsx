@@ -72,7 +72,8 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
               <>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {posts.map((post) => (
-                    <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <article key={post.id}>
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
                       <div className="aspect-video relative bg-muted">
                         {post.featuredImg ? (
                           <Image
@@ -106,7 +107,11 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
                           {post.excerpt}
                         </p>
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>{post.publishedAt && formatDate(post.publishedAt)}</span>
+                          {post.publishedAt && (
+                            <time dateTime={post.publishedAt.toISOString()}>
+                              {formatDate(post.publishedAt)}
+                            </time>
+                          )}
                           <span className="flex items-center gap-1">
                             <Eye className="h-3 w-3" />
                             {post.views} {t.pages.news.views}
@@ -114,6 +119,7 @@ export default async function BeritaPage({ searchParams }: BeritaPageProps) {
                         </div>
                       </CardContent>
                     </Card>
+                    </article>
                   ))}
                 </div>
 

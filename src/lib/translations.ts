@@ -64,10 +64,26 @@ export interface Translations {
     newsInfo: string;
     testimonials: string;
     whatTheySay: string;
+    testimonialsDesc: string;
     joinUs: string;
     joinUsDesc: string;
     registerPpdb: string;
     contactUs: string;
+    allNews: string;
+    buildingGeneration: string;
+    excellentAndCharacter: string;
+    ourMission: string;
+    foundedSince: string;
+    totalTeachers: string;
+    instructors: string;
+    accreditation: string;
+    age: string;
+    quota: string;
+    students: string;
+    ourClasses: string;
+    educationLevels: string;
+    educationLevelsDesc: string;
+    learnMore: string;
   };
   // Stats
   stats: {
@@ -101,6 +117,58 @@ export interface Translations {
     sent: string;
     required: string;
     invalid: string;
+    fullName: string;
+    phoneNumber: string;
+    subjectPlaceholder: string;
+    messagePlaceholder: string;
+    namePlaceholder: string;
+    thankYou: string;
+    messageReceived: string;
+    messageSent: string;
+    messageFailed: string;
+    sendMessage: string;
+    // PPDB Form
+    registrationSuccess: string;
+    registrationSuccessDesc: string;
+    saveRegistrationNo: string;
+    contactSchool: string;
+    backToPpdb: string;
+    draftRestored: string;
+    deleteDraft: string;
+    draftDeleted: string;
+    studentData: string;
+    fullNameLabel: string;
+    fullNamePlaceholder: string;
+    birthPlace: string;
+    birthPlacePlaceholder: string;
+    birthDate: string;
+    gender: string;
+    selectGender: string;
+    male: string;
+    female: string;
+    religion: string;
+    selectReligion: string;
+    previousSchool: string;
+    previousSchoolPlaceholder: string;
+    address: string;
+    fullAddress: string;
+    fullAddressPlaceholder: string;
+    parentData: string;
+    fatherData: string;
+    fatherName: string;
+    fatherNamePlaceholder: string;
+    occupation: string;
+    occupationPlaceholder: string;
+    motherData: string;
+    motherName: string;
+    motherNamePlaceholder: string;
+    guardianData: string;
+    guardianName: string;
+    guardianNamePlaceholder: string;
+    submitRegistration: string;
+    submitting: string;
+    registrationFailed: string;
+    errorOccurred: string;
   };
   // Date/Time
   datetime: {
@@ -141,11 +209,13 @@ export interface Translations {
       description: string;
       getInTouch: string;
       sendMessage: string;
+      sendMessageDesc: string;
       address: string;
       phone: string;
       email: string;
       operatingHours: string;
       findUs: string;
+      viewLargerMap: string;
     };
     profile: {
       title: string;
@@ -166,6 +236,11 @@ export interface Translations {
       extracurricular: string;
       featuredPrograms: string;
       achievements: string;
+      heroSubtitle: string;
+      curriculumDesc: string;
+      extracurricularDesc: string;
+      featuredProgramsDesc: string;
+      noPrograms: string;
     };
     ppdb: {
       title: string;
@@ -175,6 +250,24 @@ export interface Translations {
       timeline: string;
       registrationClosed: string;
       registrationOpen: string;
+      comingSoon: string;
+      noActivePeriod: string;
+      noActivePeriodDesc: string;
+      contactUs: string;
+      registrationInfo: string;
+      registrationPeriod: string;
+      quota: string;
+      students: string;
+      registrationRequirements: string;
+      registrationStages: string;
+      startRegistration: string;
+      registrationNotOpen: string;
+      needHelp: string;
+      needHelpDesc: string;
+      downloads: string;
+      viewAllDownloads: string;
+      academicYear: string;
+      joinUs: string;
     };
     agenda: {
       title: string;
@@ -243,7 +336,8 @@ const translations: Record<Language, Translations> = {
     home: {
       welcome: "Selamat Datang di",
       heroTitle: "Sekolah Unggulan",
-      heroSubtitle: "Mendidik Generasi Unggul dan Berkarakter untuk Masa Depan yang Gemilang",
+      heroSubtitle:
+        "Mendidik Generasi Unggul dan Berkarakter untuk Masa Depan yang Gemilang",
       registerNow: "Daftar Sekarang",
       aboutUs: "Tentang Kami",
       ourPrograms: "Program Kami",
@@ -252,10 +346,27 @@ const translations: Record<Language, Translations> = {
       newsInfo: "Kabar & Informasi",
       testimonials: "Testimoni",
       whatTheySay: "Apa Kata Mereka",
+      testimonialsDesc: "Cerita dan pengalaman dari orang tua dan siswa kami",
       joinUs: "Bergabung Bersama Kami",
-      joinUsDesc: "Daftarkan putra-putri Anda untuk menjadi bagian dari keluarga besar",
+      joinUsDesc:
+        "Daftarkan putra-putri Anda untuk menjadi bagian dari keluarga besar",
       registerPpdb: "Daftar PPDB Online",
       contactUs: "Hubungi Kami",
+      allNews: "Semua Berita",
+      buildingGeneration: "Membangun Generasi",
+      excellentAndCharacter: "Unggul dan Berkarakter",
+      ourMission: "Misi Kami",
+      foundedSince: "Berdiri Sejak",
+      totalTeachers: "Total Pengajar",
+      instructors: "Pengajar",
+      accreditation: "Akreditasi",
+      age: "Usia",
+      quota: "Kuota",
+      students: "Siswa",
+      ourClasses: "Kelas Kami",
+      educationLevels: "Jenjang Pendidikan",
+      educationLevelsDesc: "Pilihan kelas yang tersedia untuk putra-putri Anda",
+      learnMore: "Selengkapnya",
     },
     stats: {
       teachers: "Guru & Staff",
@@ -286,6 +397,58 @@ const translations: Record<Language, Translations> = {
       sent: "Terkirim",
       required: "Wajib diisi",
       invalid: "Format tidak valid",
+      fullName: "Nama Lengkap",
+      phoneNumber: "No. Telepon",
+      subjectPlaceholder: "Perihal pesan",
+      messagePlaceholder: "Tulis pesan Anda di sini...",
+      namePlaceholder: "Masukkan nama lengkap",
+      thankYou: "Terima Kasih!",
+      messageReceived: "Pesan Anda telah kami terima. Kami akan segera menghubungi Anda.",
+      messageSent: "Pesan berhasil dikirim!",
+      messageFailed: "Gagal mengirim pesan",
+      sendMessage: "Kirim Pesan",
+      // PPDB Form
+      registrationSuccess: "Pendaftaran Berhasil!",
+      registrationSuccessDesc: "Terima kasih telah mendaftar. Simpan nomor registrasi Anda:",
+      saveRegistrationNo: "Simpan nomor registrasi Anda",
+      contactSchool: "Silakan hubungi sekolah untuk informasi lebih lanjut tentang proses seleksi.",
+      backToPpdb: "Kembali ke Halaman PPDB",
+      draftRestored: "Data formulir sebelumnya telah dipulihkan.",
+      deleteDraft: "Hapus Draft",
+      draftDeleted: "Draft berhasil dihapus",
+      studentData: "Data Calon Siswa",
+      fullNameLabel: "Nama Lengkap *",
+      fullNamePlaceholder: "Nama lengkap sesuai akta",
+      birthPlace: "Tempat Lahir *",
+      birthPlacePlaceholder: "Kota kelahiran",
+      birthDate: "Tanggal Lahir *",
+      gender: "Jenis Kelamin *",
+      selectGender: "Pilih jenis kelamin",
+      male: "Laki-laki",
+      female: "Perempuan",
+      religion: "Agama",
+      selectReligion: "Pilih agama",
+      previousSchool: "Asal Sekolah",
+      previousSchoolPlaceholder: "Nama sekolah sebelumnya",
+      address: "Alamat",
+      fullAddress: "Alamat Lengkap *",
+      fullAddressPlaceholder: "Alamat lengkap tempat tinggal",
+      parentData: "Data Orang Tua / Wali",
+      fatherData: "Data Ayah",
+      fatherName: "Nama Ayah",
+      fatherNamePlaceholder: "Nama lengkap ayah",
+      occupation: "Pekerjaan",
+      occupationPlaceholder: "Pekerjaan",
+      motherData: "Data Ibu",
+      motherName: "Nama Ibu",
+      motherNamePlaceholder: "Nama lengkap ibu",
+      guardianData: "Data Wali (Opsional)",
+      guardianName: "Nama Wali",
+      guardianNamePlaceholder: "Nama lengkap wali",
+      submitRegistration: "Kirim Pendaftaran",
+      submitting: "Mengirim...",
+      registrationFailed: "Gagal melakukan pendaftaran",
+      errorOccurred: "Terjadi kesalahan. Silakan coba lagi.",
     },
     datetime: {
       justNow: "Baru saja",
@@ -296,7 +459,8 @@ const translations: Record<Language, Translations> = {
     },
     maintenance: {
       title: "Sedang Dalam Perbaikan",
-      description: "Kami sedang melakukan pemeliharaan terjadwal. Kami akan segera kembali. Terima kasih atas kesabaran Anda.",
+      description:
+        "Kami sedang melakukan pemeliharaan terjadwal. Kami akan segera kembali. Terima kasih atas kesabaran Anda.",
       workInProgress: "Pekerjaan sedang berlangsung",
       needHelp: "Butuh bantuan segera? Hubungi kami:",
     },
@@ -323,11 +487,13 @@ const translations: Record<Language, Translations> = {
         description: "Hubungi kami untuk informasi lebih lanjut",
         getInTouch: "Hubungi Kami",
         sendMessage: "Kirim Pesan",
+        sendMessageDesc: "Silakan kirim pesan kepada kami jika ada pertanyaan atau masukan",
         address: "Alamat",
         phone: "Telepon",
         email: "Email",
         operatingHours: "Jam Operasional",
         findUs: "Temukan Kami",
+        viewLargerMap: "Lihat peta lebih besar",
       },
       profile: {
         title: "Profil Sekolah",
@@ -343,11 +509,19 @@ const translations: Record<Language, Translations> = {
       },
       academic: {
         title: "Program Akademik",
-        description: "Program kurikulum, ekstrakurikuler, dan program unggulan sekolah",
+        description:
+          "Program kurikulum, ekstrakurikuler, dan program unggulan sekolah",
         curriculum: "Kurikulum",
         extracurricular: "Ekstrakurikuler",
         featuredPrograms: "Program Unggulan",
         achievements: "Prestasi",
+        heroSubtitle:
+          "Jelajahi program pendidikan dan kegiatan yang kami tawarkan",
+        curriculumDesc: "Program pembelajaran sesuai kurikulum nasional",
+        extracurricularDesc: "Kegiatan pengembangan bakat dan minat siswa",
+        featuredProgramsDesc:
+          "Program unggulan yang menjadi kebanggaan sekolah",
+        noPrograms: "Belum ada program dalam kategori ini",
       },
       ppdb: {
         title: "Penerimaan Peserta Didik Baru",
@@ -357,6 +531,24 @@ const translations: Record<Language, Translations> = {
         timeline: "Jadwal Pendaftaran",
         registrationClosed: "Pendaftaran Ditutup",
         registrationOpen: "Pendaftaran Dibuka",
+        comingSoon: "Segera Dibuka",
+        noActivePeriod: "Belum Ada Periode Aktif",
+        noActivePeriodDesc: "Saat ini belum ada periode pendaftaran yang aktif. Silakan hubungi kami untuk informasi lebih lanjut.",
+        contactUs: "Hubungi Kami",
+        registrationInfo: "Informasi Pendaftaran",
+        registrationPeriod: "Periode Pendaftaran",
+        quota: "Kuota Penerimaan",
+        students: "Siswa",
+        registrationRequirements: "Persyaratan Pendaftaran",
+        registrationStages: "Tahapan Pendaftaran",
+        startRegistration: "Mulai Pendaftaran",
+        registrationNotOpen: "Pendaftaran Belum Dibuka",
+        needHelp: "Butuh Bantuan?",
+        needHelpDesc: "Jika Anda memiliki pertanyaan tentang proses pendaftaran, silakan hubungi kami.",
+        downloads: "Unduhan",
+        viewAllDownloads: "Lihat Semua Unduhan",
+        academicYear: "Tahun Ajaran",
+        joinUs: "Bergabunglah bersama {schoolName} untuk masa depan yang lebih cerah",
       },
       agenda: {
         title: "Agenda & Kegiatan",
@@ -423,7 +615,8 @@ const translations: Record<Language, Translations> = {
     home: {
       welcome: "Welcome to",
       heroTitle: "Excellent School",
-      heroSubtitle: "Educating Excellent and Character Generation for a Bright Future",
+      heroSubtitle:
+        "Educating Excellent and Character Generation for a Bright Future",
       registerNow: "Register Now",
       aboutUs: "About Us",
       ourPrograms: "Our Programs",
@@ -432,10 +625,26 @@ const translations: Record<Language, Translations> = {
       newsInfo: "News & Information",
       testimonials: "Testimonials",
       whatTheySay: "What They Say",
+      testimonialsDesc: "Stories and experiences from our parents and students",
       joinUs: "Join Us",
       joinUsDesc: "Register your children to be part of our big family",
       registerPpdb: "Online Registration",
       contactUs: "Contact Us",
+      allNews: "All News",
+      buildingGeneration: "Building a Generation of",
+      excellentAndCharacter: "Excellence and Character",
+      ourMission: "Our Mission",
+      foundedSince: "Founded Since",
+      totalTeachers: "Total Teachers",
+      instructors: "Instructors",
+      accreditation: "Accreditation",
+      age: "Age",
+      quota: "Quota",
+      students: "Students",
+      ourClasses: "Our Classes",
+      educationLevels: "Education Levels",
+      educationLevelsDesc: "Available classes for your children",
+      learnMore: "Learn More",
     },
     stats: {
       teachers: "Teachers & Staff",
@@ -466,6 +675,58 @@ const translations: Record<Language, Translations> = {
       sent: "Sent",
       required: "Required",
       invalid: "Invalid format",
+      fullName: "Full Name",
+      phoneNumber: "Phone Number",
+      subjectPlaceholder: "Message subject",
+      messagePlaceholder: "Write your message here...",
+      namePlaceholder: "Enter your full name",
+      thankYou: "Thank You!",
+      messageReceived: "Your message has been received. We will contact you soon.",
+      messageSent: "Message sent successfully!",
+      messageFailed: "Failed to send message",
+      sendMessage: "Send Message",
+      // PPDB Form
+      registrationSuccess: "Registration Successful!",
+      registrationSuccessDesc: "Thank you for registering. Save your registration number:",
+      saveRegistrationNo: "Save your registration number",
+      contactSchool: "Please contact the school for more information about the selection process.",
+      backToPpdb: "Back to Admission Page",
+      draftRestored: "Previous form data has been restored.",
+      deleteDraft: "Delete Draft",
+      draftDeleted: "Draft deleted successfully",
+      studentData: "Student Data",
+      fullNameLabel: "Full Name *",
+      fullNamePlaceholder: "Full name as per birth certificate",
+      birthPlace: "Place of Birth *",
+      birthPlacePlaceholder: "City of birth",
+      birthDate: "Date of Birth *",
+      gender: "Gender *",
+      selectGender: "Select gender",
+      male: "Male",
+      female: "Female",
+      religion: "Religion",
+      selectReligion: "Select religion",
+      previousSchool: "Previous School",
+      previousSchoolPlaceholder: "Name of previous school",
+      address: "Address",
+      fullAddress: "Full Address *",
+      fullAddressPlaceholder: "Complete residential address",
+      parentData: "Parent / Guardian Data",
+      fatherData: "Father's Data",
+      fatherName: "Father's Name",
+      fatherNamePlaceholder: "Father's full name",
+      occupation: "Occupation",
+      occupationPlaceholder: "Occupation",
+      motherData: "Mother's Data",
+      motherName: "Mother's Name",
+      motherNamePlaceholder: "Mother's full name",
+      guardianData: "Guardian's Data (Optional)",
+      guardianName: "Guardian's Name",
+      guardianNamePlaceholder: "Guardian's full name",
+      submitRegistration: "Submit Registration",
+      submitting: "Submitting...",
+      registrationFailed: "Registration failed",
+      errorOccurred: "An error occurred. Please try again.",
     },
     datetime: {
       justNow: "Just now",
@@ -476,7 +737,8 @@ const translations: Record<Language, Translations> = {
     },
     maintenance: {
       title: "Under Maintenance",
-      description: "We're currently performing scheduled maintenance. We'll be back shortly. Thank you for your patience.",
+      description:
+        "We're currently performing scheduled maintenance. We'll be back shortly. Thank you for your patience.",
       workInProgress: "Work in progress",
       needHelp: "Need immediate assistance? Contact us:",
     },
@@ -503,11 +765,13 @@ const translations: Record<Language, Translations> = {
         description: "Contact us for more information",
         getInTouch: "Get In Touch",
         sendMessage: "Send Message",
+        sendMessageDesc: "Please send us a message if you have any questions or feedback",
         address: "Address",
         phone: "Phone",
         email: "Email",
         operatingHours: "Operating Hours",
         findUs: "Find Us",
+        viewLargerMap: "View larger map",
       },
       profile: {
         title: "School Profile",
@@ -528,6 +792,13 @@ const translations: Record<Language, Translations> = {
         extracurricular: "Extracurricular",
         featuredPrograms: "Featured Programs",
         achievements: "Achievements",
+        heroSubtitle: "Explore our educational programs and activities",
+        curriculumDesc: "Learning programs according to national curriculum",
+        extracurricularDesc:
+          "Activities for developing student talents and interests",
+        featuredProgramsDesc:
+          "Featured programs that are the pride of the school",
+        noPrograms: "No programs in this category yet",
       },
       ppdb: {
         title: "Student Admission",
@@ -537,6 +808,24 @@ const translations: Record<Language, Translations> = {
         timeline: "Registration Timeline",
         registrationClosed: "Registration Closed",
         registrationOpen: "Registration Open",
+        comingSoon: "Coming Soon",
+        noActivePeriod: "No Active Period",
+        noActivePeriodDesc: "There is currently no active registration period. Please contact us for more information.",
+        contactUs: "Contact Us",
+        registrationInfo: "Registration Information",
+        registrationPeriod: "Registration Period",
+        quota: "Admission Quota",
+        students: "Students",
+        registrationRequirements: "Registration Requirements",
+        registrationStages: "Registration Stages",
+        startRegistration: "Start Registration",
+        registrationNotOpen: "Registration Not Open",
+        needHelp: "Need Help?",
+        needHelpDesc: "If you have questions about the registration process, please contact us.",
+        downloads: "Downloads",
+        viewAllDownloads: "View All Downloads",
+        academicYear: "Academic Year",
+        joinUs: "Join {schoolName} for a brighter future",
       },
       agenda: {
         title: "Events & Activities",
@@ -563,7 +852,7 @@ export function getTranslations(language: Language = "id"): Translations {
 export function t(key: string, language: Language = "id"): string {
   const keys = key.split(".");
   let value: unknown = translations[language] || translations.id;
-  
+
   for (const k of keys) {
     if (value && typeof value === "object" && k in value) {
       value = (value as Record<string, unknown>)[k];
@@ -571,6 +860,6 @@ export function t(key: string, language: Language = "id"): string {
       return key; // Return key if translation not found
     }
   }
-  
+
   return typeof value === "string" ? value : key;
 }

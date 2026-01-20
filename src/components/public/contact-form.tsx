@@ -13,7 +13,46 @@ import { Label } from "@/components/ui/label";
 import { contactMessageSchema, type ContactMessageInput } from "@/lib/validations";
 import { submitContactMessage } from "@/actions/contact";
 
-export function ContactForm() {
+interface ContactFormTranslations {
+  fullName: string;
+  namePlaceholder: string;
+  email: string;
+  phoneNumber: string;
+  subject: string;
+  subjectPlaceholder: string;
+  message: string;
+  messagePlaceholder: string;
+  thankYou: string;
+  messageReceived: string;
+  messageSent: string;
+  messageFailed: string;
+  sendMessage: string;
+  sending: string;
+}
+
+interface ContactFormProps {
+  translations?: ContactFormTranslations;
+}
+
+const defaultTranslations: ContactFormTranslations = {
+  fullName: "Nama Lengkap",
+  namePlaceholder: "Masukkan nama lengkap",
+  email: "Email",
+  phoneNumber: "No. Telepon",
+  subject: "Subjek",
+  subjectPlaceholder: "Perihal pesan",
+  message: "Pesan",
+  messagePlaceholder: "Tulis pesan Anda di sini...",
+  thankYou: "Terima Kasih!",
+  messageReceived: "Pesan Anda telah kami terima. Kami akan segera menghubungi Anda.",
+  messageSent: "Pesan berhasil dikirim!",
+  messageFailed: "Gagal mengirim pesan",
+  sendMessage: "Kirim Pesan",
+  sending: "Mengirim...",
+};
+
+export function ContactForm({ translations = defaultTranslations }: ContactFormProps) {
+  const t = translations;
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
@@ -23,6 +62,7 @@ export function ContactForm() {
     formState: { errors, isSubmitting },
   } = useForm<ContactMessageInput>({
     resolver: zodResolver(contactMessageSchema),
+    mode: "onBlur",
   });
 
   const onSubmit = async (data: ContactMessageInput) => {
@@ -30,11 +70,11 @@ export function ContactForm() {
 
     if (result.success) {
       setIsSubmitted(true);
-      toast.success("Pesan berhasil dikirim!");
+      toast.success(t.messageSent);
       reset();
       setTimeout(() => setIsSubmitted(false), 5000);
     } else {
-      toast.error(result.error || "Gagal mengirim pesan");
+      toast.error(result.error || t.messageFailed);
     }
   };
 
@@ -42,9 +82,9 @@ export function ContactForm() {
     return (
       <div className="text-center py-12">
         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold mb-2">Terima Kasih!</h3>
+        <h3 className="text-xl font-semibold mb-2">{t.thankYou}</h3>
         <p className="text-muted-foreground">
-          Pesan Anda telah kami terima. Kami akan segera menghubungi Anda.
+          {t.messageReceived}
         </p>
       </div>
     );
@@ -54,10 +94,10 @@ export function ContactForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Nama Lengkap *</Label>
+          <Label htmlFor="name">{t.fullName} *</Label>
           <Input
             id="name"
-            placeholder="Masukkan nama lengkap"
+            placeholder={t.namePlaceholder}
             autoComplete="name"
             {...register("name")}
             disabled={isSubmitting}
@@ -68,7 +108,7 @@ export function ContactForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email *</Label>
+          <Label htmlFor="email">{t.email} *</Label>
           <Input
             id="email"
             type="email"
@@ -86,7 +126,7 @@ export function ContactForm() {
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="phone">No. Telepon</Label>
+          <Label htmlFor="phone">{t.phoneNumber}</Label>
           <Input
             id="phone"
             type="tel"
@@ -102,10 +142,10 @@ export function ContactForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subject">Subjek</Label>
+          <Label htmlFor="subject">{t.subject}</Label>
           <Input
             id="subject"
-            placeholder="Perihal pesan"
+            placeholder={t.subjectPlaceholder}
             {...register("subject")}
             disabled={isSubmitting}
           />
@@ -116,10 +156,10 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="message">Pesan *</Label>
+        <Label htmlFor="message">{t.message} *</Label>
         <Textarea
           id="message"
-          placeholder="Tulis pesan Anda di sini..."
+          placeholder={t.messagePlaceholder}
           rows={6}
           {...register("message")}
           disabled={isSubmitting}
@@ -133,12 +173,12 @@ export function ContactForm() {
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Mengirim...
+            {t.sending}
           </>
         ) : (
           <>
             <Send className="mr-2 h-4 w-4" />
-            Kirim Pesan
+            {t.sendMessage}
           </>
         )}
       </Button>

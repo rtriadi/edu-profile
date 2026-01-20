@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ThemeStyles } from "@/components/theme-styles";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
+import { SkipLink } from "@/components/ui/skip-link";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { getSiteConfig } from "@/lib/site-config";
 import { validateGoogleAnalyticsId } from "@/lib/security";
@@ -77,6 +78,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SkipLink />
         <Providers siteSettings={siteSettings}>
           {children}
           <ScrollToTop />

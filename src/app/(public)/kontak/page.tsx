@@ -216,13 +216,13 @@ export default async function KontakPage() {
                 </div>
                 {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    <a 
-                      href={`https://www.openstreetmap.org/?mlat=${schoolProfile.latitude}&mlon=${schoolProfile.longitude}#map=17/${schoolProfile.latitude}/${schoolProfile.longitude}`} 
+                    <a
+                      href={`https://www.openstreetmap.org/?mlat=${schoolProfile.latitude}&mlon=${schoolProfile.longitude}#map=17/${schoolProfile.latitude}/${schoolProfile.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline"
                     >
-                      Lihat peta lebih besar
+                      {t.pages.contact.viewLargerMap}
                     </a>
                   </p>
                 )}
@@ -236,11 +236,26 @@ export default async function KontakPage() {
               <CardHeader>
                 <CardTitle>{t.pages.contact.sendMessage}</CardTitle>
                 <CardDescription>
-                  Silakan kirim pesan kepada kami jika ada pertanyaan atau masukan
+                  {t.pages.contact.sendMessageDesc}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ContactForm />
+                <ContactForm translations={{
+                  fullName: t.forms.fullName,
+                  namePlaceholder: t.forms.namePlaceholder,
+                  email: t.forms.email,
+                  phoneNumber: t.forms.phoneNumber,
+                  subject: t.forms.subject,
+                  subjectPlaceholder: t.forms.subjectPlaceholder,
+                  message: t.forms.message,
+                  messagePlaceholder: t.forms.messagePlaceholder,
+                  thankYou: t.forms.thankYou,
+                  messageReceived: t.forms.messageReceived,
+                  messageSent: t.forms.messageSent,
+                  messageFailed: t.forms.messageFailed,
+                  sendMessage: t.forms.sendMessage,
+                  sending: t.forms.sending,
+                }} />
               </CardContent>
             </Card>
           </div>

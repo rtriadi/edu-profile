@@ -27,6 +27,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ScrollAnimation } from "@/components/ui/scroll-animation";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
@@ -212,7 +213,7 @@ export default async function HomePage() {
                         <Award className="h-6 w-6 text-yellow-300" />
                       </div>
                       <div>
-                        <p className="text-sm text-white/70">Akreditasi</p>
+                        <p className="text-sm text-white/70">{t.home.accreditation}</p>
                         <p className="font-bold text-white text-lg">
                           {schoolProfile.accreditation}
                         </p>
@@ -224,9 +225,9 @@ export default async function HomePage() {
                       <Users className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-white/70">Total Guru</p>
+                      <p className="text-sm text-white/70">{t.home.totalTeachers}</p>
                       <p className="font-bold text-white text-lg">
-                        {data.stats.staff}+ Pengajar
+                        {data.stats.staff}+ {t.home.instructors}
                       </p>
                     </div>
                   </div>
@@ -288,27 +289,35 @@ export default async function HomePage() {
         <section className="py-16 -mt-8 relative z-10">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <StatCard
-                icon={Users}
-                value={data.stats.staff}
-                label={t.stats.teachers}
-              />
-              <StatCard
-                icon={GraduationCap}
-                value={data.stats.alumni}
-                label={t.stats.alumni}
-                suffix="+"
-              />
-              <StatCard
-                icon={BookOpen}
-                value={data.stats.gradeLevels}
-                label={t.stats.gradeLevels}
-              />
-              <StatCard
-                icon={Calendar}
-                value={data.stats.extracurriculars}
-                label={t.stats.extracurricular}
-              />
+              <ScrollAnimation delay={0}>
+                <StatCard
+                  icon={Users}
+                  value={data.stats.staff}
+                  label={t.stats.teachers}
+                />
+              </ScrollAnimation>
+              <ScrollAnimation delay={0.1}>
+                <StatCard
+                  icon={GraduationCap}
+                  value={data.stats.alumni}
+                  label={t.stats.alumni}
+                  suffix="+"
+                />
+              </ScrollAnimation>
+              <ScrollAnimation delay={0.2}>
+                <StatCard
+                  icon={BookOpen}
+                  value={data.stats.gradeLevels}
+                  label={t.stats.gradeLevels}
+                />
+              </ScrollAnimation>
+              <ScrollAnimation delay={0.3}>
+                <StatCard
+                  icon={Calendar}
+                  value={data.stats.extracurriculars}
+                  label={t.stats.extracurricular}
+                />
+              </ScrollAnimation>
             </div>
           </div>
         </section>
@@ -316,15 +325,16 @@ export default async function HomePage() {
         {/* About Section */}
         <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
+            <ScrollAnimation>
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
                 <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
                   {t.home.aboutUs}
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-foreground">
-                  Membangun Generasi{" "}
-                  <span className="text-primary">Unggul</span> dan{" "}
-                  <span className="text-primary">Berkarakter</span>
+                  {t.home.buildingGeneration}{" "}
+                  
+                  <span className="text-primary">{t.home.excellentAndCharacter}</span>
                 </h2>
                 <div className="space-y-4 text-muted-foreground">
                   <p className="leading-relaxed text-base">
@@ -334,7 +344,7 @@ export default async function HomePage() {
                   <div className="p-6 rounded-2xl bg-muted border border-border">
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      Misi Kami
+                      {t.home.ourMission}
                     </h3>
                     <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                       {schoolProfile?.mission ||
@@ -347,14 +357,14 @@ export default async function HomePage() {
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium shadow-md">
                       <Award className="h-4 w-4" />
                       <span className="text-sm">
-                        Akreditasi{" "}
+                        {t.home.accreditation}{" "}
                         <strong>{schoolProfile.accreditation}</strong>
                       </span>
                     </div>
                   )}
                   <Button variant="outline" asChild className="group">
                     <Link href="/profil">
-                      Selengkapnya
+                      {t.home.learnMore}
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
@@ -373,9 +383,7 @@ export default async function HomePage() {
                       <Clock className="h-6 w-6 sm:h-7 sm:w-7" />
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm text-white/80">
-                        Berdiri Sejak
-                      </p>
+                      <p className="text-xs sm:text-sm text-white/80">{t.home.foundedSince}</p>
                       <p className="text-xl sm:text-2xl font-bold text-white">
                         {schoolProfile?.foundedYear || "1990"}
                       </p>
@@ -384,6 +392,7 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
+            </ScrollAnimation>
           </div>
         </section>
 
@@ -391,17 +400,19 @@ export default async function HomePage() {
         {data.gradeLevels && data.gradeLevels.length > 0 && (
           <section className="py-20 md:py-28 bg-muted/50">
             <div className="container mx-auto px-4">
+              <ScrollAnimation>
               <div className="text-center mb-16">
                 <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-                  Kelas Kami
+                  {t.home.ourClasses}
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                  Jenjang Pendidikan
+                  {t.home.educationLevels}
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  Pilihan kelas yang tersedia untuk putra-putri Anda
+                  {t.home.educationLevelsDesc}
                 </p>
               </div>
+              </ScrollAnimation>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {data.gradeLevels.map((grade, index) => {
                   return (
@@ -437,7 +448,7 @@ export default async function HomePage() {
                       </CardTitle>
                       {grade.ageRange && (
                         <p className="text-sm text-muted-foreground">
-                          Usia: {grade.ageRange}
+                          {`${t.home.age}: ${grade.ageRange}`}
                         </p>
                       )}
                     </CardHeader>
@@ -450,7 +461,7 @@ export default async function HomePage() {
                       {grade.quota && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Users className="h-4 w-4" />
-                          <span>Kuota: {grade.quota} siswa</span>
+                          <span>{`${t.home.quota}: ${grade.quota} ${t.home.students}`}</span>
                         </div>
                       )}
                       {grade.features && Array.isArray(grade.features) && (grade.features as string[]).length > 0 && (
@@ -470,7 +481,7 @@ export default async function HomePage() {
               <div className="text-center mt-12">
                 <Button variant="outline" size="lg" asChild className="group">
                   <Link href="/ppdb">
-                    Daftar Sekarang
+                    {t.home.registerNow}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
@@ -483,6 +494,7 @@ export default async function HomePage() {
         {data.programs.length > 0 && (
           <section className="py-20 md:py-28 bg-muted/50">
             <div className="container mx-auto px-4">
+              <ScrollAnimation>
               <div className="text-center mb-16">
                 <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
                   {t.home.ourPrograms}
@@ -491,11 +503,12 @@ export default async function HomePage() {
                   {t.home.featuredPrograms}
                 </h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto">
-                  {siteConfig.language === "en" 
+                  {siteConfig.language === "en"
                     ? "Featured programs we offer to develop student potential"
                     : "Program-program unggulan yang kami tawarkan untuk mengembangkan potensi siswa"}
                 </p>
               </div>
+              </ScrollAnimation>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {data.programs.map((program, index) => (
                   <Card
@@ -544,6 +557,7 @@ export default async function HomePage() {
         {data.recentPosts.length > 0 && (
           <section className="py-20 md:py-28">
             <div className="container mx-auto px-4">
+              <ScrollAnimation>
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
                 <div>
                   <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
@@ -564,11 +578,12 @@ export default async function HomePage() {
                   </Link>
                 </Button>
               </div>
+              </ScrollAnimation>
               <div className="grid md:grid-cols-3 gap-6">
                 {data.recentPosts.map((post) => (
+                  <article key={post.id}>
                   <Card
-                    key={post.id}
-                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border"
+                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border h-full"
                   >
                     <div className="aspect-video relative bg-muted overflow-hidden">
                       {post.featuredImg ? (
@@ -599,7 +614,11 @@ export default async function HomePage() {
                     <CardHeader className="pb-2">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                         <Clock className="h-3 w-3" />
-                        {post.publishedAt && formatDate(post.publishedAt)}
+                        {post.publishedAt && (
+                          <time dateTime={post.publishedAt.toISOString()}>
+                            {formatDate(post.publishedAt)}
+                          </time>
+                        )}
                       </div>
                       <CardTitle className="text-lg line-clamp-2 text-card-foreground group-hover:text-primary transition-colors">
                         <Link href={`/berita/${post.slug}`}>{post.title}</Link>
@@ -611,11 +630,12 @@ export default async function HomePage() {
                       </CardDescription>
                     </CardContent>
                   </Card>
+                  </article>
                 ))}
               </div>
               <div className="text-center mt-8 md:hidden">
                 <Button variant="outline" asChild>
-                  <Link href="/berita">Semua Berita</Link>
+                  <Link href="/berita">{t.home.allNews}</Link>
                 </Button>
               </div>
             </div>
@@ -632,6 +652,7 @@ export default async function HomePage() {
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
+              <ScrollAnimation>
               <div className="text-center mb-16">
                 <Badge className="mb-4 bg-white/15 text-white hover:bg-white/20 border-white/20">
                   {t.home.testimonials}
@@ -640,11 +661,10 @@ export default async function HomePage() {
                   {t.home.whatTheySay}
                 </h2>
                 <p className="text-white/80 max-w-2xl mx-auto">
-                  {siteConfig.language === "en" 
-                    ? "Testimonials from alumni, parents, and our students"
-                    : "Testimoni dari alumni, orang tua, dan siswa kami"}
+                  {t.home.testimonialsDesc}
                 </p>
               </div>
+              </ScrollAnimation>
               <div className="grid md:grid-cols-3 gap-6">
                 {data.testimonials.map((testimonial) => (
                   <Card
@@ -687,6 +707,7 @@ export default async function HomePage() {
         {/* CTA Section */}
         <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
+            <ScrollAnimation>
             <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-2xl">
               {/* Decorative elements */}
               <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:2.5rem_2.5rem]" />
@@ -696,11 +717,10 @@ export default async function HomePage() {
               <CardContent className="relative z-10 py-16 text-center">
                 <Sparkles className="h-12 w-12 mx-auto mb-6 text-yellow-300" />
                 <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-                  Bergabung Bersama Kami
+                  {t.home.joinUs}
                 </h2>
                 <p className="text-white/90 mb-10 max-w-2xl mx-auto text-lg">
-                  Daftarkan putra-putri Anda untuk menjadi bagian dari keluarga
-                  besar {siteName}
+                  {t.home.joinUsDesc} {siteName}
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
                   <Button
@@ -709,7 +729,7 @@ export default async function HomePage() {
                     asChild
                   >
                     <Link href="/ppdb">
-                      Daftar PPDB Online
+                      {t.home.registerPpdb}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
@@ -718,11 +738,12 @@ export default async function HomePage() {
                     className="border-2 border-white bg-transparent text-white hover:bg-white/20 hover:text-white font-semibold"
                     asChild
                   >
-                    <Link href="/kontak">Hubungi Kami</Link>
+                    <Link href="/kontak">{t.home.contactUs}</Link>
                   </Button>
                 </div>
               </CardContent>
             </Card>
+            </ScrollAnimation>
           </div>
         </section>
 
@@ -733,18 +754,18 @@ export default async function HomePage() {
               {[
                 {
                   icon: MapPin,
-                  title: "Alamat",
+                  title: t.footer.address,
                   value:
                     schoolProfile?.address || "Jl. Pendidikan No. 1, Jakarta",
                 },
                 {
                   icon: Phone,
-                  title: "Telepon",
+                  title: t.footer.phone,
                   value: schoolProfile?.phone || "(021) 1234567",
                 },
                 {
                   icon: Mail,
-                  title: "Email",
+                  title: t.footer.email,
                   value: schoolProfile?.email || "info@sekolah.sch.id",
                 },
               ].map((item) => (

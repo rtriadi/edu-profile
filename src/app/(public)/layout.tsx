@@ -110,7 +110,9 @@ export default async function PublicLayout({
         menuItems={menuItems}
         currentLocale={locale}
       />
-      {children}
+      <div id="main-content" className="flex-1 flex flex-col">
+        {children}
+      </div>
       <PublicFooter />
     </div>
   );

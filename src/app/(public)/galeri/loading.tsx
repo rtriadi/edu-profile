@@ -1,5 +1,5 @@
-import { PageLoading } from "@/components/ui/loading";
+import { GalleryPageSkeleton } from "@/components/skeletons/gallery-skeleton";
 
 export default function Loading() {
-  return <PageLoading message="Memuat galeri..." />;
+  return <GalleryPageSkeleton />;
 }

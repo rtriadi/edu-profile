@@ -1,5 +1,5 @@
-import { PageLoading } from "@/components/ui/loading";
+import { NewsPageSkeleton } from "@/components/skeletons/news-card-skeleton";
 
 export default function Loading() {
-  return <PageLoading message="Memuat berita..." />;
+  return <NewsPageSkeleton />;
 }
