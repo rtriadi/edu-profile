@@ -12,27 +12,35 @@ import type { ApiResponse } from "@/types";
 // ==========================================
 
 export async function getMenus() {
-  const menus = await prisma.menu.findMany({
-    include: {
-      items: {
-        where: { parentId: null },
-        orderBy: { order: "asc" },
-        include: {
-          children: {
-            orderBy: { order: "asc" },
-            include: {
-              children: {
-                orderBy: { order: "asc" },
+  return getCachedMenus();
+}
+
+const getCachedMenus = unstable_cache(
+  async () => {
+    const menus = await prisma.menu.findMany({
+      include: {
+        items: {
+          where: { parentId: null },
+          orderBy: { order: "asc" },
+          include: {
+            children: {
+              orderBy: { order: "asc" },
+              include: {
+                children: {
+                  orderBy: { order: "asc" },
+                },
               },
             },
           },
         },
       },
-    },
-    orderBy: { name: "asc" },
-  });
-  return menus;
-}
+      orderBy: { name: "asc" },
+    });
+    return menus;
+  },
+  ["menus"],
+  { revalidate: 60, tags: ["menus"] }
+);
 
 export async function getMenuById(id: string) {
   const menu = await prisma.menu.findUnique({
