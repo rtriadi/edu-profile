@@ -191,6 +191,10 @@ model Post {
   @@index([slug])
   @@index([status])
   @@index([categoryId])
+  @@index([locale])
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([status, locale])
   @@map("posts")
 }
 
@@ -250,6 +254,8 @@ model Staff {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  @@index([isActive])
+  @@index([isTeacher])
   @@map("staff")
 }
 
@@ -393,6 +399,7 @@ model PPDBRegistration {
 
   @@index([registrationNo])
   @@index([status])
+  @@index([periodId])
   @@map("ppdb_registrations")
 }
 
@@ -432,6 +439,7 @@ model Event {
   updatedAt   DateTime  @updatedAt
 
   @@index([startDate])
+  @@index([isPublished])
   @@map("events")
 }
 

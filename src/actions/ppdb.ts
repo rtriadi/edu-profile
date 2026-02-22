@@ -418,48 +418,50 @@ export async function createPublicRegistration(data: {
       return { success: false, error: "Pendaftaran di luar periode yang ditentukan" };
     }
 
-    // Check quota if set
-    if (period.quota) {
-      const currentCount = await prisma.pPDBRegistration.count({
+    // Check quota and generate registration number atomically using transaction
+    const registration = await prisma.$transaction(async (tx) => {
+      // Check quota if set
+      if (period.quota) {
+        const currentCount = await tx.pPDBRegistration.count({
+          where: { periodId: sanitizedData.periodId },
+        });
+        if (currentCount >= period.quota) {
+          throw new Error("Kuota pendaftaran sudah penuh");
+        }
+      }
+
+      // Generate registration number using transaction-safe approach
+      const year = new Date().getFullYear();
+      const count = await tx.pPDBRegistration.count({
         where: { periodId: sanitizedData.periodId },
       });
-      if (currentCount >= period.quota) {
-        return { success: false, error: "Kuota pendaftaran sudah penuh" };
-      }
-    }
+      const registrationNo = `PPDB-${year}-${String(count + 1).padStart(4, "0")}`;
 
-    // Generate registration number
-    const year = new Date().getFullYear();
-    const count = await prisma.pPDBRegistration.count({
-      where: { periodId: sanitizedData.periodId },
-    });
-    const registrationNo = `PPDB-${year}-${String(count + 1).padStart(4, "0")}`;
-
-    // Create registration with sanitized data
-    const registration = await prisma.pPDBRegistration.create({
-      data: {
-        periodId: sanitizedData.periodId,
-        registrationNo,
-        studentName: sanitizedData.studentName,
-        nisn: sanitizedData.nisn,
-        birthPlace: sanitizedData.birthPlace,
-        birthDate: sanitizedData.birthDate,
-        gender: sanitizedData.gender,
-        religion: sanitizedData.religion,
-        address: sanitizedData.address,
-        previousSchool: sanitizedData.previousSchool,
-        fatherName: sanitizedData.fatherName,
-        fatherJob: sanitizedData.fatherJob,
-        fatherPhone: sanitizedData.fatherPhone,
-        motherName: sanitizedData.motherName,
-        motherJob: sanitizedData.motherJob,
-        motherPhone: sanitizedData.motherPhone,
-        guardianName: sanitizedData.guardianName,
-        guardianPhone: sanitizedData.guardianPhone,
-        guardianEmail: sanitizedData.guardianEmail,
-        photo: sanitizedData.photo,
-        status: "PENDING",
-      },
+      // Create registration with sanitized data
+      return tx.pPDBRegistration.create({
+        data: {
+          periodId: sanitizedData.periodId,
+          registrationNo,
+          studentName: sanitizedData.studentName,
+          nisn: sanitizedData.nisn,
+          birthPlace: sanitizedData.birthPlace,
+          birthDate: sanitizedData.birthDate,
+          gender: sanitizedData.gender,
+          religion: sanitizedData.religion,
+          address: sanitizedData.address,
+          previousSchool: sanitizedData.previousSchool,
+          fatherName: sanitizedData.fatherName,
+          fatherJob: sanitizedData.fatherJob,
+          fatherPhone: sanitizedData.fatherPhone,
+          motherName: sanitizedData.motherName,
+          motherJob: sanitizedData.motherJob,
+          motherPhone: sanitizedData.motherPhone,
+          guardianName: sanitizedData.guardianName,
+          guardianPhone: sanitizedData.guardianPhone,
+          guardianEmail: sanitizedData.guardianEmail,
+          status: "PENDING",
+        },
+      });
     });
 
     revalidatePath("/admin/ppdb/registrations");
@@ -468,8 +470,9 @@ export async function createPublicRegistration(data: {
       data: { registrationNo: registration.registrationNo }, 
       message: "Pendaftaran berhasil! Nomor registrasi Anda: " + registration.registrationNo 
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Create public registration error:", error);
-    return { success: false, error: "Gagal melakukan pendaftaran. Silakan coba lagi." };
+    const errorMessage = error instanceof Error ? error.message : "Gagal melakukan pendaftaran. Silakan coba lagi.";
+    return { success: false, error: errorMessage };
   }
 }
