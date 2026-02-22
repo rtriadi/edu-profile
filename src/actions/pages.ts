@@ -24,14 +24,14 @@ export async function getPages(params?: {
   const skip = (page - 1) * limit;
 
   const where: Record<string, unknown> = {};
-  
+
   if (params?.search) {
     where.OR = [
       { title: { contains: params.search } },
       { slug: { contains: params.search } },
     ];
   }
-  
+
   if (params?.status) {
     where.status = params.status;
   }

@@ -8,6 +8,7 @@ import { SkipLink } from "@/components/ui/skip-link";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { getSiteConfig } from "@/lib/site-config";
 import { validateGoogleAnalyticsId } from "@/lib/security";
+import { auth } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +25,7 @@ const geistMono = Geist_Mono({
 // Dynamic metadata based on site config
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getSiteConfig();
-  
+
   return {
     title: {
       default: config.siteName,
@@ -51,8 +52,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const config = await getSiteConfig();
-  
+  const [config, session] = await Promise.all([
+    getSiteConfig(),
+    auth()
+  ]);
+
   // Prepare site settings for client-side context
   const siteSettings = {
     siteName: config.siteName,
@@ -64,12 +68,12 @@ export default async function RootLayout({
     secondaryColor: config.secondaryColor,
     accentColor: config.accentColor,
   };
-  
+
   // Validate Google Analytics ID before rendering
-  const validGaId = config.googleAnalyticsId && validateGoogleAnalyticsId(config.googleAnalyticsId) 
-    ? config.googleAnalyticsId 
+  const validGaId = config.googleAnalyticsId && validateGoogleAnalyticsId(config.googleAnalyticsId)
+    ? config.googleAnalyticsId
     : null;
-  
+
   return (
     <html lang={config.language || "id"} suppressHydrationWarning>
       <head>
@@ -79,7 +83,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SkipLink />
-        <Providers siteSettings={siteSettings}>
+        <Providers siteSettings={siteSettings} session={session}>
           {children}
           <ScrollToTop />
         </Providers>

@@ -7,15 +7,14 @@ const { auth } = NextAuth(authConfig);
 // Paths that should skip middleware entirely
 const publicPaths = [
   "/maintenance",
-  "/api",
   "/_next",
   "/favicon.ico",
 ];
 
 // Check if path should skip middleware
 function shouldSkip(pathname: string): boolean {
-  return publicPaths.some((path) => pathname.startsWith(path)) || 
-         pathname.includes(".");
+  return publicPaths.some((path) => pathname.startsWith(path)) ||
+    pathname.includes(".");
 }
 
 export default auth((req) => {

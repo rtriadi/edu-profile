@@ -21,14 +21,14 @@ export async function getPosts(params?: {
   const skip = (page - 1) * limit;
 
   const where: Record<string, unknown> = {};
-  
+
   if (params?.search) {
     where.OR = [
       { title: { contains: params.search } },
       { excerpt: { contains: params.search } },
     ];
   }
-  
+
   if (params?.categoryId) {
     where.categoryId = params.categoryId;
   }
@@ -36,7 +36,7 @@ export async function getPosts(params?: {
   if (params?.categorySlug) {
     where.category = { slug: params.categorySlug };
   }
-  
+
   if (params?.status) {
     where.status = params.status;
   }

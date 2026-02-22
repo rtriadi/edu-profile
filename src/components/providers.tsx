@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
+import type { Session } from "next-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
@@ -13,9 +14,10 @@ import {
 interface ProvidersProps {
   children: React.ReactNode;
   siteSettings?: Partial<SiteSettings>;
+  session?: Session | null;
 }
 
-export function Providers({ children, siteSettings = {} }: ProvidersProps) {
+export function Providers({ children, siteSettings = {}, session }: ProvidersProps) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -29,7 +31,11 @@ export function Providers({ children, siteSettings = {} }: ProvidersProps) {
   );
 
   return (
-    <SessionProvider>
+    <SessionProvider
+      session={session || null}
+      refetchInterval={0}
+      refetchOnWindowFocus={false}
+    >
       <QueryClientProvider client={queryClient}>
         <ThemeProvider
           attribute="class"

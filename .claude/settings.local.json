@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: security, performance, and accessibility improvements\n\nSecurity:\n- Add role-based authorization to media, settings, and PPDB actions\n- Restrict image remote patterns to specific allowed domains\n- Add security headers \\(X-Content-Type-Options, X-Frame-Options, etc.\\)\n\nPerformance:\n- Fix N+1 queries using $transaction for batch operations\n- Add updateTag\\(\\) calls for proper cache invalidation\n- Defer Google Analytics loading with requestIdleCallback\n- Fix transition: all anti-pattern in CSS\n\nAccessibility:\n- Add aria-labels to icon buttons\n- Add sr-only text for screen readers\n- Add autocomplete, inputMode, spellCheck to form inputs\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: add safety check for undefined session.user.role\n\nFixes 500 error on /admin/media by adding optional chaining\nto check session?.user?.role before calling canAccess\\(\\).\nThis prevents runtime errors when session or role is undefined.\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Skill(superpowers:executing-plans)",
+      "Bash(npm install:*)",
+      "Bash(npm run test:run)",
+      "Bash(cat:*)",
+      "Bash(npx next lint:*)",
+      "Bash(powershell:*)",
+      "Bash(git checkout:*)",
+      "Bash(node:*)"
+    ]
+  }
+}
