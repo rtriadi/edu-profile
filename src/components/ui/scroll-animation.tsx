@@ -15,16 +15,9 @@ export function ScrollAnimation({
 }: ScrollAnimationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
@@ -50,11 +43,7 @@ export function ScrollAnimation({
     }
 
     return () => observer.disconnect();
-  }, [hasAnimated, mounted]);
-
-  if (!mounted) {
-    return <div className={className}>{children}</div>;
-  }
+  }, [hasAnimated]);
 
   return (
     <div

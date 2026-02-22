@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "
 const storageCache = new Map<string, unknown>();
 
 function subscribe(callback: () => void) {
-  if (typeof window === "undefined") return () => {};
+  if (typeof window === "undefined") return () => { };
   window.addEventListener("storage", callback);
   return () => window.removeEventListener("storage", callback);
 }
@@ -15,18 +15,18 @@ export function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
-  const store = useSyncExternalStore(
-    subscribe,
-    () => storedValue,
-    () => initialValue
-  );
-
   const [storedValue, setStoredValue] = useState<T>(() => {
     if (storageCache.has(key)) {
       return storageCache.get(key) as T;
     }
     return initialValue;
   });
+
+  const store = useSyncExternalStore(
+    subscribe,
+    () => storedValue,
+    () => initialValue
+  );
 
   // Initialize from localStorage on mount
   useEffect(() => {
