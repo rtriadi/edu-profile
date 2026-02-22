@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface ScrollAnimationProps {
   children: React.ReactNode;
@@ -13,17 +13,59 @@ export function ScrollAnimation({
   className,
   delay = 0,
 }: ScrollAnimationProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setIsVisible(true);
+          setHasAnimated(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: "-50px" }
+    );
+
+    const element = document.getElementById(`scroll-${Math.random().toString(36).slice(2, 9)}`);
+    if (element) {
+      element.id = `scroll-${Math.random().toString(36).slice(2, 9)}`;
+      observer.observe(element);
+    }
+
+    return () => observer.disconnect();
+  }, [hasAnimated]);
+
+  const prefersReducedMotion = typeof window !== "undefined" 
+    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches 
+    : false;
+
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>;
+  }
 
   return (
-    <motion.div
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-      whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: shouldReduceMotion ? 0 : 0.5, delay }}
+    <div
+      id={`scroll-${Math.random().toString(36).slice(2, 9)}`}
       className={className}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "translateY(0)" : "translateY(20px)",
+        transition: `opacity 0.5s ease-out ${delay}s, transform 0.5s ease-out ${delay}s`,
+        willChange: "opacity, transform",
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

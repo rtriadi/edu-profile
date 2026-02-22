@@ -1,24 +1,39 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface GoogleAnalyticsProps {
   gaId: string;
 }
 
 export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
   useEffect(() => {
-    // Defer GA loading until after hydration for better performance
-    if (!gaId) return;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    
+    if (prefersReducedMotion) {
+      setShouldLoad(false);
+      return;
+    }
 
     const loadGA = () => {
-      // Load gtag.js
+      if (!gaId) return;
+
+      const existingScript = document.querySelector(
+        'script[src*="googletagmanager.com/gtag/js"]'
+      );
+      if (existingScript) return;
+
       const script = document.createElement("script");
       script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
       script.async = true;
+      script.defer = true;
+      script.setAttribute("data-cookieconsent", "analytics");
       document.head.appendChild(script);
 
-      // Initialize dataLayer using a type-safe approach
       const win = window as typeof window & { dataLayer?: unknown[] };
       win.dataLayer = win.dataLayer || [];
       function gtag(...args: unknown[]) {
@@ -28,12 +43,15 @@ export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
       gtag("config", gaId);
     };
 
-    // Use requestIdleCallback if available, otherwise setTimeout
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(loadGA);
-    } else {
-      setTimeout(loadGA, 1);
-    }
+    const timer = setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(loadGA, { timeout: 4000 });
+      } else {
+        setTimeout(loadGA, 3000);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, [gaId]);
 
   return null;
