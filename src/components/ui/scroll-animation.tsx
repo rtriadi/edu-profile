@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface ScrollAnimationProps {
   children: React.ReactNode;
@@ -15,6 +15,7 @@ export function ScrollAnimation({
 }: ScrollAnimationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -37,18 +38,17 @@ export function ScrollAnimation({
       { threshold: 0.1, rootMargin: "-50px" }
     );
 
-    const element = document.getElementById(`scroll-${Math.random().toString(36).slice(2, 9)}`);
-    if (element) {
-      element.id = `scroll-${Math.random().toString(36).slice(2, 9)}`;
-      observer.observe(element);
+    if (ref.current) {
+      observer.observe(ref.current);
     }
 
     return () => observer.disconnect();
   }, [hasAnimated]);
 
-  const prefersReducedMotion = typeof window !== "undefined" 
-    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches 
-    : false;
+  const [prefersReducedMotion] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>;
@@ -56,7 +56,7 @@ export function ScrollAnimation({
 
   return (
     <div
-      id={`scroll-${Math.random().toString(36).slice(2, 9)}`}
+      ref={ref}
       className={className}
       style={{
         opacity: isVisible ? 1 : 0,
