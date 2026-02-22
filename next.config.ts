@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Disable prerendering to avoid DB connection issues during build
+  // All pages will be server-rendered on demand
+  // Output standalone for better Vercel deployment
+  output: "standalone",
+  
   // Image optimization
   images: {
     formats: ["image/avif", "image/webp"],

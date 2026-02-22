@@ -7,8 +7,7 @@ import { getSiteConfig } from "@/lib/site-config";
 import { getMenuByLocation } from "@/actions/menus";
 import { getLocale } from "@/actions/locale";
 
-export const dynamic = "force-static";
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 // Menu item type for header
 interface MenuItem {
