@@ -7,8 +7,7 @@ import { getSiteConfig } from "@/lib/site-config";
 import { getMenuByLocation } from "@/actions/menus";
 import { getLocale } from "@/actions/locale";
 
-// Dynamic rendering - fetch fresh data on each request
-// This prevents build-time database errors on Vercel
+export const dynamic = "force-static";
 export const revalidate = 60;
 
 // Menu item type for header
