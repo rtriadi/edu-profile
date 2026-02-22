@@ -56,7 +56,13 @@ function adjustLightness(oklch: string, adjustment: number): string {
 }
 
 export async function ThemeStyles() {
-  const themeSettings = await getThemeSettings();
+  let themeSettings;
+  try {
+    themeSettings = await getThemeSettings();
+  } catch (error) {
+    console.error("Error loading theme settings:", error);
+    return null;
+  }
 
   const primaryColor = themeSettings.primaryColor || "#3B82F6";
   const secondaryColor = themeSettings.secondaryColor || "#10B981";
