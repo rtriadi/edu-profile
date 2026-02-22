@@ -2,10 +2,12 @@
 
 import dynamic from "next/dynamic";
 
-// Dynamic import framer-motion to reduce initial bundle size (bundle-dynamic-imports)
 const MotionDiv = dynamic(
   () => import("framer-motion").then((mod) => mod.motion.div),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => <div className="animate-pulse min-h-[100px]" />
+  }
 );
 
 export default function Template({ children }: { children: React.ReactNode }) {

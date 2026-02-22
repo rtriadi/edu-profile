@@ -1,23 +1,32 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 
 // Cache for localStorage reads (js-cache-storage)
 const storageCache = new Map<string, unknown>();
+
+function subscribe(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
 
 export function useLocalStorage<T>(
   key: string,
   initialValue: T
 ): [T, (value: T | ((prev: T) => T)) => void, () => void] {
-  // State to store our value
+  const store = useSyncExternalStore(
+    subscribe,
+    () => storedValue,
+    () => initialValue
+  );
+
   const [storedValue, setStoredValue] = useState<T>(() => {
-    // Check cache first (js-cache-storage)
     if (storageCache.has(key)) {
       return storageCache.get(key) as T;
     }
     return initialValue;
   });
-  const [isInitialized, setIsInitialized] = useState(false);
 
   // Initialize from localStorage on mount
   useEffect(() => {
@@ -27,7 +36,6 @@ export function useLocalStorage<T>(
       // Check cache first
       if (storageCache.has(key)) {
         setStoredValue(storageCache.get(key) as T);
-        setIsInitialized(true);
         return;
       }
 
@@ -40,7 +48,6 @@ export function useLocalStorage<T>(
     } catch (error) {
       console.warn(`Error reading localStorage key "${key}":`, error);
     }
-    setIsInitialized(true);
   }, [key]);
 
   // Use functional setState to avoid stale closures (rerender-functional-setstate)
@@ -77,7 +84,7 @@ export function useLocalStorage<T>(
     }
   }, [key, initialValue]);
 
-  return [isInitialized ? storedValue : initialValue, setValue, clearValue];
+  return [store, setValue, clearValue];
 }
 
 // Hook specifically for form drafts with debounce

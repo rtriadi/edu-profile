@@ -109,7 +109,7 @@ export function PPDBRegistrationForm({ periodId }: PPDBRegistrationFormProps) {
     if (savedDraft && !isSuccess) {
       form.reset(savedDraft);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [savedDraft, isSuccess, form]);
 
   const handleClearDraft = () => {
     clearDraft();

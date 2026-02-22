@@ -79,12 +79,12 @@ export function ImageWithFallback({
   }
 
   return (
-    <>
+    <div className={cn("relative", className)}>
       {/* Skeleton while loading */}
       {showSkeleton && isLoading && (
         <div
           className={cn(
-            "absolute inset-0 bg-muted animate-pulse",
+            "absolute inset-0 bg-muted animate-pulse z-10",
             className
           )}
           aria-hidden="true"
@@ -104,6 +104,6 @@ export function ImageWithFallback({
         onError={handleError}
         {...props}
       />
-    </>
+    </div>
   );
 }
