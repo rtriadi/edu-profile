@@ -47,6 +47,13 @@ function hexToOklch(hex: string): string {
   return `oklch(${L.toFixed(3)} ${C.toFixed(3)} ${H.toFixed(3)})`;
 }
 
+function normalizeHexColor(value: string | undefined, fallback: string): string {
+  if (!value) return fallback;
+  const normalized = value.startsWith("#") ? value : `#${value}`;
+  const isValid = /^#[0-9A-Fa-f]{6}$/.test(normalized);
+  return isValid ? normalized : fallback;
+}
+
 // Generate a lighter/darker variant
 function adjustLightness(oklch: string, adjustment: number): string {
   const match = oklch.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
@@ -56,17 +63,22 @@ function adjustLightness(oklch: string, adjustment: number): string {
 }
 
 export async function ThemeStyles() {
-  let themeSettings;
+  let themeSettings: {
+    primaryColor?: string;
+    secondaryColor?: string;
+    accentColor?: string;
+    customCss?: string;
+  } = {};
   try {
     themeSettings = await getThemeSettings();
   } catch (error) {
     console.error("Error loading theme settings:", error);
-    return null;
+    themeSettings = {};
   }
 
-  const primaryColor = themeSettings.primaryColor || "#3B82F6";
-  const secondaryColor = themeSettings.secondaryColor || "#10B981";
-  const accentColor = themeSettings.accentColor || "#8B5CF6";
+  const primaryColor = normalizeHexColor(themeSettings.primaryColor, "#3B82F6");
+  const secondaryColor = normalizeHexColor(themeSettings.secondaryColor, "#10B981");
+  const accentColor = normalizeHexColor(themeSettings.accentColor, "#8B5CF6");
 
   // Convert hex colors to OKLCH for CSS variables
   const primaryOklch = hexToOklch(primaryColor);

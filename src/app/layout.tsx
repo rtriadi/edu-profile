@@ -10,6 +10,8 @@ import { getSiteConfig } from "@/lib/site-config";
 import { validateGoogleAnalyticsId } from "@/lib/security";
 import { auth } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -46,6 +48,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
   };
 }
+
+export const revalidate = 0;
 
 export default async function RootLayout({
   children,
