@@ -26,6 +26,8 @@ const nextConfig: NextConfig = {
         hostname: "lh3.googleusercontent.com",
       },
     ],
+  },
+  
   // Experimental features for performance
   experimental: {
     serverActions: {
