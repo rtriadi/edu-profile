@@ -38,55 +38,51 @@ import { getLocale } from "@/actions/locale";
 const getHomeData = unstable_cache(
   async () => {
     try {
-      const [
-        schoolProfile,
-        recentPosts,
-        programs,
-        upcomingEvents,
-        facilities,
-        testimonials,
-        gradeLevels,
-        staffCount,
-        alumniCount,
-        gradeLevelCount,
-        extracurricularCount,
-      ] = await Promise.all([
-        prisma.schoolProfile.findFirst(),
-        prisma.post.findMany({
-          where: { status: "PUBLISHED" },
-          orderBy: { publishedAt: "desc" },
-          take: 3,
-          include: { category: { select: { name: true, color: true } } },
-        }),
-        prisma.program.findMany({
-          where: { isActive: true, type: "FEATURED" },
-          orderBy: { order: "asc" },
-          take: 4,
-        }),
-        prisma.event.findMany({
-          where: { isPublished: true, startDate: { gte: new Date() } },
-          orderBy: { startDate: "asc" },
-          take: 3,
-        }),
-        prisma.facility.findMany({
-          where: { isPublished: true },
-          orderBy: { order: "asc" },
-          take: 6,
-        }),
-        prisma.testimonial.findMany({
-          where: { isPublished: true },
-          orderBy: { order: "asc" },
-          take: 3,
-        }),
-        prisma.gradeLevel.findMany({
+      // Execute queries sequentially to prevent Supabase connection pool exhaustion (Error P1001/P2024)
+      const schoolProfile = await prisma.schoolProfile.findFirst();
+      const recentPosts = await prisma.post.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { publishedAt: "desc" },
+        take: 3,
+        include: { category: { select: { name: true, color: true } } },
+      });
+      const programs = await prisma.program.findMany({
+        where: { isActive: true, type: "FEATURED" },
+        orderBy: { order: "asc" },
+        take: 4,
+      });
+      const upcomingEvents = await prisma.event.findMany({
+        where: { isPublished: true, startDate: { gte: new Date() } },
+        orderBy: { startDate: "asc" },
+        take: 3,
+      });
+      const facilities = await prisma.facility.findMany({
+        where: { isPublished: true },
+        orderBy: { order: "asc" },
+        take: 6,
+      });
+      const testimonials = await prisma.testimonial.findMany({
+        where: { isPublished: true },
+        orderBy: { order: "asc" },
+        take: 3,
+      });
+      
+      // Some optional tables might fail if not fully migrated, handle gracefully
+      let gradeLevels: any[] = [];
+      try {
+        gradeLevels = await prisma.gradeLevel.findMany({
           where: { isActive: true },
           orderBy: { order: "asc" },
-        }).catch(() => []),
-        prisma.staff.count({ where: { isActive: true } }),
-        prisma.alumni.count({ where: { isPublished: true } }),
-        prisma.gradeLevel.count({ where: { isActive: true } }),
-        prisma.program.count({ where: { isActive: true, type: "EXTRACURRICULAR" } }),
-      ]);
+        });
+      } catch (e) {
+        // Table might not exist yet
+      }
+
+      // Aggregate counts
+      const staffCount = await prisma.staff.count({ where: { isActive: true } }).catch(() => 0);
+      const alumniCount = await prisma.alumni.count({ where: { isPublished: true } }).catch(() => 0);
+      const gradeLevelCount = gradeLevels.length;
+      const extracurricularCount = await prisma.program.count({ where: { isActive: true, type: "EXTRACURRICULAR" } }).catch(() => 0);
 
       return {
         schoolProfile,

@@ -26,15 +26,11 @@ const nextConfig: NextConfig = {
         hostname: "lh3.googleusercontent.com",
       },
     ],
-  },
-
-  // Server Actions Configuration
-  serverActions: {
-    bodySizeLimit: "10mb",
-  },
-
   // Experimental features for performance
   experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
     optimizeCss: true,
     optimizePackageImports: [
       "lucide-react",
