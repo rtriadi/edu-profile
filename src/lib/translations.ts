@@ -45,6 +45,7 @@ export interface Translations {
     extracurricular: string;
     featuredPrograms: string;
     achievements: string;
+    information: string;
     news: string;
     gallery: string;
     ppdb: string;
@@ -327,6 +328,7 @@ const translations: Record<Language, Translations> = {
       extracurricular: "Ekstrakurikuler",
       featuredPrograms: "Program Unggulan",
       achievements: "Prestasi",
+      information: "Informasi",
       news: "Berita",
       gallery: "Galeri",
       ppdb: "PPDB",
@@ -606,6 +608,7 @@ const translations: Record<Language, Translations> = {
       extracurricular: "Extracurricular",
       featuredPrograms: "Featured Programs",
       achievements: "Achievements",
+      information: "Information",
       news: "News",
       gallery: "Gallery",
       ppdb: "Admission",

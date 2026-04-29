@@ -9,6 +9,7 @@ import { SkipLink } from "@/components/ui/skip-link";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { getSiteConfig } from "@/lib/site-config";
 import { validateGoogleAnalyticsId } from "@/lib/security";
+import { getLocale } from "@/actions/locale";
 
 // Cache getSiteConfig per-request to avoid double DB call
 // (generateMetadata + RootLayout both need it, cache deduplicates)
@@ -65,13 +66,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // Single DB call — React.cache() deduplicates across generateMetadata + here
-  const config = await getCachedConfig();
+  const [config, locale] = await Promise.all([
+    getCachedConfig(),
+    getLocale(),
+  ]);
 
   // Prepare site settings for client-side context
   const siteSettings = {
     siteName: config.siteName,
     siteTagline: config.siteTagline,
-    language: config.language,
+    language: locale || config.language,
     timezone: config.timezone,
     maintenanceMode: config.maintenanceMode,
     primaryColor: config.primaryColor,
@@ -87,7 +91,7 @@ export default async function RootLayout({
       : null;
 
   return (
-    <html lang={config.language || "id"} suppressHydrationWarning>
+    <html lang={locale || config.language || "id"} suppressHydrationWarning>
       <head>
         <ThemeStyles />
       </head>

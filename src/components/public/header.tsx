@@ -70,8 +70,33 @@ const getDefaultNavItems = (t: (key: string) => string): NavItem[] => [
   { label: t("nav.contact"), href: "/kontak" },
 ];
 
+const translateLabel = (label: string, t: (key: string) => string): string => {
+  const map: Record<string, string> = {
+    "Beranda": t("nav.home"),
+    "Profil": t("nav.profile"),
+    "Tentang Sekolah": t("nav.aboutUs"),
+    "Visi & Misi": t("nav.visionMission"),
+    "Sejarah": t("nav.history"),
+    "Struktur Organisasi": t("nav.structure"),
+    "Guru & Staff": t("nav.teachersStaff"),
+    "Fasilitas": t("nav.facilities"),
+    "Akademik": t("nav.academic"),
+    "Kurikulum": t("nav.curriculum"),
+    "Ekstrakurikuler": t("nav.extracurricular"),
+    "Program Unggulan": t("nav.featuredPrograms"),
+    "Prestasi": t("nav.achievements"),
+    "Informasi": t("nav.information") || "Information", // Added Information if missing
+    "Berita & Artikel": t("nav.news"),
+    "Galeri Sekolah": t("nav.gallery"),
+    "Galeri": t("nav.gallery"),
+    "PPDB": t("nav.ppdb"),
+    "Kontak": t("nav.contact"),
+  };
+  return map[label] || label;
+};
+
 // Transform database menu items to NavItem format
-function transformMenuItems(items: MenuItem[]): NavItem[] {
+function transformMenuItems(items: MenuItem[], t: (key: string) => string): NavItem[] {
   return items
     .filter((item) => item.isVisible)
     .map((item) => {
@@ -104,10 +129,10 @@ function transformMenuItems(items: MenuItem[]): NavItem[] {
       const visibleChildren = item.children?.filter((c) => c.isVisible) || [];
 
       return {
-        label: item.label,
+        label: translateLabel(item.label, t),
         href,
         openNew: item.openNew,
-        children: visibleChildren.length > 0 ? transformMenuItems(visibleChildren) : undefined,
+        children: visibleChildren.length > 0 ? transformMenuItems(visibleChildren, t) : undefined,
       };
     });
 }
@@ -130,7 +155,7 @@ export function PublicHeader({
   const [isScrolled, setIsScrolled] = useState(false);
   const { t } = useTranslation();
 
-  const transformedItems = menuItems.length > 0 ? transformMenuItems(menuItems) : [];
+  const transformedItems = menuItems.length > 0 ? transformMenuItems(menuItems, t) : [];
   const navItems: NavItem[] =
     transformedItems.length > 0 ? transformedItems : getDefaultNavItems(t);
 
@@ -163,8 +188,8 @@ export function PublicHeader({
 
       <header
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-300",
-          isScrolled ? "glass-header shadow-sm shadow-black/5" : "bg-transparent"
+          "sticky top-0 z-50 w-full transition-all duration-300 glass-header",
+          isScrolled ? "shadow-sm shadow-black/5" : ""
         )}
       >
         <div className="container mx-auto px-4">
@@ -295,7 +320,7 @@ export function PublicHeader({
         <div
           className={cn(
             "lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
-            isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+            isOpen ? "max-h-[calc(100vh-4rem)] opacity-100 overflow-y-auto" : "max-h-0 opacity-0"
           )}
         >
           <div className="border-t border-border/50 bg-background/98 backdrop-blur-xl">

@@ -33,20 +33,30 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
+import { getLocale } from "@/actions/locale";
 
 const getHomeData = unstable_cache(
   async () => {
     try {
-      const schoolProfile = await prisma.schoolProfile.findFirst();
-
-      const [recentPosts, programs, upcomingEvents] = await Promise.all([
+      const [
+        schoolProfile,
+        recentPosts,
+        programs,
+        upcomingEvents,
+        facilities,
+        testimonials,
+        gradeLevels,
+        staffCount,
+        alumniCount,
+        gradeLevelCount,
+        extracurricularCount,
+      ] = await Promise.all([
+        prisma.schoolProfile.findFirst(),
         prisma.post.findMany({
           where: { status: "PUBLISHED" },
           orderBy: { publishedAt: "desc" },
           take: 3,
-          include: {
-            category: { select: { name: true, color: true } },
-          },
+          include: { category: { select: { name: true, color: true } } },
         }),
         prisma.program.findMany({
           where: { isActive: true, type: "FEATURED" },
@@ -54,16 +64,10 @@ const getHomeData = unstable_cache(
           take: 4,
         }),
         prisma.event.findMany({
-          where: {
-            isPublished: true,
-            startDate: { gte: new Date() },
-          },
+          where: { isPublished: true, startDate: { gte: new Date() } },
           orderBy: { startDate: "asc" },
           take: 3,
         }),
-      ]);
-
-      const [facilities, testimonials, gradeLevels] = await Promise.all([
         prisma.facility.findMany({
           where: { isPublished: true },
           orderBy: { order: "asc" },
@@ -78,15 +82,10 @@ const getHomeData = unstable_cache(
           where: { isActive: true },
           orderBy: { order: "asc" },
         }).catch(() => []),
-      ]);
-
-      const stats = await Promise.all([
         prisma.staff.count({ where: { isActive: true } }),
         prisma.alumni.count({ where: { isPublished: true } }),
         prisma.gradeLevel.count({ where: { isActive: true } }),
-        prisma.program.count({
-          where: { isActive: true, type: "EXTRACURRICULAR" },
-        }),
+        prisma.program.count({ where: { isActive: true, type: "EXTRACURRICULAR" } }),
       ]);
 
       return {
@@ -98,10 +97,10 @@ const getHomeData = unstable_cache(
         upcomingEvents,
         gradeLevels,
         stats: {
-          staff: stats[0],
-          alumni: stats[1],
-          gradeLevels: stats[2],
-          extracurriculars: stats[3],
+          staff: staffCount,
+          alumni: alumniCount,
+          gradeLevels: gradeLevelCount,
+          extracurriculars: extracurricularCount,
         },
       };
     } catch (error) {
@@ -128,13 +127,14 @@ const getHomeData = unstable_cache(
 );
 
 export default async function HomePage() {
-  const [data, siteConfig] = await Promise.all([
+  const [data, siteConfig, locale] = await Promise.all([
     getHomeData(),
     getSiteConfig(),
+    getLocale(),
   ]);
   const { schoolProfile } = data;
   
-  const language: Language = siteConfig.language === "en" ? "en" : "id";
+  const language: Language = locale === "en" ? "en" : "id";
   const t = getTranslations(language);
 
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
@@ -149,7 +149,7 @@ export default async function HomePage() {
             {/* Left Content */}
             <div className="space-y-8">
               <ScrollAnimation delay={0.1}>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/20 mb-2">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-dark border border-white/20 mb-2">
                   <Sparkles className="h-4 w-4 text-yellow-300" />
                   <span className="text-sm font-medium text-white tracking-wide">
                     {t.home.welcome} {siteName}
@@ -175,7 +175,7 @@ export default async function HomePage() {
                 <div className="flex flex-wrap gap-4 pt-2">
                   <Button
                     size="lg"
-                    className="h-14 px-8 bg-white text-primary hover:bg-white/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-base rounded-xl group"
+                    className="h-14 px-8 bg-white text-theme-primary hover:bg-white/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-base rounded-xl group"
                     asChild
                   >
                     <Link href="/ppdb">
@@ -197,7 +197,7 @@ export default async function HomePage() {
                 <div className="flex flex-wrap gap-8 pt-10 border-t border-white/10 mt-8">
                   {schoolProfile?.accreditation && (
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-2xl glass-dark flex items-center justify-center">
                         <Award className="h-6 w-6 text-yellow-300" />
                       </div>
                       <div>
@@ -209,7 +209,7 @@ export default async function HomePage() {
                     </div>
                   )}
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-2xl glass-dark flex items-center justify-center">
                       <Users className="h-6 w-6 text-white" />
                     </div>
                     <div>
@@ -228,16 +228,16 @@ export default async function HomePage() {
               <ScrollAnimation delay={0.3}>
                 <div className="relative aspect-[4/3] w-full max-w-lg mx-auto">
                   {/* Glass panel */}
-                  <div className="absolute inset-0 glass rounded-3xl shadow-2xl rotate-3 transition-transform hover:rotate-0 duration-500 ease-out" />
-                  <div className="absolute inset-0 glass rounded-3xl flex items-center justify-center border-t border-l border-white/30">
+                  <div className="absolute inset-0 glass-dark rounded-3xl shadow-2xl rotate-3 transition-transform hover:rotate-0 duration-500 ease-out" />
+                  <div className="absolute inset-0 glass-dark rounded-3xl flex items-center justify-center border-t border-l border-white/30">
                     <GraduationCap className="h-32 w-32 text-white/40" />
                   </div>
                   
                   {/* Floating elements */}
-                  <div className="absolute -left-8 top-1/4 p-4 glass rounded-2xl shadow-xl animate-float">
+                  <div className="absolute -left-8 top-1/4 p-4 glass-dark rounded-2xl shadow-xl animate-float">
                     <BookOpen className="h-8 w-8 text-white" />
                   </div>
-                  <div className="absolute -right-6 top-2/3 p-4 glass border-yellow-300/30 rounded-2xl shadow-xl animate-float-slow delay-300">
+                  <div className="absolute -right-6 top-2/3 p-4 glass-dark border-yellow-300/30 rounded-2xl shadow-xl animate-float-slow delay-300">
                     <Trophy className="h-8 w-8 text-yellow-300" />
                   </div>
                 </div>
@@ -506,7 +506,7 @@ export default async function HomePage() {
             <div className="grid md:grid-cols-3 gap-6">
               {data.testimonials.map((testimonial, i) => (
                 <ScrollAnimation key={testimonial.id} delay={i * 0.1}>
-                  <Card className="glass border-white/20 hover:bg-white/10 transition-colors h-full flex flex-col">
+                  <Card className="glass-dark border-white/20 hover:bg-white/10 transition-colors h-full flex flex-col">
                     <CardContent className="pt-8 flex-1 flex flex-col">
                       <div className="flex gap-1 mb-6">
                         {[...Array(5)].map((_, i) => (

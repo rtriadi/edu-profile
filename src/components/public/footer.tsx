@@ -16,6 +16,7 @@ import { getMenuByLocation } from "@/actions/menus";
 import { prisma } from "@/lib/prisma";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
+import { getLocale } from "@/actions/locale";
 
 async function getFooterData() {
   const schoolProfile = await prisma.schoolProfile.findFirst();
@@ -23,15 +24,16 @@ async function getFooterData() {
 }
 
 export async function PublicFooter() {
-  const [schoolProfile, siteConfig, footerMenu] = await Promise.all([
+  const [schoolProfile, siteConfig, footerMenu, locale] = await Promise.all([
     getFooterData(),
     getSiteConfig(),
     getMenuByLocation("footer"),
+    getLocale(),
   ]);
 
   const socialMedia = schoolProfile?.socialMedia as Record<string, string> | null;
-  const translations = getTranslations(siteConfig.language as Language);
-  const isEn = siteConfig.language === "en";
+  const translations = getTranslations(locale as Language);
+  const isEn = locale === "en";
 
   const currentYear = new Date().getFullYear();
   const siteName = siteConfig.siteName || schoolProfile?.name || "EduProfile";
@@ -84,23 +86,15 @@ export async function PublicFooter() {
   ];
 
   return (
-    <footer className="relative overflow-hidden" style={{ backgroundColor: "var(--theme-primary-dark)" }}>
-      {/* Decorative gradient blobs */}
+    <footer className="relative overflow-hidden border-t border-white/10 text-white" style={{ backgroundColor: "var(--theme-primary-dark)" }}>
+      {/* Soft Decorative gradient blobs */}
       <div
-        className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none opacity-40"
+        className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none opacity-20"
         style={{ backgroundColor: "var(--theme-primary)", transform: "translate(-30%, -30%)" }}
       />
       <div
-        className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none opacity-30"
+        className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none opacity-[0.05]"
         style={{ backgroundColor: "var(--theme-accent)", transform: "translate(20%, 20%)" }}
-      />
-
-      {/* Top gradient border */}
-      <div
-        className="absolute top-0 left-0 right-0 h-px opacity-50"
-        style={{
-          background: "linear-gradient(to right, transparent, var(--theme-primary-light), var(--theme-accent), transparent)",
-        }}
       />
 
       <div className="container mx-auto px-4 py-16 relative z-10">
@@ -122,22 +116,18 @@ export async function PublicFooter() {
                 </div>
               ) : (
                 <div
-                  className="flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl text-theme-primary-foreground shadow-lg"
                   style={{ backgroundColor: "var(--theme-primary)" }}
                 >
                   <GraduationCap className="h-6 w-6" />
                 </div>
               )}
               <div>
-                <span
-                  className="font-display font-bold text-xl block leading-tight text-white"
-                >
+                <span className="font-display font-bold text-xl block leading-tight text-white">
                   {siteName}
                 </span>
                 {schoolProfile?.accreditation && (
-                  <span
-                    className="text-xs font-medium text-white/80"
-                  >
+                  <span className="text-xs font-medium text-white/70">
                     {isEn ? "Accreditation" : "Akreditasi"} {schoolProfile.accreditation}
                   </span>
                 )}
@@ -145,9 +135,7 @@ export async function PublicFooter() {
             </div>
 
             {/* Tagline */}
-            <p
-              className="text-sm leading-relaxed mb-6 text-white/70"
-            >
+            <p className="text-sm leading-relaxed mb-6 text-white/70">
               {schoolProfile?.tagline ||
                 siteConfig.siteTagline ||
                 translations.home.heroSubtitle}
@@ -165,7 +153,7 @@ export async function PublicFooter() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 bg-white/5"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-primary/20 text-white/70 hover:text-white border border-white/10 bg-white/5"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -176,9 +164,7 @@ export async function PublicFooter() {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h3
-              className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90"
-            >
+            <h3 className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90">
               {translations.footer.quickLinks}
             </h3>
             <ul className="space-y-2">
@@ -186,20 +172,14 @@ export async function PublicFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="group flex items-center gap-2 text-sm py-1 transition-colors duration-150 text-white/70"
+                    className="group flex items-center gap-2 text-sm py-1 transition-colors duration-150 text-white/70 hover:text-white"
                   >
                     <span
                       className="w-1 h-1 rounded-full flex-shrink-0 transition-all group-hover:w-2"
-                      style={{ backgroundColor: "var(--theme-primary-light)" }}
+                      style={{ backgroundColor: "var(--theme-primary)" }}
                     />
-                    <span
-                      className="group-hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </span>
-                    <ArrowUpRight
-                      className="h-3 w-3 opacity-0 -translate-y-0.5 group-hover:opacity-60 group-hover:translate-y-0 transition-all"
-                    />
+                    <span className="transition-colors">{link.label}</span>
+                    <ArrowUpRight className="h-3 w-3 opacity-0 -translate-y-0.5 group-hover:opacity-60 group-hover:translate-y-0 transition-all text-theme-primary" />
                   </Link>
                 </li>
               ))}
@@ -208,32 +188,24 @@ export async function PublicFooter() {
 
           {/* Column 3: Contact */}
           <div>
-            <h3
-              className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90"
-            >
+            <h3 className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90">
               {translations.footer.contact}
             </h3>
             <ul className="space-y-4">
               {schoolProfile?.address && (
                 <li className="flex items-start gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 bg-white/10"
-                  >
-                    <MapPin className="h-3.5 w-3.5 text-white/90" />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 bg-theme-primary/20">
+                    <MapPin className="h-3.5 w-3.5 text-theme-primary-light" />
                   </div>
-                  <span
-                    className="text-sm leading-relaxed text-white/70"
-                  >
+                  <span className="text-sm leading-relaxed text-white/70">
                     {schoolProfile.address}
                   </span>
                 </li>
               )}
               {schoolProfile?.phone && (
                 <li className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/10"
-                  >
-                    <Phone className="h-3.5 w-3.5 text-white/90" />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-theme-primary/20">
+                    <Phone className="h-3.5 w-3.5 text-theme-primary-light" />
                   </div>
                   <a
                     href={`tel:${schoolProfile.phone}`}
@@ -245,10 +217,8 @@ export async function PublicFooter() {
               )}
               {schoolProfile?.email && (
                 <li className="flex items-center gap-3">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/10"
-                  >
-                    <Mail className="h-3.5 w-3.5 text-white/90" />
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-theme-primary/20">
+                    <Mail className="h-3.5 w-3.5 text-theme-primary-light" />
                   </div>
                   <a
                     href={`mailto:${schoolProfile.email}`}
@@ -263,36 +233,26 @@ export async function PublicFooter() {
 
           {/* Column 4: Info + CTA */}
           <div>
-            <h3
-              className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90"
-            >
+            <h3 className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90">
               {translations.footer.information}
             </h3>
             <div className="space-y-3">
               {schoolProfile?.npsn && (
-                <div
-                  className="p-4 rounded-xl border border-white/10 bg-white/5"
-                >
-                  <span
-                    className="text-xs uppercase tracking-widest font-medium text-white/60"
-                  >
+                <div className="p-4 rounded-xl border border-white/10 bg-white/5 shadow-sm">
+                  <span className="text-xs uppercase tracking-widest font-medium text-white/50">
                     NPSN
                   </span>
-                  <p className="font-semibold mt-0.5 text-white/90">
+                  <p className="font-semibold mt-0.5 text-white">
                     {schoolProfile.npsn}
                   </p>
                 </div>
               )}
               {schoolProfile?.foundedYear && (
-                <div
-                  className="p-4 rounded-xl border border-white/10 bg-white/5"
-                >
-                  <span
-                    className="text-xs uppercase tracking-widest font-medium text-white/60"
-                  >
+                <div className="p-4 rounded-xl border border-white/10 bg-white/5 shadow-sm">
+                  <span className="text-xs uppercase tracking-widest font-medium text-white/50">
                     {translations.footer.foundedSince}
                   </span>
-                  <p className="font-semibold mt-0.5 text-white/90">
+                  <p className="font-semibold mt-0.5 text-white">
                     {schoolProfile.foundedYear}
                   </p>
                 </div>
@@ -301,7 +261,7 @@ export async function PublicFooter() {
               {/* PPDB CTA */}
               <Link
                 href="/ppdb"
-                className="flex items-center justify-center gap-2 p-4 rounded-xl font-semibold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white shadow-lg"
+                className="flex items-center justify-center gap-2 p-4 rounded-xl font-semibold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-theme-primary-foreground shadow-lg"
                 style={{
                   backgroundColor: "var(--theme-primary)",
                   boxShadow: "0 4px 20px color-mix(in srgb, var(--theme-primary) 30%, transparent)",
@@ -315,22 +275,15 @@ export async function PublicFooter() {
         </div>
 
         {/* Bottom Bar */}
-        <div
-          className="mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 text-white/60"
-        >
-          <p
-            className="text-sm"
-            suppressHydrationWarning
-          >
+        <div className="mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 text-white/50">
+          <p className="text-sm" suppressHydrationWarning>
             © {currentYear} {siteName}. {translations.footer.allRightsReserved}.
           </p>
-          <p
-            className="text-sm flex items-center gap-1"
-          >
+          <p className="text-sm flex items-center gap-1">
             {translations.footer.poweredBy}{" "}
             <a
               href="#"
-              className="transition-colors hover:text-white font-medium hover:underline text-white/80"
+              className="transition-colors hover:text-white font-medium hover:underline text-white/70"
             >
               EduProfile CMS
             </a>
