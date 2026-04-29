@@ -15,6 +15,7 @@ import {
   Clock,
   Award,
   Target,
+  ArrowUpRight,
 } from "lucide-react";
 import { unstable_cache } from "next/cache";
 
@@ -33,14 +34,11 @@ import { formatDate } from "@/lib/utils";
 import { getSiteConfig } from "@/lib/site-config";
 import { getTranslations, type Language } from "@/lib/translations";
 
-// Use unstable_cache for data fetching to ensure caching even with dynamic layout (cookies)
 const getHomeData = unstable_cache(
   async () => {
     try {
-      // 1. Critical Data: School Profile
       const schoolProfile = await prisma.schoolProfile.findFirst();
 
-      // 2. Primary Content: Posts, Programs, Events (3 concurrent connections)
       const [recentPosts, programs, upcomingEvents] = await Promise.all([
         prisma.post.findMany({
           where: { status: "PUBLISHED" },
@@ -65,7 +63,6 @@ const getHomeData = unstable_cache(
         }),
       ]);
 
-      // 3. Secondary Content: Facilities, Testimonials, GradeLevels (3 concurrent connections)
       const [facilities, testimonials, gradeLevels] = await Promise.all([
         prisma.facility.findMany({
           where: { isPublished: true },
@@ -83,7 +80,6 @@ const getHomeData = unstable_cache(
         }).catch(() => []),
       ]);
 
-      // 4. Statistics: Counts (4 concurrent connections)
       const stats = await Promise.all([
         prisma.staff.count({ where: { isActive: true } }),
         prisma.alumni.count({ where: { isPublished: true } }),
@@ -138,7 +134,6 @@ export default async function HomePage() {
   ]);
   const { schoolProfile } = data;
   
-  // Get translations based on admin language setting with validation
   const language: Language = siteConfig.language === "en" ? "en" : "id";
   const t = getTranslations(language);
 
@@ -146,49 +141,41 @@ export default async function HomePage() {
 
   return (
     <main className="flex-1">
-      {/* Hero Section - Works in both light and dark mode */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-          {/* Background - adapts to theme */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
-
-          {/* Decorative elements */}
-          <div className="absolute inset-0">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[50rem] h-[50rem] bg-white/5 rounded-full blur-3xl" />
-          </div>
-
-          {/* Grid pattern overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:4rem_4rem]" />
-
-          <div className="container mx-auto px-4 relative z-10 py-20">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8 text-white">
-                {/* Welcome badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20">
+      {/* WARM ACADEMIC HERO SECTION */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-mesh-warm bg-noise isolate">
+        <div className="container mx-auto px-4 relative z-10 py-24 md:py-32">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            
+            {/* Left Content */}
+            <div className="space-y-8">
+              <ScrollAnimation delay={0.1}>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/20 mb-2">
                   <Sparkles className="h-4 w-4 text-yellow-300" />
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-white tracking-wide">
                     {t.home.welcome} {siteName}
                   </span>
                 </div>
+              </ScrollAnimation>
 
-                {/* Main heading */}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-white">
+              <ScrollAnimation delay={0.2}>
+                <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] text-white drop-shadow-sm">
                   {schoolProfile?.name || siteName}
                 </h1>
+              </ScrollAnimation>
 
-                {/* Tagline */}
-                <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed">
+              <ScrollAnimation delay={0.3}>
+                <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed font-light">
                   {schoolProfile?.tagline ||
                     siteConfig.siteTagline ||
                     t.home.heroSubtitle}
                 </p>
+              </ScrollAnimation>
 
-                {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-4">
+              <ScrollAnimation delay={0.4}>
+                <div className="flex flex-wrap gap-4 pt-2">
                   <Button
                     size="lg"
-                    className="bg-white text-primary hover:bg-white/90 shadow-xl shadow-black/20 font-semibold group"
+                    className="h-14 px-8 bg-white text-primary hover:bg-white/90 shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-base rounded-xl group"
                     asChild
                   >
                     <Link href="/ppdb">
@@ -198,481 +185,330 @@ export default async function HomePage() {
                   </Button>
                   <Button
                     size="lg"
-                    className="border-2 border-white bg-transparent text-white hover:bg-white/20 hover:text-white font-semibold backdrop-blur-sm"
+                    className="h-14 px-8 border-2 border-white/30 bg-white/5 text-white hover:bg-white/20 hover:border-white/50 font-semibold text-base rounded-xl backdrop-blur-md transition-all"
                     asChild
                   >
                     <Link href="/profil">{t.home.aboutUs}</Link>
                   </Button>
                 </div>
+              </ScrollAnimation>
 
-                {/* Quick stats in hero */}
-                <div className="flex flex-wrap gap-8 pt-8 border-t border-white/20">
+              <ScrollAnimation delay={0.5}>
+                <div className="flex flex-wrap gap-8 pt-10 border-t border-white/10 mt-8">
                   {schoolProfile?.accreditation && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-yellow-400/20 flex items-center justify-center">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center">
                         <Award className="h-6 w-6 text-yellow-300" />
                       </div>
                       <div>
-                        <p className="text-sm text-white/70">{t.home.accreditation}</p>
-                        <p className="font-bold text-white text-lg">
+                        <p className="text-xs text-white/70 uppercase tracking-widest mb-0.5">{t.home.accreditation}</p>
+                        <p className="font-display font-bold text-white text-xl">
                           {schoolProfile.accreditation}
                         </p>
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center">
                       <Users className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-sm text-white/70">{t.home.totalTeachers}</p>
-                      <p className="font-bold text-white text-lg">
+                      <p className="text-xs text-white/70 uppercase tracking-widest mb-0.5">{t.home.totalTeachers}</p>
+                      <p className="font-display font-bold text-white text-xl">
                         {data.stats.staff}+ {t.home.instructors}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center">
-                      <BookOpen className="h-6 w-6 text-white" />
+                </div>
+              </ScrollAnimation>
+            </div>
+
+            {/* Right Visual (Desktop Only) */}
+            <div className="hidden lg:block relative">
+              <ScrollAnimation delay={0.3}>
+                <div className="relative aspect-[4/3] w-full max-w-lg mx-auto">
+                  {/* Glass panel */}
+                  <div className="absolute inset-0 glass rounded-3xl shadow-2xl rotate-3 transition-transform hover:rotate-0 duration-500 ease-out" />
+                  <div className="absolute inset-0 glass rounded-3xl flex items-center justify-center border-t border-l border-white/30">
+                    <GraduationCap className="h-32 w-32 text-white/40" />
+                  </div>
+                  
+                  {/* Floating elements */}
+                  <div className="absolute -left-8 top-1/4 p-4 glass rounded-2xl shadow-xl animate-float">
+                    <BookOpen className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="absolute -right-6 top-2/3 p-4 glass border-yellow-300/30 rounded-2xl shadow-xl animate-float-slow delay-300">
+                    <Trophy className="h-8 w-8 text-yellow-300" />
+                  </div>
+                </div>
+              </ScrollAnimation>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* STATS STRIP */}
+      <section className="relative z-20 -mt-10 mb-16 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 md:p-6 bg-card rounded-3xl shadow-xl border border-border">
+            <ScrollAnimation delay={0.1}>
+              <StatItem icon={Users} value={data.stats.staff} label={t.stats.teachers} />
+            </ScrollAnimation>
+            <ScrollAnimation delay={0.2}>
+              <StatItem icon={GraduationCap} value={data.stats.alumni} label={t.stats.alumni} suffix="+" />
+            </ScrollAnimation>
+            <ScrollAnimation delay={0.3}>
+              <StatItem icon={BookOpen} value={data.stats.gradeLevels} label={t.stats.gradeLevels} />
+            </ScrollAnimation>
+            <ScrollAnimation delay={0.4}>
+              <StatItem icon={Calendar} value={data.stats.extracurriculars} label={t.stats.extracurricular} />
+            </ScrollAnimation>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT SECTION */}
+      <section className="py-20 md:py-24 overflow-hidden relative">
+        <div className="absolute right-0 top-0 w-1/3 h-full bg-secondary/10 -z-10 rounded-l-[100px]" />
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="order-2 lg:order-1 relative">
+              <ScrollAnimation delay={0.2}>
+                <div className="relative aspect-[4/3] rounded-[2rem] overflow-hidden bg-muted border border-border shadow-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
+                    <GraduationCap className="h-32 w-32 text-primary/20" />
+                  </div>
+                </div>
+                {/* Floating founder badge */}
+                <div className="absolute -bottom-6 -right-6 md:bottom-10 md:-right-10 p-6 bg-card rounded-2xl shadow-xl border border-border max-w-xs animate-float-slow">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                      <Clock className="h-7 w-7" />
                     </div>
                     <div>
-                      <p className="text-sm text-white/70">{t.stats.gradeLevels}</p>
-                      <p className="font-bold text-white text-lg">
-                        {data.stats.gradeLevels} {t.stats.gradeLevels}
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">{t.home.foundedSince}</p>
+                      <p className="text-2xl font-display font-bold text-foreground">
+                        {schoolProfile?.foundedYear || "1990"}
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Hero visual - right side */}
-              <div className="hidden lg:block relative">
-                <div className="relative aspect-square max-w-lg mx-auto">
-                  {/* Main visual container */}
-                  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 shadow-2xl" />
-                  <div className="absolute inset-6 bg-white/5 rounded-2xl flex items-center justify-center">
-                    <GraduationCap className="h-40 w-40 text-white/30" />
-                  </div>
-
-                  {/* Floating cards */}
-                  <div className="absolute -left-6 top-1/4 p-4 bg-white/15 backdrop-blur-lg rounded-2xl border border-white/20 shadow-xl animate-float">
-                    <BookOpen className="h-8 w-8 text-white" />
-                  </div>
-                  <div className="absolute -right-6 top-1/2 p-4 bg-white/15 backdrop-blur-lg rounded-2xl border border-white/20 shadow-xl animate-float delay-500">
-                    <Target className="h-8 w-8 text-white" />
-                  </div>
-                  <div className="absolute left-1/4 -bottom-4 p-4 bg-yellow-400/20 backdrop-blur-lg rounded-2xl border border-yellow-400/30 shadow-xl animate-float delay-300">
-                    <Trophy className="h-8 w-8 text-yellow-300" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Wave divider - uses CSS variable for background */}
-          <div className="absolute bottom-0 left-0 right-0">
-            <svg
-              viewBox="0 0 1440 120"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-full"
-            >
-              <path
-                d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V120Z"
-                className="fill-background"
-              />
-            </svg>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="py-16 -mt-8 relative z-10">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <ScrollAnimation delay={0}>
-                <StatCard
-                  icon={Users}
-                  value={data.stats.staff}
-                  label={t.stats.teachers}
-                />
               </ScrollAnimation>
+            </div>
+
+            <div className="order-1 lg:order-2">
               <ScrollAnimation delay={0.1}>
-                <StatCard
-                  icon={GraduationCap}
-                  value={data.stats.alumni}
-                  label={t.stats.alumni}
-                  suffix="+"
-                />
-              </ScrollAnimation>
-              <ScrollAnimation delay={0.2}>
-                <StatCard
-                  icon={BookOpen}
-                  value={data.stats.gradeLevels}
-                  label={t.stats.gradeLevels}
-                />
-              </ScrollAnimation>
-              <ScrollAnimation delay={0.3}>
-                <StatCard
-                  icon={Calendar}
-                  value={data.stats.extracurriculars}
-                  label={t.stats.extracurricular}
-                />
-              </ScrollAnimation>
-            </div>
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section className="py-20 md:py-28">
-          <div className="container mx-auto px-4">
-            <ScrollAnimation>
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="order-2 lg:order-1">
-                <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
+                <div className="inline-flex items-center badge-academic mb-6">
                   {t.home.aboutUs}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight text-foreground">
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 leading-[1.15] text-foreground">
                   {t.home.buildingGeneration}{" "}
-                  
-                  <span className="text-primary">{t.home.excellentAndCharacter}</span>
+                  <span className="text-primary italic pr-2">{t.home.excellentAndCharacter}</span>
                 </h2>
-                <div className="space-y-4 text-muted-foreground">
-                  <p className="leading-relaxed text-base">
+                <div className="space-y-6 text-muted-foreground">
+                  <p className="leading-relaxed text-lg">
                     {schoolProfile?.vision ||
                       "Menjadi sekolah unggulan yang menghasilkan lulusan berkarakter, cerdas, dan berwawasan global."}
                   </p>
-                  <div className="p-6 rounded-2xl bg-muted border border-border">
+                  <div className="p-6 rounded-2xl bg-secondary/20 border border-secondary/30 relative overflow-hidden">
+                    <div className="absolute -right-4 -top-4 opacity-5">
+                      <Target className="w-32 h-32" />
+                    </div>
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <Target className="w-5 h-5 text-primary" />
                       {t.home.ourMission}
                     </h3>
-                    <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                    <p className="text-sm leading-relaxed text-muted-foreground relative z-10">
                       {schoolProfile?.mission ||
                         "Menyelenggarakan pendidikan berkualitas untuk mengembangkan potensi peserta didik."}
                     </p>
                   </div>
                 </div>
                 <div className="mt-8 flex flex-wrap items-center gap-4">
-                  {schoolProfile?.accreditation && (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium shadow-md">
-                      <Award className="h-4 w-4" />
-                      <span className="text-sm">
-                        {t.home.accreditation}{" "}
-                        <strong>{schoolProfile.accreditation}</strong>
-                      </span>
-                    </div>
-                  )}
-                  <Button variant="outline" asChild className="group">
+                  <Button size="lg" asChild className="group rounded-xl h-12 px-6">
                     <Link href="/profil">
                       {t.home.learnMore}
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   </Button>
                 </div>
-              </div>
-              <div className="order-1 lg:order-2 relative pb-8 lg:pb-0">
-                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-muted border border-border">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center">
-                    <GraduationCap className="h-32 w-32 text-muted-foreground/30" />
-                  </div>
-                </div>
-                {/* Floating badge - responsive positioning */}
-                <div className="mt-4 lg:mt-0 lg:absolute lg:-bottom-6 lg:-left-6 p-4 sm:p-6 bg-primary rounded-2xl shadow-2xl">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/20 flex items-center justify-center text-white flex-shrink-0">
-                      <Clock className="h-6 w-6 sm:h-7 sm:w-7" />
-                    </div>
-                    <div>
-                      <p className="text-xs sm:text-sm text-white/80">{t.home.foundedSince}</p>
-                      <p className="text-xl sm:text-2xl font-bold text-white">
-                        {schoolProfile?.foundedYear || "1990"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </ScrollAnimation>
-          </div>
-        </section>
-
-        {/* Grade Levels Section */}
-        {data.gradeLevels && data.gradeLevels.length > 0 && (
-          <section className="py-20 md:py-28 bg-muted/50">
-            <div className="container mx-auto px-4">
-              <ScrollAnimation>
-              <div className="text-center mb-16">
-                <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
-                  {t.home.ourClasses}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-                  {t.home.educationLevels}
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                  {t.home.educationLevelsDesc}
-                </p>
-              </div>
               </ScrollAnimation>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {data.gradeLevels.map((grade, index) => {
-                  return (
-                  <Card
-                    key={grade.id}
-                    className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border overflow-hidden"
-                  >
-                    <div className={`h-2 ${
-                      index % 4 === 0
-                        ? "bg-primary"
-                        : index % 4 === 1
-                          ? "bg-secondary"
-                          : index % 4 === 2
-                            ? "bg-primary/80"
-                            : "bg-secondary/80"
-                    }`} />
-                    <CardHeader className="pb-2">
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
-                          index % 4 === 0
-                            ? "bg-primary/10 text-primary"
-                            : index % 4 === 1
-                              ? "bg-secondary/10 text-secondary"
-                              : index % 4 === 2
-                                ? "bg-primary/5 text-primary/80"
-                                : "bg-secondary/5 text-secondary/80"
-                        }`}
-                      >
-                        <GraduationCap className="h-6 w-6" />
-                      </div>
-                      <CardTitle className="text-lg text-card-foreground">
-                        {grade.name}
-                      </CardTitle>
-                      {grade.ageRange && (
-                        <p className="text-sm text-muted-foreground">
-                          {`${t.home.age}: ${grade.ageRange}`}
-                        </p>
-                      )}
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {grade.description && (
-                        <CardDescription className="line-clamp-2">
-                          {grade.description}
-                        </CardDescription>
-                      )}
-                      {grade.quota && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Users className="h-4 w-4" />
-                          <span>{`${t.home.quota}: ${grade.quota} ${t.home.students}`}</span>
-                        </div>
-                      )}
-                      {grade.features && Array.isArray(grade.features) && (grade.features as string[]).length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {(grade.features as string[]).slice(0, 3).map((feature, i) => (
-                            <Badge key={i} variant="secondary" className="text-xs">
-                              {feature}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  );
-                })}
-              </div>
-              <div className="text-center mt-12">
-                <Button variant="outline" size="lg" asChild className="group">
-                  <Link href="/ppdb">
-                    {t.home.registerNow}
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </div>
             </div>
-          </section>
-        )}
+          </div>
+        </div>
+      </section>
 
-        {/* Programs Section */}
-        {data.programs.length > 0 && (
-          <section className="py-20 md:py-28 bg-muted/50">
-            <div className="container mx-auto px-4">
-              <ScrollAnimation>
-              <div className="text-center mb-16">
-                <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
+      {/* PROGRAMS SECTION */}
+      {data.programs.length > 0 && (
+        <section className="py-24 bg-muted/30 border-y border-border relative">
+          <div className="container mx-auto px-4">
+            <ScrollAnimation>
+              <div className="text-center mb-16 max-w-2xl mx-auto">
+                <div className="inline-flex items-center badge-academic mb-4">
                   {t.home.ourPrograms}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 text-foreground">
                   {t.home.featuredPrograms}
                 </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-muted-foreground text-lg">
                   {siteConfig.language === "en"
                     ? "Featured programs we offer to develop student potential"
                     : "Program-program unggulan yang kami tawarkan untuk mengembangkan potensi siswa"}
                 </p>
               </div>
-              </ScrollAnimation>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {data.programs.map((program, index) => (
-                  <Card
-                    key={program.id}
-                    className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border"
-                  >
-                    <CardHeader className="pb-4">
-                      <div
-                        className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${
-                          index % 4 === 0
-                            ? "bg-primary/10 text-primary"
-                            : index % 4 === 1
-                              ? "bg-secondary/10 text-secondary"
-                              : index % 4 === 2
-                                ? "bg-primary/5 text-primary/80"
-                                : "bg-secondary/5 text-secondary/80"
-                        }`}
-                      >
-                        <GraduationCap className="h-7 w-7" />
+            </ScrollAnimation>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {data.programs.map((program, index) => (
+                <ScrollAnimation key={program.id} delay={0.1 * index}>
+                  <Card className="card-glow h-full border-border bg-card overflow-hidden group">
+                    <div className="h-1.5 w-full bg-gradient-to-r from-primary/40 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CardHeader className="pt-6">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:bg-primary group-hover:text-primary-foreground">
+                        <BookOpen className="h-6 w-6" />
                       </div>
-                      <CardTitle className="text-lg text-card-foreground">
+                      <CardTitle className="font-display text-xl text-foreground">
                         {program.name}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <CardDescription className="line-clamp-3">
+                      <CardDescription className="line-clamp-3 text-base leading-relaxed">
                         {program.description}
                       </CardDescription>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-              <div className="text-center mt-12">
-                <Button variant="outline" size="lg" asChild className="group">
-                  <Link href="/akademik">
-                    {t.common.seeAll}
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-              </div>
+                </ScrollAnimation>
+              ))}
             </div>
-          </section>
-        )}
+            
+            <div className="text-center mt-12">
+              <Button variant="outline" size="lg" asChild className="group rounded-xl">
+                <Link href="/akademik">
+                  {t.common.seeAll}
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
-        {/* News Section */}
-        {data.recentPosts.length > 0 && (
-          <section className="py-20 md:py-28">
-            <div className="container mx-auto px-4">
-              <ScrollAnimation>
+      {/* LATEST NEWS */}
+      {data.recentPosts.length > 0 && (
+        <section className="py-24">
+          <div className="container mx-auto px-4">
+            <ScrollAnimation>
               <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
                 <div>
-                  <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/10 border-0">
+                  <div className="inline-flex items-center badge-academic mb-4">
                     {t.home.latestNews}
-                  </Badge>
-                  <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                  </div>
+                  <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground">
                     {t.home.newsInfo}
                   </h2>
                 </div>
-                <Button
-                  variant="outline"
-                  asChild
-                  className="hidden md:flex group"
-                >
+                <Button variant="ghost" asChild className="hidden md:flex group text-primary hover:text-primary/80">
                   <Link href="/berita">
                     {t.common.seeAll}
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
               </div>
-              </ScrollAnimation>
-              <div className="grid md:grid-cols-3 gap-6">
-                {data.recentPosts.map((post) => (
-                  <article key={post.id}>
-                  <Card
-                    className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card border-border h-full"
-                  >
-                    <div className="aspect-video relative bg-muted overflow-hidden">
+            </ScrollAnimation>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {data.recentPosts.map((post, index) => (
+                <ScrollAnimation key={post.id} delay={index * 0.1}>
+                  <article className="group h-full flex flex-col">
+                    <div className="aspect-[4/3] rounded-3xl relative bg-muted overflow-hidden mb-6">
                       {post.featuredImg ? (
                         <Image
                           src={post.featuredImg}
                           alt={post.title}
                           fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-muted">
-                          <Calendar className="h-12 w-12 text-muted-foreground/40" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-secondary/20">
+                          <NewspaperIcon className="h-12 w-12 text-primary/30" />
                         </div>
                       )}
                       <div className="absolute top-4 left-4">
                         <span
-                          className="text-xs px-3 py-1.5 rounded-full text-white font-medium shadow-lg bg-primary"
-                          style={
-                            post.category.color
-                              ? { backgroundColor: post.category.color }
-                              : undefined
-                          }
+                          className="text-xs px-3 py-1.5 rounded-full text-white font-semibold tracking-wide shadow-md"
+                          style={{ backgroundColor: post.category.color || "var(--primary)" }}
                         >
                           {post.category.name}
                         </span>
                       </div>
                     </div>
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                        <Clock className="h-3 w-3" />
-                        {post.publishedAt && (
-                          <time dateTime={post.publishedAt.toISOString()}>
-                            {formatDate(post.publishedAt)}
-                          </time>
-                        )}
-                      </div>
-                      <CardTitle className="text-lg line-clamp-2 text-card-foreground group-hover:text-primary transition-colors">
-                        <Link href={`/berita/${post.slug}`}>{post.title}</Link>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="line-clamp-2">
-                        {post.excerpt}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
+                    
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                      <Clock className="h-4 w-4 text-primary/70" />
+                      {post.publishedAt && (
+                        <time dateTime={post.publishedAt.toISOString()}>
+                          {formatDate(post.publishedAt)}
+                        </time>
+                      )}
+                    </div>
+                    
+                    <h3 className="font-display text-xl font-bold line-clamp-2 text-foreground group-hover:text-primary transition-colors mb-3">
+                      <Link href={`/berita/${post.slug}`}>
+                        {post.title}
+                      </Link>
+                    </h3>
+                    
+                    <p className="text-muted-foreground line-clamp-2 mb-4 flex-1">
+                      {post.excerpt}
+                    </p>
+                    
+                    <Link 
+                      href={`/berita/${post.slug}`}
+                      className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors mt-auto"
+                    >
+                      Baca selengkapnya
+                      <ArrowUpRight className="ml-1 h-4 w-4" />
+                    </Link>
                   </article>
-                ))}
-              </div>
-              <div className="text-center mt-8 md:hidden">
-                <Button variant="outline" asChild>
-                  <Link href="/berita">{t.home.allNews}</Link>
-                </Button>
-              </div>
+                </ScrollAnimation>
+              ))}
             </div>
-          </section>
-        )}
-
-        {/* Testimonials Section */}
-        {data.testimonials.length > 0 && (
-          <section className="py-20 md:py-28 bg-primary text-primary-foreground relative overflow-hidden">
-            {/* Background decorations */}
-            <div className="absolute inset-0">
-              <div className="absolute top-0 left-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+            
+            <div className="text-center mt-10 md:hidden">
+              <Button variant="outline" className="w-full rounded-xl" asChild>
+                <Link href="/berita">{t.home.allNews}</Link>
+              </Button>
             </div>
+          </div>
+        </section>
+      )}
 
-            <div className="container mx-auto px-4 relative z-10">
-              <ScrollAnimation>
-              <div className="text-center mb-16">
-                <Badge className="mb-4 bg-white/15 text-white hover:bg-white/20 border-white/20">
+      {/* TESTIMONIALS */}
+      {data.testimonials.length > 0 && (
+        <section className="py-24 bg-mesh-warm relative overflow-hidden isolate">
+          <div className="absolute inset-0 bg-noise mix-blend-overlay opacity-50" />
+          <div className="container mx-auto px-4 relative z-10">
+            <ScrollAnimation>
+              <div className="text-center mb-16 max-w-2xl mx-auto">
+                <div className="inline-flex items-center badge-academic bg-white/10 text-white border-white/20 mb-4">
                   {t.home.testimonials}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 text-white">
                   {t.home.whatTheySay}
                 </h2>
-                <p className="text-white/80 max-w-2xl mx-auto">
+                <p className="text-white/80 text-lg">
                   {t.home.testimonialsDesc}
                 </p>
               </div>
-              </ScrollAnimation>
-              <div className="grid md:grid-cols-3 gap-6">
-                {data.testimonials.map((testimonial) => (
-                  <Card
-                    key={testimonial.id}
-                    className="bg-white/10 border-white/20 backdrop-blur-sm hover:bg-white/15 transition-colors"
-                  >
-                    <CardContent className="pt-8">
-                      <div className="flex gap-1 mb-4">
+            </ScrollAnimation>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              {data.testimonials.map((testimonial, i) => (
+                <ScrollAnimation key={testimonial.id} delay={i * 0.1}>
+                  <Card className="glass border-white/20 hover:bg-white/10 transition-colors h-full flex flex-col">
+                    <CardContent className="pt-8 flex-1 flex flex-col">
+                      <div className="flex gap-1 mb-6">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
@@ -680,11 +516,11 @@ export default async function HomePage() {
                           />
                         ))}
                       </div>
-                      <p className="text-white/95 italic mb-6 leading-relaxed">
+                      <p className="text-white/95 italic mb-8 leading-relaxed flex-1">
                         &ldquo;{testimonial.content}&rdquo;
                       </p>
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
+                      <div className="flex items-center gap-4 mt-auto">
+                        <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg border border-white/30">
                           {testimonial.name[0]}
                         </div>
                         <div>
@@ -698,122 +534,85 @@ export default async function HomePage() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* CTA Section */}
-        <section className="py-20 md:py-28">
-          <div className="container mx-auto px-4">
-            <ScrollAnimation>
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-2xl">
-              {/* Decorative elements */}
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:2.5rem_2.5rem]" />
-              <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
-              <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
-
-              <CardContent className="relative z-10 py-16 text-center">
-                <Sparkles className="h-12 w-12 mx-auto mb-6 text-yellow-300" />
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-                  {t.home.joinUs}
-                </h2>
-                <p className="text-white/90 mb-10 max-w-2xl mx-auto text-lg">
-                  {t.home.joinUsDesc} {siteName}
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <Button
-                    size="lg"
-                    className="bg-white text-primary hover:bg-white/90 font-semibold shadow-xl"
-                    asChild
-                  >
-                    <Link href="/ppdb">
-                      {t.home.registerPpdb}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                  <Button
-                    size="lg"
-                    className="border-2 border-white bg-transparent text-white hover:bg-white/20 hover:text-white font-semibold"
-                    asChild
-                  >
-                    <Link href="/kontak">{t.home.contactUs}</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            </ScrollAnimation>
-          </div>
-        </section>
-
-        {/* Contact Info */}
-        <section className="py-16 bg-slate-900">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: MapPin,
-                  title: t.footer.address,
-                  value:
-                    schoolProfile?.address || "Jl. Pendidikan No. 1, Jakarta",
-                },
-                {
-                  icon: Phone,
-                  title: t.footer.phone,
-                  value: schoolProfile?.phone || "(021) 1234567",
-                },
-                {
-                  icon: Mail,
-                  title: t.footer.email,
-                  value: schoolProfile?.email || "info@sekolah.sch.id",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-start gap-4 p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1 text-white">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-300 text-sm">
-                      {item.value}
-                    </p>
-                  </div>
-                </div>
+                </ScrollAnimation>
               ))}
             </div>
           </div>
         </section>
-      </main>
+      )}
+
+      {/* CTA SECTION */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <ScrollAnimation>
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-card border border-border shadow-2xl p-8 md:p-16 text-center isolate">
+              <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent -z-10" />
+              
+              <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-8 rotate-12">
+                <Sparkles className="h-10 w-10 text-primary" />
+              </div>
+              
+              <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-foreground max-w-2xl mx-auto leading-tight">
+                {t.home.joinUs}
+              </h2>
+              <p className="text-muted-foreground mb-10 max-w-xl mx-auto text-lg leading-relaxed">
+                {t.home.joinUsDesc} <span className="font-semibold text-foreground">{siteName}</span>
+              </p>
+              
+              <div className="flex flex-wrap justify-center gap-4">
+                <Button size="lg" className="h-14 px-8 text-base rounded-xl font-semibold shadow-lg" asChild>
+                  <Link href="/ppdb">
+                    {t.home.registerPpdb}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="h-14 px-8 text-base rounded-xl font-semibold" asChild>
+                  <Link href="/kontak">{t.home.contactUs}</Link>
+                </Button>
+              </div>
+            </div>
+          </ScrollAnimation>
+        </div>
+      </section>
+    </main>
   );
 }
 
-function StatCard({
-  icon: Icon,
-  value,
-  label,
-  suffix = "",
-}: {
-  icon: React.ElementType;
-  value: number;
-  label: string;
-  suffix?: string;
-}) {
+function StatItem({ icon: Icon, value, label, suffix = "" }: any) {
   return (
-    <div className="group p-6 bg-card rounded-2xl shadow-lg border border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-        <Icon className="h-6 w-6 text-primary" />
+    <div className="flex items-center gap-4 p-2">
+      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <Icon className="h-5 w-5 text-primary" />
       </div>
-      <div className="text-3xl md:text-4xl font-bold mb-1 text-card-foreground">
-        {value}
-        {suffix}
+      <div>
+        <div className="font-display text-2xl md:text-3xl font-bold text-foreground leading-none mb-1">
+          {value}{suffix}
+        </div>
+        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</div>
       </div>
-      <div className="text-sm text-muted-foreground">{label}</div>
     </div>
+  );
+}
+
+// Helper icon component since Newspaper is imported as NewspaperIcon internally
+function NewspaperIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+      <path d="M18 14h-8" />
+      <path d="M15 18h-5" />
+      <path d="M10 6h8v4h-8V6Z" />
+    </svg>
   );
 }

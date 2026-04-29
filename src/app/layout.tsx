@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
+import { cache } from "react";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { ThemeStyles } from "@/components/theme-styles";
@@ -8,25 +9,32 @@ import { SkipLink } from "@/components/ui/skip-link";
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { getSiteConfig } from "@/lib/site-config";
 import { validateGoogleAnalyticsId } from "@/lib/security";
-import { auth } from "@/lib/auth";
 
-export const dynamic = "force-dynamic";
+// Cache getSiteConfig per-request to avoid double DB call
+// (generateMetadata + RootLayout both need it, cache deduplicates)
+const getCachedConfig = cache(getSiteConfig);
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   subsets: ["latin"],
   display: "swap",
 });
 
 // Dynamic metadata based on site config
 export async function generateMetadata(): Promise<Metadata> {
-  const config = await getSiteConfig();
+  const config = await getCachedConfig();
 
   return {
     title: {
@@ -34,7 +42,9 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${config.siteName}`,
     },
     description: config.siteDescription || config.siteTagline,
-    keywords: config.siteKeywords ? config.siteKeywords.split(",").map(k => k.trim()) : ["sekolah", "profil sekolah", "CMS", "website sekolah"],
+    keywords: config.siteKeywords
+      ? config.siteKeywords.split(",").map((k) => k.trim())
+      : ["sekolah", "profil sekolah", "CMS", "website sekolah"],
     openGraph: {
       title: config.siteName,
       description: config.siteDescription || config.siteTagline,
@@ -49,17 +59,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const revalidate = 0;
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [config, session] = await Promise.all([
-    getSiteConfig(),
-    auth()
-  ]);
+  // Single DB call — React.cache() deduplicates across generateMetadata + here
+  const config = await getCachedConfig();
 
   // Prepare site settings for client-side context
   const siteSettings = {
@@ -74,9 +80,11 @@ export default async function RootLayout({
   };
 
   // Validate Google Analytics ID before rendering
-  const validGaId = config.googleAnalyticsId && validateGoogleAnalyticsId(config.googleAnalyticsId)
-    ? config.googleAnalyticsId
-    : null;
+  const validGaId =
+    config.googleAnalyticsId &&
+    validateGoogleAnalyticsId(config.googleAnalyticsId)
+      ? config.googleAnalyticsId
+      : null;
 
   return (
     <html lang={config.language || "id"} suppressHydrationWarning>
@@ -84,10 +92,10 @@ export default async function RootLayout({
         <ThemeStyles />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fraunces.variable} ${plusJakartaSans.variable} ${geistMono.variable} antialiased`}
       >
         <SkipLink />
-        <Providers siteSettings={siteSettings} session={session}>
+        <Providers siteSettings={siteSettings}>
           {children}
           <ScrollToTop />
         </Providers>

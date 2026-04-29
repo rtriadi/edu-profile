@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Disable prerendering to avoid DB connection issues during build
   // All pages will be server-rendered on demand
-  // Output standalone for better Vercel deployment
-  output: "standalone",
+  // serverExternalPackages prevents bundling issues with Prisma/bcryptjs in Vercel serverless
+  serverExternalPackages: ["@prisma/client", "bcryptjs"],
   
   // Image optimization
   images: {
