@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
+import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -96,8 +97,27 @@ export function MediaLibrary({
     setIsUploading(true);
 
     for (const file of acceptedFiles) {
+      let fileToUpload = file;
+
+      // Compress if it's an image and larger than 1MB
+      if (file.type.startsWith("image/") && file.size > 1024 * 1024) {
+        try {
+          toast.info(`Mengkompresi ${file.name}...`);
+          const options = {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1920,
+            useWebWorker: true,
+          };
+          const compressedBlob = await imageCompression(file, options);
+          fileToUpload = new File([compressedBlob], file.name, { type: compressedBlob.type });
+        } catch (error) {
+          console.error("Compression error:", error);
+          toast.error(`Gagal mengkompresi ${file.name}, menggunakan file asli...`);
+        }
+      }
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", fileToUpload);
       formData.append("folder", "general");
 
       const result = await uploadMedia(formData);

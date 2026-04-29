@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Server Actions Configuration
+  serverActions: {
+    bodySizeLimit: "10mb",
+  },
+
   // Experimental features for performance
   experimental: {
     optimizeCss: true,
