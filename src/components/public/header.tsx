@@ -188,8 +188,8 @@ export function PublicHeader({
                   <GraduationCap className="h-5 w-5" />
                 </div>
               )}
-              <div className="hidden sm:block">
-                <span className="font-display font-bold text-lg text-foreground leading-tight tracking-tight">
+              <div className="flex-1 min-w-0">
+                <span className="font-display font-bold text-base sm:text-lg text-foreground leading-tight tracking-tight truncate block max-w-[140px] sm:max-w-none">
                   {siteName}
                 </span>
               </div>
@@ -299,23 +299,7 @@ export function PublicHeader({
           )}
         >
           <div className="border-t border-border/50 bg-background/98 backdrop-blur-xl">
-            {/* Logo row in mobile menu */}
-            <div className="flex items-center gap-3 px-4 py-4 border-b border-border/40">
-              {logo ? (
-                <Image
-                  src={logo}
-                  alt={siteName}
-                  width={32}
-                  height={32}
-                  className="object-contain h-8 w-auto"
-                />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <GraduationCap className="h-4 w-4" />
-                </div>
-              )}
-              <span className="font-display font-bold text-base">{siteName}</span>
-            </div>
+            {/* Removed redundant logo row from mobile menu to fix double logo issue */}
 
             {/* Navigation links */}
             <nav className="flex flex-col px-3 py-3 gap-0.5">

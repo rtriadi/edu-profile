@@ -182,12 +182,12 @@
 
 /* Warm academic gradient for hero sections (light mode) */
 .bg-mesh-warm {
-  background-color: oklch(0.35 0.15 250);
+  background-color: var(--theme-primary);
   background-image:
-    radial-gradient(at 20% 50%, oklch(0.45 0.18 260) 0%, transparent 50%),
-    radial-gradient(at 80% 20%, oklch(0.40 0.12 220) 0%, transparent 40%),
-    radial-gradient(at 60% 80%, oklch(0.30 0.12 270) 0%, transparent 45%),
-    radial-gradient(at 0% 0%, oklch(0.50 0.15 240) 0%, transparent 35%);
+    radial-gradient(at 20% 50%, var(--theme-primary-light) 0%, transparent 50%),
+    radial-gradient(at 80% 20%, var(--theme-primary-dark) 0%, transparent 40%),
+    radial-gradient(at 60% 80%, var(--theme-secondary-dark) 0%, transparent 45%),
+    radial-gradient(at 0% 0%, var(--theme-accent-dark) 0%, transparent 35%);
 }
 
 /* Subtle texture overlay */
@@ -209,9 +209,9 @@
 .card-glow:hover {
   transform: translateY(-3px);
   box-shadow:
-    0 0 0 1px oklch(0.35 0.15 250 / 15%),
-    0 16px 40px oklch(0.35 0.15 250 / 8%),
-    0 4px 12px oklch(0.35 0.15 250 / 6%);
+    0 0 0 1px color-mix(in srgb, var(--theme-primary) 15%, transparent),
+    0 16px 40px color-mix(in srgb, var(--theme-primary) 8%, transparent),
+    0 4px 12px color-mix(in srgb, var(--theme-primary) 6%, transparent);
 }
 
 .dark .card-glow:hover {
@@ -238,10 +238,10 @@
 
 /* Glassmorphism header */
 .glass-header {
-  background: oklch(0.99 0.005 85 / 85%);
+  background: color-mix(in srgb, var(--background) 85%, transparent);
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border-bottom: 1px solid oklch(0.90 0.02 85 / 60%);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
@@ -254,14 +254,14 @@
    GRADIENT TEXT
    ========================================== */
 .text-gradient {
-  background: linear-gradient(135deg, oklch(0.35 0.15 250), oklch(0.55 0.18 270));
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, oklch(0.65 0.14 85), oklch(0.75 0.10 70));
+  background: linear-gradient(135deg, var(--theme-secondary), var(--theme-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -580,9 +580,9 @@ a, button {
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  background: oklch(0.35 0.15 250 / 10%);
-  color: oklch(0.35 0.15 250);
-  border: 1px solid oklch(0.35 0.15 250 / 20%);
+  background: color-mix(in srgb, var(--theme-primary) 10%, transparent);
+  color: var(--theme-primary);
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 20%, transparent);
 }
 
 .dark .badge-academic {

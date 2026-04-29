@@ -65,46 +65,41 @@ export async function PublicFooter() {
       key: "facebook",
       icon: Facebook,
       label: "Facebook",
-      hoverColor: "hover:bg-blue-600",
     },
     {
       key: "instagram",
       icon: Instagram,
       label: "Instagram",
-      hoverColor: "hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500",
     },
     {
       key: "youtube",
       icon: Youtube,
       label: "YouTube",
-      hoverColor: "hover:bg-red-600",
     },
     {
       key: "twitter",
       icon: Twitter,
       label: "Twitter / X",
-      hoverColor: "hover:bg-sky-500",
     },
   ];
 
   return (
-    <footer className="relative overflow-hidden" style={{ backgroundColor: "oklch(0.13 0.025 250)" }}>
+    <footer className="relative overflow-hidden" style={{ backgroundColor: "var(--theme-primary-dark)" }}>
       {/* Decorative gradient blobs */}
       <div
-        className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: "oklch(0.35 0.15 250 / 12%)", transform: "translate(-30%, -30%)" }}
+        className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none opacity-40"
+        style={{ backgroundColor: "var(--theme-primary)", transform: "translate(-30%, -30%)" }}
       />
       <div
-        className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: "oklch(0.55 0.10 85 / 8%)", transform: "translate(20%, 20%)" }}
+        className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full blur-3xl pointer-events-none opacity-30"
+        style={{ backgroundColor: "var(--theme-accent)", transform: "translate(20%, 20%)" }}
       />
 
       {/* Top gradient border */}
       <div
-        className="absolute top-0 left-0 right-0 h-px"
+        className="absolute top-0 left-0 right-0 h-px opacity-50"
         style={{
-          background:
-            "linear-gradient(to right, transparent, oklch(0.68 0.18 250 / 40%), oklch(0.72 0.12 85 / 30%), transparent)",
+          background: "linear-gradient(to right, transparent, var(--theme-primary-light), var(--theme-accent), transparent)",
         }}
       />
 
@@ -128,22 +123,20 @@ export async function PublicFooter() {
               ) : (
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg"
-                  style={{ backgroundColor: "oklch(0.35 0.15 250)" }}
+                  style={{ backgroundColor: "var(--theme-primary)" }}
                 >
                   <GraduationCap className="h-6 w-6" />
                 </div>
               )}
               <div>
                 <span
-                  className="font-display font-bold text-xl block leading-tight"
-                  style={{ color: "oklch(0.96 0.01 85)" }}
+                  className="font-display font-bold text-xl block leading-tight text-white"
                 >
                   {siteName}
                 </span>
                 {schoolProfile?.accreditation && (
                   <span
-                    className="text-xs font-medium"
-                    style={{ color: "oklch(0.72 0.12 85)" }}
+                    className="text-xs font-medium text-white/80"
                   >
                     {isEn ? "Accreditation" : "Akreditasi"} {schoolProfile.accreditation}
                   </span>
@@ -153,8 +146,7 @@ export async function PublicFooter() {
 
             {/* Tagline */}
             <p
-              className="text-sm leading-relaxed mb-6"
-              style={{ color: "oklch(0.65 0.04 250)" }}
+              className="text-sm leading-relaxed mb-6 text-white/70"
             >
               {schoolProfile?.tagline ||
                 siteConfig.siteTagline ||
@@ -163,7 +155,7 @@ export async function PublicFooter() {
 
             {/* Social Media Icons */}
             <div className="flex items-center gap-2">
-              {socialLinks.map(({ key, icon: Icon, label, hoverColor }) => {
+              {socialLinks.map(({ key, icon: Icon, label }) => {
                 const url = socialMedia?.[key];
                 if (!url) return null;
                 return (
@@ -173,12 +165,7 @@ export async function PublicFooter() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:text-white ${hoverColor}`}
-                    style={{
-                      backgroundColor: "oklch(1 0 0 / 6%)",
-                      color: "oklch(0.65 0.04 250)",
-                      border: "1px solid oklch(1 0 0 / 8%)",
-                    }}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 text-white/70 hover:text-white border border-white/10 bg-white/5"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -190,8 +177,7 @@ export async function PublicFooter() {
           {/* Column 2: Quick Links */}
           <div>
             <h3
-              className="font-semibold text-sm uppercase tracking-widest mb-5"
-              style={{ color: "oklch(0.75 0.08 250)" }}
+              className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90"
             >
               {translations.footer.quickLinks}
             </h3>
@@ -200,12 +186,11 @@ export async function PublicFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="group flex items-center gap-2 text-sm py-1 transition-colors duration-150"
-                    style={{ color: "oklch(0.60 0.04 250)" }}
+                    className="group flex items-center gap-2 text-sm py-1 transition-colors duration-150 text-white/70"
                   >
                     <span
                       className="w-1 h-1 rounded-full flex-shrink-0 transition-all group-hover:w-2"
-                      style={{ backgroundColor: "oklch(0.68 0.18 250 / 60%)" }}
+                      style={{ backgroundColor: "var(--theme-primary-light)" }}
                     />
                     <span
                       className="group-hover:text-white transition-colors"
@@ -214,7 +199,6 @@ export async function PublicFooter() {
                     </span>
                     <ArrowUpRight
                       className="h-3 w-3 opacity-0 -translate-y-0.5 group-hover:opacity-60 group-hover:translate-y-0 transition-all"
-                      style={{ color: "oklch(0.68 0.18 250)" }}
                     />
                   </Link>
                 </li>
@@ -225,8 +209,7 @@ export async function PublicFooter() {
           {/* Column 3: Contact */}
           <div>
             <h3
-              className="font-semibold text-sm uppercase tracking-widest mb-5"
-              style={{ color: "oklch(0.75 0.08 250)" }}
+              className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90"
             >
               {translations.footer.contact}
             </h3>
@@ -234,17 +217,12 @@ export async function PublicFooter() {
               {schoolProfile?.address && (
                 <li className="flex items-start gap-3">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ backgroundColor: "oklch(0.35 0.15 250 / 20%)" }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 bg-white/10"
                   >
-                    <MapPin
-                      className="h-3.5 w-3.5"
-                      style={{ color: "oklch(0.68 0.18 250)" }}
-                    />
+                    <MapPin className="h-3.5 w-3.5 text-white/90" />
                   </div>
                   <span
-                    className="text-sm leading-relaxed"
-                    style={{ color: "oklch(0.60 0.04 250)" }}
+                    className="text-sm leading-relaxed text-white/70"
                   >
                     {schoolProfile.address}
                   </span>
@@ -253,18 +231,13 @@ export async function PublicFooter() {
               {schoolProfile?.phone && (
                 <li className="flex items-center gap-3">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: "oklch(0.35 0.15 250 / 20%)" }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/10"
                   >
-                    <Phone
-                      className="h-3.5 w-3.5"
-                      style={{ color: "oklch(0.68 0.18 250)" }}
-                    />
+                    <Phone className="h-3.5 w-3.5 text-white/90" />
                   </div>
                   <a
                     href={`tel:${schoolProfile.phone}`}
-                    className="text-sm hover:text-white transition-colors"
-                    style={{ color: "oklch(0.60 0.04 250)" }}
+                    className="text-sm hover:text-white transition-colors text-white/70"
                   >
                     {schoolProfile.phone}
                   </a>
@@ -273,18 +246,13 @@ export async function PublicFooter() {
               {schoolProfile?.email && (
                 <li className="flex items-center gap-3">
                   <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: "oklch(0.35 0.15 250 / 20%)" }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-white/10"
                   >
-                    <Mail
-                      className="h-3.5 w-3.5"
-                      style={{ color: "oklch(0.68 0.18 250)" }}
-                    />
+                    <Mail className="h-3.5 w-3.5 text-white/90" />
                   </div>
                   <a
                     href={`mailto:${schoolProfile.email}`}
-                    className="text-sm hover:text-white transition-colors"
-                    style={{ color: "oklch(0.60 0.04 250)" }}
+                    className="text-sm hover:text-white transition-colors text-white/70"
                   >
                     {schoolProfile.email}
                   </a>
@@ -296,52 +264,35 @@ export async function PublicFooter() {
           {/* Column 4: Info + CTA */}
           <div>
             <h3
-              className="font-semibold text-sm uppercase tracking-widest mb-5"
-              style={{ color: "oklch(0.75 0.08 250)" }}
+              className="font-semibold text-sm uppercase tracking-widest mb-5 text-white/90"
             >
               {translations.footer.information}
             </h3>
             <div className="space-y-3">
               {schoolProfile?.npsn && (
                 <div
-                  className="p-4 rounded-xl"
-                  style={{
-                    backgroundColor: "oklch(1 0 0 / 4%)",
-                    border: "1px solid oklch(1 0 0 / 8%)",
-                  }}
+                  className="p-4 rounded-xl border border-white/10 bg-white/5"
                 >
                   <span
-                    className="text-xs uppercase tracking-widest font-medium"
-                    style={{ color: "oklch(0.50 0.04 250)" }}
+                    className="text-xs uppercase tracking-widest font-medium text-white/60"
                   >
                     NPSN
                   </span>
-                  <p
-                    className="font-semibold mt-0.5"
-                    style={{ color: "oklch(0.90 0.02 85)" }}
-                  >
+                  <p className="font-semibold mt-0.5 text-white/90">
                     {schoolProfile.npsn}
                   </p>
                 </div>
               )}
               {schoolProfile?.foundedYear && (
                 <div
-                  className="p-4 rounded-xl"
-                  style={{
-                    backgroundColor: "oklch(1 0 0 / 4%)",
-                    border: "1px solid oklch(1 0 0 / 8%)",
-                  }}
+                  className="p-4 rounded-xl border border-white/10 bg-white/5"
                 >
                   <span
-                    className="text-xs uppercase tracking-widest font-medium"
-                    style={{ color: "oklch(0.50 0.04 250)" }}
+                    className="text-xs uppercase tracking-widest font-medium text-white/60"
                   >
                     {translations.footer.foundedSince}
                   </span>
-                  <p
-                    className="font-semibold mt-0.5"
-                    style={{ color: "oklch(0.90 0.02 85)" }}
-                  >
+                  <p className="font-semibold mt-0.5 text-white/90">
                     {schoolProfile.foundedYear}
                   </p>
                 </div>
@@ -350,11 +301,10 @@ export async function PublicFooter() {
               {/* PPDB CTA */}
               <Link
                 href="/ppdb"
-                className="flex items-center justify-center gap-2 p-4 rounded-xl font-semibold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5"
+                className="flex items-center justify-center gap-2 p-4 rounded-xl font-semibold text-sm transition-all hover:opacity-90 hover:-translate-y-0.5 text-white shadow-lg"
                 style={{
-                  backgroundColor: "oklch(0.35 0.15 250)",
-                  color: "oklch(0.98 0 0)",
-                  boxShadow: "0 4px 20px oklch(0.35 0.15 250 / 30%)",
+                  backgroundColor: "var(--theme-primary)",
+                  boxShadow: "0 4px 20px color-mix(in srgb, var(--theme-primary) 30%, transparent)",
                 }}
               >
                 {translations.home.registerPpdb}
@@ -366,25 +316,21 @@ export async function PublicFooter() {
 
         {/* Bottom Bar */}
         <div
-          className="mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
-          style={{ borderTop: "1px solid oklch(1 0 0 / 8%)" }}
+          className="mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 text-white/60"
         >
           <p
             className="text-sm"
-            style={{ color: "oklch(0.45 0.03 250)" }}
             suppressHydrationWarning
           >
             © {currentYear} {siteName}. {translations.footer.allRightsReserved}.
           </p>
           <p
             className="text-sm flex items-center gap-1"
-            style={{ color: "oklch(0.45 0.03 250)" }}
           >
             {translations.footer.poweredBy}{" "}
             <a
               href="#"
-              className="transition-colors hover:underline font-medium"
-              style={{ color: "oklch(0.68 0.18 250)" }}
+              className="transition-colors hover:text-white font-medium hover:underline text-white/80"
             >
               EduProfile CMS
             </a>
